@@ -13,7 +13,7 @@ export default function telaInical(){
 const styles=StyleSheet.create({
 
     main:{
-        backgroundColor:'green',
+        backgroundColor:'',
         width:'100%',
         height:'100%'
 
