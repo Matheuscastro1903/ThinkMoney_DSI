@@ -15,7 +15,6 @@ export async function criarLembrete(userId: string, dados: Lembrete): Promise<vo
     criadoEm: Timestamp.now()
   })
 }
-
 // Buscar lembretes ordenados pelo vencimento mais próximo
 export async function buscarLembretes(userId: string): Promise<(Lembrete & { id: string })[]> {
   const q = query(

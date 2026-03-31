@@ -16,7 +16,6 @@ export async function criarGasto(userId: string, dados: Gasto): Promise<void> {
     criadoEm: Timestamp.now()
   })
 }
-
 // Buscar todos os gastos
 export async function buscarGastos(userId: string): Promise<(Gasto & { id: string })[]> {
   const q = query(

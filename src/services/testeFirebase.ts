@@ -3,7 +3,6 @@ import { criarGasto } from './gastosService'
 import { criarMeta } from './metasService'
 import { criarLembrete } from './lembretesService'
 
-
 export async function testarFirebase() {
   try {
     await cadastrarUsuario({
@@ -11,6 +10,7 @@ export async function testarFirebase() {
       email: "teste123@gmail.com",
       senha: "123456",
       dataNascimento: "2000-01-15",
+      username: "joaodelas"
     });
     console.log("✅ Usuário cadastrado!");
 

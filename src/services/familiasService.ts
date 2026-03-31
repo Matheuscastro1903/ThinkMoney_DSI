@@ -9,7 +9,7 @@ import { getDoc, deleteDoc } from 'firebase/firestore'
 import { loginUsuario } from "./authService"
 // ─────────────────────────────────────────
 // TIPOS
-// ─────────────────────────────────────────
+// ─────────────────────────────────────
 
 interface Familia {
   codigo: string

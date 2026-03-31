@@ -26,7 +26,6 @@ export async function buscarMetas(userId: string): Promise<(Meta & { id: string 
   const snapshot = await getDocs(q)
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Meta }))
 }
-
 // Adicionar valor poupado à meta
 export async function contribuirMeta(userId: string, metaId: string, valor: number): Promise<void> {
   await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), {
