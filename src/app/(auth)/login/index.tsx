@@ -24,7 +24,7 @@ export default function Login() {
 
             {/* ScrollView por dentro — permite rolar caso necessário */}
             <ScrollView contentContainerStyle={styles.fundo}>
-                <ButtonComeBack label='Voltar' url='/(auth)/login' color='#1D1252'></ButtonComeBack>
+                <ButtonComeBack label='Voltar' url='/' color='#1D1252'></ButtonComeBack>
                 <Image
                     source={require('../../../assets/images/logothinkmoney.png')}
                     style={styles.logo}
