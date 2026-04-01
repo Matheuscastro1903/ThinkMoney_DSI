@@ -16,7 +16,10 @@ interface Familia {
   adminId: string
   numeroMembros: number
   membros: string[]
-  criadoEm: Timestamp
+  criadoEm: Timestamp,
+  nome: string,
+  renda_total: string,
+
 }
 
 interface GastoFamiliar {
@@ -66,7 +69,7 @@ async function criarFamilia(): Promise<string> {
   const ref = await addDoc(collection(db, 'familias'), {
     codigo,
     adminId: user.uid,
-    numeroMembros: 1,            // começa com 1 (só o criador)
+    numeroMembros: 1,            // vai ler o array de membros e fazer um len()
     membros: [user.uid],         // só o criador no array
     criadoEm: Timestamp.now()
   } as Familia)

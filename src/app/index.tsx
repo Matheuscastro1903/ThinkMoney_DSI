@@ -33,8 +33,8 @@ export default function telaInical(){
             </Link>
 
 
-            {/* botao para teste de noticias  */}
-            <Link href={'/noticias'} asChild>
+            {/* botao para teste de config  */}
+            <Link href={'/configurar'} asChild>
                             <TouchableOpacity style={styles.button}>
                                 <Ionicons name="arrow-forward" size={32} color="white" />
                             </TouchableOpacity>
