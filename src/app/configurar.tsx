@@ -3,14 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-/*
-<Ionicons name="at-circle" size={24} color="white" />
-<Ionicons name="calendar-outline" size={24} color="white" />
-<Ionicons name="briefcase-outline" size={24} color="white" />
-<Ionicons name="location-outline" size={24} color="white" />
-<Ionicons name="call-outline" size={24} color="white" />
-<Ionicons name="shield-checkmark-outline" size={24} color="white" />
-*/
+
 
 export default function App() {
     return (
