@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
 
-
 export default function App() {
     return (
         
