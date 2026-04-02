@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
 
 interface campoInputSenhaProps {
     label: string,
