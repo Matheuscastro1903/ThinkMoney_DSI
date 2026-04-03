@@ -5,15 +5,29 @@ import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: Sa
 import InputLogin from '../../../components/auth/inputlogin';
 import InputSenha from '@/src/components/auth/inputsenha';
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
+import EscolhaAvatar from '@/src/components/auth/escolhaavantar';
+import InputDate from '@/src/components/auth/inputdata';
 
 import { Link } from "expo-router";
 
 export default function Cadastro() {
 
+    
+
+    const [avatarEscolhido, setAvatarEscolhido] = useState('../../assets/images/avatarcapivara.png');
+
+    const [inputNome,setInputNome]=useState('')
+    const [inputUserName,setUserName]=useState('')
+    const [inputEmail,setInputEmail]=useState('')
+    const [inputSenha,setInputSenha]=useState('')
+    const [inputSenhaConfirmada,setInputSenhaConfirmada]=useState('')
+    const [inputData, setInputData] = useState<Date | null>(null);
+
     const [termosAceitos, setTermosAceitos] = useState(false);
+    
 
     function debugando() {
-        console.log(1)
+        console.log(inputNome,inputEmail,inputUserName,inputSenha,inputSenhaConfirmada,inputData,avatarEscolhido)
     }
 
     return (
@@ -30,36 +44,60 @@ export default function Cadastro() {
 
                 <View style={styles.main}>
 
-                    <View>
+                    <View >
+                        <Text style={styles.mainFrase}>Crie sua conta</Text>
+                        <Text style={styles.subFrase}>Inicie sua jornada com o ThinkMoney</Text>
+                    </View>
+
+                    <EscolhaAvatar onChange={(avatar) => setAvatarEscolhido(avatar)} />
+
+                    <View style={styles.containercadastro}>
                         <InputLogin
-                            label='Nome completo'
-                            placeholder='Seu nome'
-                            atualizando={debugando}
+                            label='Digite seu Nome completo:'
+                            placeholder='Ex: Matheus de Castro'
+                            atualizando={(valor) => setInputNome(valor)}
                             icon={require('../../../assets/icons/iconeusuario.svg')}
+                            value={inputNome}
                         />
 
                         <InputLogin
-                            label='Email'
-                            placeholder='email@gmail.com'
-                            atualizando={debugando}
+                            label='Digite seu Username:'
+                            placeholder='Ex: Castro_07'
+                            atualizando={(valor) => setUserName(valor)}
                             icon={require('../../../assets/icons/iconeusuario.svg')}
+                            value={inputUserName}
+                        />
+
+                        <InputLogin
+                            label='Digite seu Email:'
+                            placeholder='Ex: matheuzinho1903@gmail.com'
+                            atualizando={(valor) => setInputEmail(valor)}
+                            icon={require('../../../assets/icons/iconeusuario.svg')}
+                            value={inputEmail}
                         />
 
                         <InputSenha
-                            label='Senha'
-                            placeholder='Digite sua senha'
-                            atualizando={debugando}
+                            label='Digite sua Senha'
+                            placeholder='Ex:123456'
+                            atualizando={(valor) => setInputSenha(valor)}
                             icon={require('../../../assets/icons/iconecadeado.svg')}
                             iconVisibilidade={require('../../../assets/icons/iconeolho.svg')}
+                            value={inputSenha}
                         />
 
                         <InputSenha
-                            label='Confirmar senha'
-                            placeholder='Confirme sua senha'
-                            atualizando={debugando}
-                            icon={require('../../../assets/icons/iconecadeado.svg')}
+                            label='Confirme sua Senha:'
+                            placeholder='Ex:123456'
+                            atualizando={(valor) => setInputSenhaConfirmada(valor)}
+                            icon={require('../../../assets/icons/iconeescudo.svg')}
                             iconVisibilidade={require('../../../assets/icons/iconeolho.svg')}
+                            value={inputSenhaConfirmada}
                         />
+                        <InputDate label='Data de nascimento:' 
+                        icon={require('../../../assets/icons/iconedata.svg')}
+                        onChange={(dataPronta) => setInputData(dataPronta)}
+                        ></InputDate>
+
                     </View>
 
                     <TouchableOpacity
@@ -81,12 +119,15 @@ export default function Cadastro() {
                 </View>
 
                 <View style={styles.containerlinklogin}>
+                    
                     <Text style={{ color: '#867DC1' }}>Já tem uma conta?</Text>
                     <Link href={'/(auth)/login'} asChild>
                         <TouchableOpacity>
                             <Text style={styles.textlinklogin}>Faça login</Text>
                         </TouchableOpacity>
                     </Link>
+
+
                 </View>
 
             </ScrollView>
@@ -107,7 +148,7 @@ const styles = StyleSheet.create({
     fundo: {
         flexGrow: 1,              // flexGrow:1 necessário para ScrollView expandir corretamente
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         backgroundColor: '#1D1252',
         width: '100%',
         gap: 30,
@@ -127,6 +168,25 @@ const styles = StyleSheet.create({
         padding: 20,
         gap: 30,
         width: '90%',
+        alignItems:'center',
+        justifyContent:'center'
+    },
+
+    mainFrase:{
+        color:'#1D1252',
+        fontSize:24,
+        fontWeight:'bold'
+    },
+
+    subFrase:{
+        color:'#575F67',
+        fontSize:16
+    },
+
+    
+    containercadastro:{
+        alignContent:'center',
+        justifyContent:'center'
     },
 
     checkboxContainer: {
@@ -176,3 +236,4 @@ const styles = StyleSheet.create({
     },
 
 });
+
