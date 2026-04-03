@@ -33,7 +33,16 @@ export default function telaInical(){
                           </TouchableOpacity>
             </Link>
 
-            
+
+            {/* botao para teste de noticias  */}
+            <Link href={'/noticias'} asChild>
+                            <TouchableOpacity style={styles.button}>
+                                <Ionicons name="arrow-forward" size={32} color="white" />
+                            </TouchableOpacity>
+
+            </Link>
+
+            <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={debugando} icon={require('../assets/icons/iconeusuario.svg')}></InputLogin>
 
         </View>
     )
