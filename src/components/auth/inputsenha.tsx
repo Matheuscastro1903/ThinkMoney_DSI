@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
 
 interface campoInputSenhaProps {
     label: string,
@@ -8,9 +8,10 @@ interface campoInputSenhaProps {
     icon: any,
     // MUDANÇA 1: Nova prop para receber o ícone do botão de mostrar/esconder senha
     iconVisibilidade: any,
+    value:string
 }
 
-export default function inputSenha({ label, placeholder, atualizando, icon, iconVisibilidade }: campoInputSenhaProps) {
+export default function inputSenha({ label, placeholder, atualizando, icon, iconVisibilidade,value}: campoInputSenhaProps) {
 
     // MUDANÇA 2: Estado local para controlar visibilidade da senha (era controlado pelo pai antes)
     const [protegido, setProtegido] = useState(true);
@@ -39,6 +40,7 @@ export default function inputSenha({ label, placeholder, atualizando, icon, icon
                     // MUDANÇA 6: secureTextEntry controla se a senha fica visível ou oculta
                     // "protegido = true" → esconde | "protegido = false" → mostra
                     secureTextEntry={protegido}
+                    value={value}
                 />
 
                 

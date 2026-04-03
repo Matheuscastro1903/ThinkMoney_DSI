@@ -7,10 +7,11 @@ interface campoInputProps{
     placeholder:string,
     atualizando: (texto: string) => void; // Esta é a função que o pai vai enviar
     icon:any
+    value: string; // ADICIONADO: para receber o valor do estado do pai
 
 }
 
-export default function inputLogin({label,placeholder,atualizando,icon}:campoInputProps){
+export default function inputLogin({label,placeholder,atualizando,icon,value}:campoInputProps){
     
 
     
@@ -30,7 +31,7 @@ export default function inputLogin({label,placeholder,atualizando,icon}:campoInp
                     <TextInput style={styles.textinput}
                         placeholder={placeholder}
                         placeholderTextColor="#ccc"
-                        value={placeholder}//definimos o valor inicial como o valor email=""
+                        value={value}//definimos o valor inicial como o valor email=""
                 //onChangeText será ativado quando começar a digitar
                 //setando o novo texto,iremos setar o novo value também
                         onChangeText={atualizando} 
@@ -92,8 +93,8 @@ const styles = StyleSheet.create({
 },
 
     icon: {
-    width: 13,                
-    height: 13,
+    width: 15,                
+    height: 15,
     resizeMode: 'contain'
     },
 

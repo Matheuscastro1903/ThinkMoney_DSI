@@ -1,15 +1,14 @@
 
 
-import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
-import { Link } from "expo-router"
+import { Link } from "expo-router";
 
 
 //importando biblioteca de icons
 import { Ionicons } from '@expo/vector-icons';
 
-import InputLogin from '../components/inputlogin';
 
 export default function telaInical() {
 
@@ -52,11 +51,12 @@ const styles = StyleSheet.create({
         flex: 1,                     // Ocupa a tela inteira
         justifyContent: 'center',    // Centraliza verticalmente
         alignItems: 'center',        // Centraliza horizontalmente
-        backgroundColor: '#1D1252'
+        backgroundColor: '#1D1252',
+        gap:8
     },
     logo: {
-        width: 412,                  // Largura da imagem
-        height: 525,                 // Altura da imagem
+        width: 256,                  // Largura da imagem
+        height: 276,                 // Altura da imagem
         resizeMode: 'contain'        // Garante que a imagem não seja cortada
     },
 
