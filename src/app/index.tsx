@@ -1,6 +1,6 @@
 
 
-import { Image, StyleSheet, Text, View,TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 
 import { Link } from "expo-router"
@@ -11,33 +11,33 @@ import { Ionicons } from '@expo/vector-icons';
 
 import InputLogin from '../components/inputlogin';
 
-export default function telaInical(){
+export default function telaInical() {
 
-    function debugando(){
+    function debugando() {
         console.log(1)
     }
-     
-    return(
+
+    return (
         <View style={styles.main}>
 
-            <Image 
+            <Image
                 source={require('../assets/images/logothink.png')}
-                style={styles.logo} 
+                style={styles.logo}
             />
 
-             <Link href={'/(auth)/login'} asChild>
+            <Link href={'/(auth)/login'} asChild>
 
-                          <TouchableOpacity style={styles.button}>
-                              <Ionicons name="arrow-forward" size={32} color="white" />
-                          </TouchableOpacity>
+                <TouchableOpacity style={styles.button}>
+                    <Ionicons name="arrow-forward" size={32} color="white" />
+                </TouchableOpacity>
             </Link>
 
 
             {/* botao para teste de noticias  */}
-            <Link href={'/noticias'} asChild>
-                            <TouchableOpacity style={styles.button}>
-                                <Ionicons name="arrow-forward" size={32} color="white" />
-                            </TouchableOpacity>
+            <Link href={'/(tabs)/home'} asChild>
+                <TouchableOpacity style={styles.button}>
+                    <Ionicons name="arrow-forward" size={32} color="white" />
+                </TouchableOpacity>
 
             </Link>
 
@@ -60,21 +60,21 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'        // Garante que a imagem não seja cortada
     },
 
-    button:{
-    width:64,
-    height:64,
-    backgroundColor:'black',
-    borderRadius:32,
+    button: {
+        width: 64,
+        height: 64,
+        backgroundColor: 'black',
+        borderRadius: 32,
 
-    alignItems:'center',
-    justifyContent:'center',
-    marginTop:100
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 100
 
-  },
-  textbutton:{
-    color:'#ffffff',
-    fontSize:30,
-    fontWeight:'bold'
-  }
+    },
+    textbutton: {
+        color: '#ffffff',
+        fontSize: 30,
+        fontWeight: 'bold'
+    }
 
 });
