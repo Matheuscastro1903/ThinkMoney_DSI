@@ -34,7 +34,7 @@ export default function telaInical(){
 
 
             {/* botao para teste de noticias  */}
-            <Link href={'/noticias'} asChild>
+            <Link href={'/familia'} asChild>
                             <TouchableOpacity style={styles.button}>
                                 <Ionicons name="arrow-forward" size={32} color="white" />
                             </TouchableOpacity>
