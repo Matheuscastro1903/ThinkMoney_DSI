@@ -16,7 +16,10 @@ export default function NavBar() {
     return (
         <View style={styles.footer}>
 
-            {/* botão Home */}
+            {/* botão Home 
+            se o ccaminho for home aplica determinado estilo,caso contrário,aplica o outro
+            
+            */}
             <Link href="/home" asChild>
                 <TouchableOpacity style={caminho === '/home'
         ? styles.botaoAtivo

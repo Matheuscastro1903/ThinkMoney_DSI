@@ -12,7 +12,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <Header />
+            
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={styles.saldo}>
                     <Text style={styles.text1}>

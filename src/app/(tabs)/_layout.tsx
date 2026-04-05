@@ -1,18 +1,20 @@
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Slot } from "expo-router"; // SLOT — renderiza a tela atual automaticamente
+import { Slot } from "expo-router"; //slot— renderiza a tela atual automaticamente
 import NavBar from "@/src/components/tabs/navbar";
+import Header from "@/src/components/Header";
 
 export default function Layout() {
     return (
         <SafeAreaView style={styles.safeArea}>
 
             <View style={styles.container}>
-
-                {/* Slot é o equivalente ao {children} do Next — renderiza a tela ativa */}
+                {/*header fixo em todas as telas */}
+                <Header></Header>
+                {/*slot é o equivalente ao {children} do Next — renderiza a tela ativa*/}
                 <Slot />
 
-                {/* Footer fixo em todas as telas do grupo (app) */}
+                {/*footer fixo em todas as telas */}
                 <NavBar></NavBar>
 
             </View>
