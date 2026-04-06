@@ -4,7 +4,6 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
-import Header from '../../../components/Header';
 
 
 export default function Home() {
@@ -12,7 +11,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            
+
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={styles.saldo}>
                     <Text style={styles.text1}>
@@ -115,7 +114,7 @@ export default function Home() {
                         <Text style={styles.textValor}>R$ 140,00</Text>
                         <Text style={styles.textCategoria}>22:00</Text>
                     </View>
-                
+
 
                 </View>
             </ScrollView>

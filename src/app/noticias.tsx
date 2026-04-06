@@ -5,14 +5,12 @@ import {
   FlatList,
   Image,
   Linking,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 // Configuração da API de notícias financeiras.
 const Api_Key = "d75f7ohr01qk56kci3fgd75f7ohr01qk56kci3g0";
@@ -32,12 +30,6 @@ interface NewsItem {
   source: string;
   summary: string;
   url: string;
-}
-
-// Props esperadas no header (foto de usuário e ação ao clicar).
-interface HeaderProps {
-  userPhoto?: string | null;
-  onPressPhoto?: () => void;
 }
 
 // Busca notícias da categoria informada e retorna a lista tipada.
@@ -60,40 +52,7 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
-// Header superior com logo e avatar/foto do usuário.
-const Header = ({ userPhoto, onPressPhoto }: HeaderProps) => {
-  return (
-    <View style={styles.headerContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.innerContainer}>
-          <View style={styles.logoContainer}>
-            {/* LOGO DO THINKMONEY */}
-            <Image
-              source={require("../assets/images/logothink.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-
-          <TouchableOpacity
-            style={styles.avatarButton}
-            onPress={onPressPhoto}
-            activeOpacity={0.8}
-          >
-            {userPhoto ? (
-              <Image source={{ uri: userPhoto }} style={styles.avatarImage} />
-            ) : (
-              <Text style={styles.avatarText}>Foto</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    </View>
-  );
-};
-
-// Barra de busca controlada por props para filtrar notícias na tela.
+  // Barra de busca controlada por props para filtrar notícias na tela.
 const SearchBar=({
   value,
   onChangeText,
@@ -279,7 +238,6 @@ const NewsFeedScreen = ({ userPhoto, onPressPhoto }: Props) => {
   // Renderização condicional: loading, erro ou lista de notícias.
   return(
     <View style= {styles.screenContainer}>
-      <Header userPhoto={userPhoto} onPressPhoto={onPressPhoto}/>
       <SearchBar
         value={searchQuery}
         onChangeText={handleSearch}

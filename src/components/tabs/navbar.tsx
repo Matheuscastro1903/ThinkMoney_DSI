@@ -16,9 +16,9 @@ export default function NavBar() {
     return (
         <View style={styles.footer}>
 
-            {/* botão Home 
+            {/* botão Home
             se o ccaminho for home aplica determinado estilo,caso contrário,aplica o outro
-            
+
             */}
             <Link href="/home" asChild>
                 <TouchableOpacity style={caminho === '/home'
@@ -39,7 +39,9 @@ export default function NavBar() {
 
             {/* botão FAQ */}
             <Link href="/faq" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/faq'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="chatbubble-ellipses"
                         size={24}
@@ -54,7 +56,9 @@ export default function NavBar() {
 
             {/* botão central — Mapa */}
             <Link href="/mapa" asChild>
-                <TouchableOpacity style={styles.botaoMais}>
+                <TouchableOpacity style={caminho === '/mapa'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="location"
                         size={32}
@@ -68,7 +72,9 @@ export default function NavBar() {
 
             {/* botão Notícias */}
             <Link href="/noticias" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/noticias'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="newspaper"
                         size={24}
@@ -82,7 +88,9 @@ export default function NavBar() {
 
             {/* botão Família */}
             <Link href="/familia" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/familia'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="people"
                         size={24}
