@@ -16,9 +16,9 @@ export default function NavBar() {
     return (
         <View style={styles.footer}>
 
-            {/* botão Home 
+            {/* botão Home
             se o ccaminho for home aplica determinado estilo,caso contrário,aplica o outro
-            
+
             */}
             <Link href="/home" asChild>
                 <TouchableOpacity style={caminho === '/home'
@@ -39,7 +39,9 @@ export default function NavBar() {
 
             {/* botão FAQ */}
             <Link href="/faq" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/faq'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="chatbubble-ellipses"
                         size={24}
@@ -54,10 +56,12 @@ export default function NavBar() {
 
             {/* botão central — Mapa */}
             <Link href="/mapa" asChild>
-                <TouchableOpacity style={styles.botaoMais}>
+                <TouchableOpacity style={caminho === '/mapa'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="location"
-                        size={32}
+                        size={24}
                         color={caminho === '/mapa' ? '#1D1252' : '#ffffff'}
                     />
                     <Text style={[styles.labelMais, caminho === '/mapa' && styles.labelAtivo]}>
@@ -68,7 +72,9 @@ export default function NavBar() {
 
             {/* botão Notícias */}
             <Link href="/noticias" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/noticias'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="newspaper"
                         size={24}
@@ -82,7 +88,9 @@ export default function NavBar() {
 
             {/* botão Família */}
             <Link href="/familia" asChild>
-                <TouchableOpacity style={styles.botaoDesativado}>
+                <TouchableOpacity style={caminho === '/familia'
+                    ? styles.botaoAtivo
+                    : styles.botaoDesativado}>
                     <Ionicons
                         name="people"
                         size={24}
@@ -114,24 +122,30 @@ const styles = StyleSheet.create({
 
     botaoDesativado: {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         gap: 4,
         flex: 1,
+        minHeight: 52,
+        paddingBottom: 8,
     },
 
     botaoMais: {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         gap: 4,
         flex: 1,
+        minHeight: 52,
+        paddingBottom: 8,
     },
 
     botaoAtivo:{
-    //aplicando os mesmo estilos do botão desativado
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     gap: 4,
     flex: 1,
+    minHeight: 52,
+    paddingTop: 4,
+    paddingBottom: 8,
     backgroundColor:'#ffffff',
     borderRadius:12
     },
