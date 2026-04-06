@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth'
 import { doc, setDoc, Timestamp } from 'firebase/firestore'
 import { auth, db } from './firebaseConfig'
 
@@ -40,6 +40,13 @@ export async function loginUsuario(dados: {email: string, senha: string}) {
 
 export async function logoutUsuario(): Promise<void> {
   await signOut(auth)
+}
+
+
+// Recuperar Senha
+
+export async function recuperarSenha(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email)
 }
 
 

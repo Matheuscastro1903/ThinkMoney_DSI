@@ -61,7 +61,7 @@ export default function NavBar() {
                     : styles.botaoDesativado}>
                     <Ionicons
                         name="location"
-                        size={32}
+                        size={24}
                         color={caminho === '/mapa' ? '#1D1252' : '#ffffff'}
                     />
                     <Text style={[styles.labelMais, caminho === '/mapa' && styles.labelAtivo]}>
@@ -122,24 +122,30 @@ const styles = StyleSheet.create({
 
     botaoDesativado: {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         gap: 4,
         flex: 1,
+        minHeight: 52,
+        paddingBottom: 8,
     },
 
     botaoMais: {
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         gap: 4,
         flex: 1,
+        minHeight: 52,
+        paddingBottom: 8,
     },
 
     botaoAtivo:{
-    //aplicando os mesmo estilos do botão desativado
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     gap: 4,
     flex: 1,
+    minHeight: 52,
+    paddingTop: 4,
+    paddingBottom: 8,
     backgroundColor:'#ffffff',
     borderRadius:12
     },
