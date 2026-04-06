@@ -17,6 +17,8 @@ export default function Login() {
     }
 
     const [manterConectado, setManterConectado] = useState(false);
+    const [inputEmail,setInputEmail]=useState('')
+    const [inputSenha,setInputSenha]=useState('')
 
     return (
         // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -24,7 +26,7 @@ export default function Login() {
 
             {/* ScrollView por dentro — permite rolar caso necessário */}
             <ScrollView contentContainerStyle={styles.fundo}>
-                <ButtonComeBack label='Voltar' url='/' color='#1D1252'></ButtonComeBack>
+                <ButtonComeBack label='Voltar' url='/app/' color='#1D1252'></ButtonComeBack>
                 <Image
                     source={require('../../../assets/images/logothinkmoney.png')}
                     style={styles.logo}
@@ -33,12 +35,12 @@ export default function Login() {
                 <View style={styles.main}>
 
                     <View>
-                        <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={debugando} icon={require('../../../assets/icons/iconeusuario.svg')} />
+                        <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={(valor) => setInputEmail(valor)}  icon={require('../../../assets/icons/iconeusuario.svg')} value={inputEmail}/>
 
-                        <InputSenha label='Digite sua senha' placeholder='Digite sua senha' atualizando={debugando} icon={require('../../../assets/icons/iconecadeado.svg')} iconVisibilidade={require('../../../assets/icons/iconeolho.svg')} />
+                        <InputSenha label='Digite sua senha' placeholder='Digite sua senha' atualizando={(valor) => setInputSenha(valor)} icon={require('../../../assets/icons/iconecadeado.svg')} iconVisibilidade={require('../../../assets/icons/iconeolho.svg')} value={inputSenha}/>
 
                         <View style={styles.esqueceusenha}>
-                            <Link href={'/(auth)/login'} asChild>
+                            <Link href={'/(tabs)/home'} asChild>
                                 <TouchableOpacity>
                                     <Text style={styles.textesqueceu}>Esqueci a senha</Text>
                                 </TouchableOpacity>

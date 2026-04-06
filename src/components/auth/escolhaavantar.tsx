@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react"
+import { View, Image, TouchableOpacity, StyleSheet,Text } from "react-native"
 
 type AvatarID = 1 | 2 | 3 | 4 | 5;
 

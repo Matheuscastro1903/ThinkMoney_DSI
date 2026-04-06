@@ -1,5 +1,3 @@
-
-
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
@@ -10,37 +8,39 @@ import { Link } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 
 
-export default function telaInical() {
+export default function telaInical(){
 
-    function debugando() {
+    function debugando(){
         console.log(1)
     }
-
-    return (
+     
+    return(
         <View style={styles.main}>
 
-            <Image
-                source={require('../assets/images/logothink.png')}
-                style={styles.logo}
+            <Image 
+                source={require('../assets/images/logothinkmoney.png')}
+                style={styles.logo} 
             />
 
+            <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
+            
             <Link href={'/(auth)/login'} asChild>
 
-                <TouchableOpacity style={styles.button}>
-                    <Ionicons name="arrow-forward" size={32} color="white" />
-                </TouchableOpacity>
+                          <TouchableOpacity style={styles.button}>
+                              <Ionicons name="arrow-forward" size={32} color="white" />
+                          </TouchableOpacity>
             </Link>
 
 
             {/* botao para teste de noticias  */}
-            <Link href={'/(tabs)/home'} asChild>
-                <TouchableOpacity style={styles.button}>
-                    <Ionicons name="arrow-forward" size={32} color="white" />
-                </TouchableOpacity>
+            <Link href={'/noticias'} asChild>
+                            <TouchableOpacity style={styles.button}>
+                                <Ionicons name="arrow-forward" size={32} color="white" />
+                            </TouchableOpacity>
 
             </Link>
 
-            <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={debugando} icon={require('../assets/icons/iconeusuario.svg')}></InputLogin>
+            
 
         </View>
     )
@@ -60,21 +60,36 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'        // Garante que a imagem não seja cortada
     },
 
-    button: {
-        width: 64,
-        height: 64,
-        backgroundColor: 'black',
-        borderRadius: 32,
+    button:{
+    width:64,
+    height:64,
+    backgroundColor:'black',
+    borderRadius:32,
 
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 100
+    alignItems:'center',
+    justifyContent:'center',
+    marginTop:100
 
-    },
-    textbutton: {
+  },
+  textbutton:{
+    color:'#ffffff',
+    fontSize:30,
+    fontWeight:'bold'
+  },
+
+  fraseImpacto: {
+        
+                  
+        left: 0,
+        right: 0,               // left:0 + right:0 garante largura total para centralizar o texto
+        textAlign: 'center',    // centraliza o texto horizontalmente
+         
+        
+        fontSize: 22,
+        
         color: '#ffffff',
-        fontSize: 30,
-        fontWeight: 'bold'
-    }
+        paddingHorizontal: 30,  // evita que o texto cole nas bordas em telas menores
+        lineHeight: 32,         // respiro entre linhas caso quebre
+    },
 
 });

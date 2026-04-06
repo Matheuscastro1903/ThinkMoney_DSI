@@ -70,7 +70,7 @@ const Header = ({ userPhoto, onPressPhoto }: HeaderProps) => {
           <View style={styles.logoContainer}>
             {/* LOGO DO THINKMONEY */}
             <Image
-              source={require("../assets/images/logothink.png")}
+              source={require("../../../assets/images/logothink.png")}
               style={styles.logo}
               resizeMode="contain"
             />

@@ -3,7 +3,10 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'rea
 export default function Header() {
     return (
         <View style={styles.header}>
+            
             <Image source={require('../assets/images/logothink.png')} style={styles.logo} />
+            
+            
             <TouchableOpacity onPress={() =>
                 console.log('clicou no perfil')}>
                 <Image source={require('../assets/images/onca.png')}
@@ -15,17 +18,16 @@ export default function Header() {
 
 const styles = StyleSheet.create({
     header: {
-        height: 120,
+        height: 87,
         backgroundColor: '#000000',
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingLeft:30,
+        paddingRight:30
 
-        paddingTop: 50,
-        paddingRight: 30,
-        paddingBottom: 14,
-        paddingLeft: 30,
+        
     },
     logo: {
         width: 68,

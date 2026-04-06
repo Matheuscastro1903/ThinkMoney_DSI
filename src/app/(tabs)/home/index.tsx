@@ -12,7 +12,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <Header />
+            
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={styles.saldo}>
                     <Text style={styles.text1}>
@@ -115,6 +115,7 @@ export default function Home() {
                         <Text style={styles.textValor}>R$ 140,00</Text>
                         <Text style={styles.textCategoria}>22:00</Text>
                     </View>
+                
 
                 </View>
             </ScrollView>
