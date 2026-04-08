@@ -9,27 +9,29 @@ import {
 
 import { useRouter } from "expo-router";
 
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { useState } from "react";
 
 export default function Familia() {
   const router = useRouter();
 
   function abrirSaibaMaisFamilia() {
-    return
+    return;
   }
 
   function entrarEmFamilia() {
-    return
+    return;
   }
 
   function criarFamilia() {
-    return
+    router.push("../criar");
+    return;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-
       <View style={styles.header}>
         <View style={styles.familyIcon}>
           <MaterialIcons name="family-restroom" size={50} color="#000000" />
@@ -42,23 +44,38 @@ export default function Familia() {
           entes queridos para gerir o patrimônio em conjunto.
         </Text>
       </View>
-      
-      <View style={styles.body}>
-        <TextInput style={styles.input} placeholder="Digite o código da família" placeholderTextColor="#787581" keyboardType="default"/>
 
-        <TouchableOpacity style={styles.confirmarButton} activeOpacity={0.7} onPress={entrarEmFamilia}>
+      <View style={styles.body}>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite o código da família"
+          placeholderTextColor="#787581"
+          keyboardType="default"
+        />
+
+        <TouchableOpacity
+          style={styles.confirmarButton}
+          activeOpacity={0.7}
+          onPress={entrarEmFamilia}
+        >
           <Text style={styles.textConfirmarButton}>Confirmar e Entrar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.criarFamiliaButton} activeOpacity={0.7} onPress={criarFamilia}>
+        <TouchableOpacity
+          style={styles.criarFamiliaButton}
+          activeOpacity={0.7}
+          onPress={criarFamilia}
+        >
           <Text style={styles.textCriarFamiliaButton}>Criar minha família</Text>
         </TouchableOpacity>
 
         <Text>
-          Não tem um código? <Text style={styles.textLink} onPress={abrirSaibaMaisFamilia}>Saiba mais.</Text>
+          Não tem um código?{" "}
+          <Text style={styles.textLink} onPress={abrirSaibaMaisFamilia}>
+            Saiba mais.
+          </Text>
         </Text>
       </View>
-
     </SafeAreaView>
   );
 }
