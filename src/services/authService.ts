@@ -42,6 +42,20 @@ export async function logoutUsuario(): Promise<void> {
   await signOut(auth)
 }
 
+// == BUSCAR DADOS DO USUÁRIO ==
+
+export async function buscarDadosUsuario(uid: string) {
+  const docRef = doc(db, 'usuarios', uid)
+  const docSnap = await getDoc(docRef)
+  
+  if (docSnap.exists()) {
+    return docSnap.data()
+  } else {
+    console.log("Usuário não encontrado")
+    return null
+  }
+}
+
 
 // Recuperar Senha
 
