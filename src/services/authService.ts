@@ -1,5 +1,5 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth'
+import { doc, setDoc, Timestamp } from 'firebase/firestore'
 import { auth, db } from './firebaseConfig'
 
 
@@ -54,6 +54,13 @@ export async function buscarDadosUsuario(uid: string) {
     console.log("Usuário não encontrado")
     return null
   }
+}
+
+
+// Recuperar Senha
+
+export async function recuperarSenha(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email)
 }
 
 
