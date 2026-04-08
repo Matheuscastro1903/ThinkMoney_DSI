@@ -112,4 +112,62 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     fontSize: 18,
   },
+
+  confirmarButton: {
+    backgroundColor: "#1D1252",
+    padding: 20,
+    borderRadius: 5,
+    marginBottom: 20,
+    width: "100%",
+    alignItems: "center",
+    color: "white",
+  },
+
+  textConfirmarButton: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+
+  criarFamiliaButton: {
+    borderColor: "#1D1252",
+    borderWidth: 1,
+    padding: 20,
+    borderRadius: 5,
+    marginBottom: 12,
+    width: "100%",
+    alignItems: "center",
+    color: "#1D1252",
+  },
+
+  textCriarFamiliaButton: {
+    color: "#1D1252",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+
+  textLink: {
+    color: "#1E90FF",
+    textDecorationLine: "underline",
+  },
+
+  codeContainer: {
+    backgroundColor: "#ffffff",
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  prontoButton: {
+    backgroundColor: "#1D1252",
+    borderColor: "#ffffff",
+    borderWidth: 1,
+    marginHorizontal: 20,
+    marginTop: 20,
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: "center",
+  },
 });
