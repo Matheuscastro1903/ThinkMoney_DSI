@@ -17,8 +17,8 @@ export default function Login() {
     }
 
     const [manterConectado, setManterConectado] = useState(false);
-    const [inputEmail,setInputEmail]=useState('')
-    const [inputSenha,setInputSenha]=useState('')
+    const [inputEmail, setInputEmail] = useState('')
+    const [inputSenha, setInputSenha] = useState('')
 
     return (
         // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -35,12 +35,12 @@ export default function Login() {
                 <View style={styles.main}>
 
                     <View>
-                        <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={(valor) => setInputEmail(valor)}  icon={require('../../../assets/icons/iconeusuario.svg')} value={inputEmail}/>
+                        <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={(valor) => setInputEmail(valor)} icon={require('../../../assets/icons/iconeusuario.svg')} value={inputEmail} />
 
-                        <InputSenha label='Digite sua senha' placeholder='Digite sua senha' atualizando={(valor) => setInputSenha(valor)} icon={require('../../../assets/icons/iconecadeado.svg')} iconVisibilidade={require('../../../assets/icons/iconeolho.svg')} value={inputSenha}/>
+                        <InputSenha label='Digite sua senha' placeholder='Digite sua senha' atualizando={(valor) => setInputSenha(valor)} icon={require('../../../assets/icons/iconecadeado.svg')} iconVisibilidade={require('../../../assets/icons/iconeolho.svg')} value={inputSenha} />
 
                         <View style={styles.esqueceusenha}>
-                            <Link href={'/(tabs)/home'} asChild>
+                            <Link href={'/(auth)/esqueci-senha'} asChild>
                                 <TouchableOpacity>
                                     <Text style={styles.textesqueceu}>Esqueci a senha</Text>
                                 </TouchableOpacity>
