@@ -3,36 +3,45 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 
 //importando biblioteca de icons
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from '@expo/vector-icons';
 
-export default function telaInical() {
-  function debugando() {
-    console.log(1);
-  }
 
-  return (
-    <View style={styles.main}>
-      <Image
-        source={require("../assets/images/logothinkmoney.png")}
-        style={styles.logo}
-      />
+export default function telaInical(){
 
-      <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
+    function debugando(){
+        console.log(1)
+    }
+     
+    return(
+        <View style={styles.main}>
 
-      <Link href={"/(auth)/login"} asChild>
-        <TouchableOpacity style={styles.button}>
-          <Ionicons name="arrow-forward" size={32} color="white" />
-        </TouchableOpacity>
-      </Link>
+            <Image 
+                source={require('../assets/images/logothinkmoney.png')}
+                style={styles.logo} 
+            />
 
-      {/* botao para teste das telas novas  */}
-      <Link href={"/(tabs)/faq"} asChild>
-        <TouchableOpacity style={styles.button}>
-          <Ionicons name="arrow-forward" size={32} color="white" />
-        </TouchableOpacity>
-      </Link>
-    </View>
-  );
+            <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
+            
+            <Link href={'/(auth)/login'} asChild>
+
+                          <TouchableOpacity style={styles.button}>
+                              <Ionicons name="arrow-forward" size={32} color="white" />
+                          </TouchableOpacity>
+            </Link>
+
+
+            {/* botao para teste das telas novas  */}
+            <Link href={'/(tabs)/home'} asChild>
+                            <TouchableOpacity style={styles.button}>
+                                <Ionicons name="arrow-forward" size={32} color="white" />
+                            </TouchableOpacity>
+
+            </Link>
+
+            
+
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
