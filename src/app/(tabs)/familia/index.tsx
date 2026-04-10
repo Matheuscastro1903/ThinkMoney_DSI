@@ -1,1 +1,0 @@
-// arquivo destinado a guardar a "primeira tela da família"
