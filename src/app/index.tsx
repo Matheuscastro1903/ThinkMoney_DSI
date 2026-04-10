@@ -1,15 +1,10 @@
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-
-import { Image, StyleSheet, Text, View,TouchableOpacity } from 'react-native';
-
-
-import { Link } from "expo-router"
-
+import { Link } from "expo-router";
 
 //importando biblioteca de icons
 import { Ionicons } from '@expo/vector-icons';
 
-import InputLogin from '../components/inputlogin';
 
 export default function telaInical(){
 
@@ -21,11 +16,13 @@ export default function telaInical(){
         <View style={styles.main}>
 
             <Image 
-                source={require('../assets/images/logothink.png')}
+                source={require('../assets/images/logothinkmoney.png')}
                 style={styles.logo} 
             />
 
-             <Link href={'/(auth)/login'} asChild>
+            <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
+            
+            <Link href={'/(auth)/login'} asChild>
 
                           <TouchableOpacity style={styles.button}>
                               <Ionicons name="arrow-forward" size={32} color="white" />
@@ -33,48 +30,59 @@ export default function telaInical(){
             </Link>
 
 
-            {/* botao para teste de noticias  */}
-            <Link href={'/familia'} asChild>
+            {/* botao para teste das telas novas  */}
+            <Link href={'/(tabs)/home'} asChild>
                             <TouchableOpacity style={styles.button}>
                                 <Ionicons name="arrow-forward" size={32} color="white" />
                             </TouchableOpacity>
 
             </Link>
 
-            <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={debugando} icon={require('../assets/icons/iconeusuario.svg')}></InputLogin>
+            
 
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    main: {
-        flex: 1,                     // Ocupa a tela inteira
-        justifyContent: 'center',    // Centraliza verticalmente
-        alignItems: 'center',        // Centraliza horizontalmente
-        backgroundColor: '#1D1252'
-    },
-    logo: {
-        width: 412,                  // Largura da imagem
-        height: 525,                 // Altura da imagem
-        resizeMode: 'contain'        // Garante que a imagem não seja cortada
-    },
-
-    button:{
-    width:64,
-    height:64,
-    backgroundColor:'black',
-    borderRadius:32,
-
-    alignItems:'center',
-    justifyContent:'center',
-    marginTop:100
-
+  main: {
+    flex: 1, // Ocupa a tela inteira
+    justifyContent: "center", // Centraliza verticalmente
+    alignItems: "center", // Centraliza horizontalmente
+    backgroundColor: "#1D1252",
+    gap: 8,
   },
-  textbutton:{
-    color:'#ffffff',
-    fontSize:30,
-    fontWeight:'bold'
-  }
+  logo: {
+    width: 256, // Largura da imagem
+    height: 276, // Altura da imagem
+    resizeMode: "contain", // Garante que a imagem não seja cortada
+  },
 
+  button: {
+    width: 64,
+    height: 64,
+    backgroundColor: "black",
+    borderRadius: 32,
+
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 100,
+  },
+  textbutton: {
+    color: "#ffffff",
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+
+  fraseImpacto: {
+    left: 0,
+    right: 0, // left:0 + right:0 garante largura total para centralizar o texto
+    textAlign: "center", // centraliza o texto horizontalmente
+
+    fontSize: 22,
+
+    color: "#ffffff",
+    paddingHorizontal: 30, // evita que o texto cole nas bordas em telas menores
+    lineHeight: 32, // respiro entre linhas caso quebre
+  },
 });
