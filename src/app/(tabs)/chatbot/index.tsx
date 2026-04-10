@@ -2,21 +2,13 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link } from "expo-router";
-
+import HeaderBack from "@/src/components/headerBack";
 
 
 export default function ChatBot() {
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Link href={'/(tabs)/home'} asChild>
-                    <TouchableOpacity style={{flexDirection:'row', alignItems:'center', marginLeft:20}}>
-                        <Ionicons name="arrow-back" size={32} color="white" />
-                        <Text style={{color:'white', fontSize:15, fontWeight: "bold", marginLeft: 15}}>Voltar</Text>
-                    </TouchableOpacity>
-                </Link>
-               
-            </View>
+            <HeaderBack />
 
             <View style={styles.chat}>
                 <View style={styles.int}>
@@ -89,12 +81,6 @@ export default function ChatBot() {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: "white"
-    },
-    header: {
-        backgroundColor: "black",
-        height: 60,
-        flexDirection: "column",
-        justifyContent: "center"
     },
     int: {
         flexDirection: "column",

@@ -19,7 +19,7 @@ export default function App() {
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.container2}>
                     <Image
-                    source={require('../assets/images/image.png')}
+                    source={require('../../../assets/images/image.png')}
                     style={styles.avatar}
                     />
                     <Text style={styles.name}>João Marcelo</Text>
