@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, styles } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 
@@ -51,15 +51,15 @@ function CardFaq({pergunta, resposta}:
         return(
 
             <TouchableOpacity
-                style= {[StyleSheet.card, aberto && styles.cardAberto]}
+                style= {[styles.card, aberto && styles.cardAberto]}
                 onPress={() => setAberto(!aberto)}
                 activeOpacity={0.8}
             >
-                <view style= {styles.cardTopo}>
-                    <text styles={styles.pergunta}>{pergunta}</text>
+                <View style= {styles.cardTopo}>
+                    <Text style={styles.pergunta}>{pergunta}</Text>
                     <Ionicons name={aberto ? 'chevron-up' : 'chevron-down'} size={24} color="#94A3B8" />
-                </view>
-                {aberto && <text style={styles.resposta}>{resposta}</text>}
+                </View>
+                {aberto && <Text style={styles.resposta}>{resposta}</Text>}
             </TouchableOpacity>
         )
     }
@@ -72,12 +72,153 @@ export default function Faq() {
             contentContainerStyle={styles.scroll}
             showsHorizontalScrollIndicator={false}
         >
-            <text style={styles.titulo}>Perguntas Frequentes</text>
+            <Text style={styles.titulo}>Perguntas Frequentes</Text>
 
 
-            <text style={styles.subtitulo}>Dúvidas? Encontre aqui as respostas para as perguntas mais comuns sobre o ThinkMoney.</text>
-            
+            <Text style={styles.subtitulo}>Dúvidas? Encontre aqui as respostas para as perguntas mais comuns sobre o ThinkMoney.</Text>
 
+            {FAQ.map((item) => (
+                <CardFaq key={item.id} pergunta={item.pergunta} resposta={item.resposta} />
+            ))}
+
+
+
+            <View style={styles.suporte}>
+                <Text style={styles.suporteTexto}>Ainda tem dúvidas? Entre em contato com nosso suporte!</Text>
+                <Link href="/(tabs)/chatbot" style={styles.suporteSubtitulo}>Fale Conosco</Link>
+
+                <Link href='/(tabs)/chatbot' asChild>
+                    <TouchableOpacity style={styles.botaoPrimario} activeOpacity={0.85}>
+                        <Text style={styles.botaoPrimarioTexto}>Chatbot</Text>
+                    </TouchableOpacity>
+                </Link>
+
+                <TouchableOpacity style={styles.botaoSecundario} activeOpacity={0.85}>
+                    <Text style={styles.botaoSecundarioTexto}>E-mail</Text>
+                </TouchableOpacity>
+
+            </View>
+        </ScrollView>
     )
+
 }
+
+
+
+
+    
+const styles = StyleSheet.create({
+    fundo: {
+        flex: 1,
+        backgroundColor: '#1D1252',
+    },
+    scroll: {
+        paddingHorizontal: 24,
+        paddingTop: 48,
+        paddingBottom: 100,
+        gap: 12,
+    },
+ 
+    titulo: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        lineHeight: 44,
+        letterSpacing: -0.9,
+        marginBottom: 4,
+    },
+    subtitulo: {
+        fontSize: 16,
+        color: '#867DC1',
+        lineHeight: 24,
+        marginBottom: 8,
+    },
+ 
+    // Card accordion
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 16,
+    },
+    cardAberto: {
+        borderLeftWidth: 3,
+        borderLeftColor: '#4ADE80',
+    },
+    cardTopo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: 12,
+    },
+    pergunta: {
+        flex: 1,
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#1D1252',
+        lineHeight: 20,
+    },
+    resposta: {
+        marginTop: 10,
+        fontSize: 13,
+        color: '#484550',
+        lineHeight: 20,
+    },
+ 
+    // Seção suporte
+    suporte: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 12,
+        padding: 24,
+        gap: 16,
+        marginTop: 8,
+    },
+    suporteTitulo: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        lineHeight: 30,
+    },
+    suporteTexto: {
+        fontSize: 14,
+        color: '#FFFFFF',
+        lineHeight: 22,
+    },
+    suporteSubtitulo: {
+        fontSize: 14,
+        color: '#867DC1',
+        lineHeight: 22,
+        marginTop: -4,
+    },
+    botaoPrimario: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingVertical: 16,
+        gap: 10,
+    },
+    botaoPrimarioTexto: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#1D1252',
+    },
+    botaoSecundario: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 12,
+        paddingVertical: 16,
+        gap: 10,
+    },
+    botaoSecundarioTexto: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
+});
 
