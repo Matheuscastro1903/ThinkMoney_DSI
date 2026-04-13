@@ -31,13 +31,11 @@ export default function telaInical(){
                           </TouchableOpacity>
             </Link>
 
+            <Link href={'/metas'} asChild>
 
-            {/* botao para teste das telas novas  */}
-            <Link href={'/(tabs)/metas'} asChild>
-                            <TouchableOpacity style={styles.button}>
-                                <Ionicons name="arrow-forward" size={32} color="white" />
-                            </TouchableOpacity>
-
+                          <TouchableOpacity style={styles.button}>
+                              <Ionicons name="arrow-forward" size={32} color="white" />
+                          </TouchableOpacity>
             </Link>
 
             
