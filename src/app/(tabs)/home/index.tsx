@@ -4,10 +4,12 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
+import { useRouter } from 'expo-router';
 
 
 export default function Home() {
-    //Vou por a logica aqui.
+    const router = useRouter();
+
 
     return (
         <View style={styles.container}>
@@ -63,17 +65,17 @@ export default function Home() {
                         </Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => console.log('clicou para registrar um novo gasto!') }>
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => console.log('clicou para registrar um novo gasto!')}>
                     <Ionicons name="add-circle-outline" size={24} color="black" />
                     <Text style={styles.text5}>
                         REGISTRAR NOVO GASTO
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
-                    <TouchableOpacity style={styles.metasPessoais} onPress={() => console.log('clicou em metas pessoais!') }>
+                    <TouchableOpacity style={styles.metasPessoais} onPress={() => console.log('clicou em metas pessoais!')}>
                         <Text style={styles.text6}>METAS PESSOAIS</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.lembretes} onPress={() => console.log('clicou em lembretes!') }>
+                    <TouchableOpacity style={styles.lembretes} onPress={() => router.push('/(details)/detailshome/lembretes')}>
                         <Text style={styles.text6}>LEMBRETES</Text>
                     </TouchableOpacity>
                 </View>
@@ -81,8 +83,10 @@ export default function Home() {
                     <Text style={styles.ultimosGastos}>ÚLTIMOS GASTOS</Text>
                 </View>
                 <View style={styles.gastosHistorico}>
-                    <Ionicons name="cart" size={24} color="black" />
-                    <View style={{ flex: 1 }}>
+                    <View style={styles.iconeGastos}>
+                        <Ionicons name="cart-outline" size={20} color="#1D1252" />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
                         <Text style={styles.textHistorico}>Assaí Atacadista</Text>
                         <Text style={styles.textCategoria}>Alimentação</Text>
                     </View>
@@ -90,11 +94,12 @@ export default function Home() {
                         <Text style={styles.textValor}>R$ 452,10</Text>
                         <Text style={styles.textCategoria}>19:00</Text>
                     </View>
-
                 </View>
                 <View style={styles.gastosHistorico}>
-                    <Ionicons name="car" size={24} color="black" />
-                    <View style={{ flex: 1 }}>
+                    <View style={styles.iconeGastos}>
+                        <Ionicons name="car-outline" size={20} color="#1D1252" />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
                         <Text style={styles.textHistorico}>Posto Shell Graal</Text>
                         <Text style={styles.textCategoria}>Combustível</Text>
                     </View>
@@ -102,11 +107,12 @@ export default function Home() {
                         <Text style={styles.textValor}>R$ 200,00</Text>
                         <Text style={styles.textCategoria}>14:32</Text>
                     </View>
-
                 </View>
                 <View style={styles.gastosHistorico}>
-                    <Ionicons name="restaurant" size={24} color="black" />
-                    <View style={{ flex: 1 }}>
+                    <View style={styles.iconeGastos}>
+                        <Ionicons name="restaurant-outline" size={20} color="#1D1252" />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
                         <Text style={styles.textHistorico}>Coco Bambu</Text>
                         <Text style={styles.textCategoria}>Alimentação</Text>
                     </View>
@@ -114,8 +120,6 @@ export default function Home() {
                         <Text style={styles.textValor}>R$ 140,00</Text>
                         <Text style={styles.textCategoria}>22:00</Text>
                     </View>
-
-
                 </View>
             </ScrollView>
         </View>
@@ -287,13 +291,14 @@ const styles = StyleSheet.create({
     },
     textHistorico: {
         fontSize: 16,
-        color: '#000000',
+        color: '#1D1252',
         fontFamily: 'Inter',
+        fontWeight: 'bold',
 
     },
     textValor: {
         fontSize: 14,
-        color: '#000000',
+        color: '#1D1252',
         fontFamily: 'Inter',
         fontWeight: 'bold',
     },
@@ -302,6 +307,14 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
         fontFamily: 'Inter',
         marginTop: 2,
+    },
+    iconeGastos: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#F1F5F9', // Cinza clarinho padrão
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
 })
