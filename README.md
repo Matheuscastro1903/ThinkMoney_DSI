@@ -1,50 +1,53 @@
-# Welcome to your Expo app 👋
+# ThinkMoney
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Este é um projeto React Native criado com [Expo](https://expo.dev), focado em gestão e organização financeira pessoal. O aplicativo oferece funcionalidades para acompanhamento de metas financeiras, gerenciamento de lembretes de contas e suporte via assistente virtual integrado.
 
-## Get started
+## Funcionalidades Principais
 
-1. Install dependencies
+> **Status:** O projeto encontra-se em desenvolvimento ativo. Novas funcionalidades e otimizações são integradas recorrentemente.
 
-   ```bash
-   npm install
-   ```
+*   **Gestão de Metas:** Acompanhamento visual de objetivos financeiros através de indicadores de progresso.
+*   **Lembretes:** Sistema de controle de contas com filtros de status (Todos, Pendentes, Pagos).
+*   **Chatbot:** Assistente virtual integrado para suporte.
+*   **Autenticação:** Sistema de login e recuperação de senha utilizando Firebase.
 
-2. Start the app
+## Estrutura do Projeto
 
-   ```bash
-   npx expo start
-   ```
+A navegação e as telas da aplicação estão localizadas no diretório `src/app`, utilizando o padrão de rotas baseadas em arquivo fornecido pelo [Expo Router](https://docs.expo.dev/router/introduction).
 
-In the output, you'll find options to open the app in a
+## Como Executar Localmente
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Siga os passos abaixo para instalar as dependências e iniciar o ambiente de desenvolvimento.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1.  Instale as dependências do projeto:
 
-## Get a fresh project
+    ```bash
+    npm install
+    ```
 
-When you're ready, run:
+2.  Inicie o servidor de desenvolvimento do Expo:
 
-```bash
-npm run reset-project
-```
+    ```bash
+    npx expo start
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+No terminal (output), você encontrará as opções para abrir o aplicativo em:
 
-## Learn more
+*   [Development build](https://docs.expo.dev/develop/development-builds/introduction/)
+*   [Emulador Android](https://docs.expo.dev/workflow/android-studio-emulator/)
+*   [Simulador iOS](https://docs.expo.dev/workflow/ios-simulator/)
+*   [Expo Go](https://expo.dev/go) (aplicativo para testes em dispositivos físicos)
 
-To learn more about developing your project with Expo, look at the following resources:
+## Tecnologias Utilizadas
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+*   **React Native & Expo**
+*   **TypeScript**
+*   **Expo Router**
+*   **Firebase**
 
-## Join the community
+## Saiba Mais
 
-Join our community of developers creating universal apps.
+Para consultar a documentação oficial e aprender mais sobre as ferramentas utilizadas na base deste projeto, acesse os recursos abaixo:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+*   [Documentação do Expo](https://docs.expo.dev/)
+*   [Tutorial de Introdução ao Expo](https://docs.expo.dev/tutorial/introduction/)
