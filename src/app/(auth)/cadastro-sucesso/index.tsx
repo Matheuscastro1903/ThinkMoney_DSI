@@ -1,22 +1,20 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 
-
-
-export default function LinkEnviado() {
+export default function CadastroSucesso() {
     return (
         <View style={styles.container}>
             <View style={styles.icone}>
-                <Ionicons name="paper-plane" size={60} color="black" />
+                <Ionicons name="checkmark" size={80} color="black" />
             </View>
             <View style={styles.main}>
                 <Text style={styles.text1}>
-                    Link enviado!
+                    Cadastro realizado!
                 </Text>
                 <Text style={styles.text2}>
-                    Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
+                    Agora você pode aproveitar todos os recursos que o ThinkMoney tem a oferecer.
                 </Text>
             </View>
             <LinearGradient
@@ -26,16 +24,16 @@ export default function LinkEnviado() {
                 style={styles.linhaSeparadora}>
 
             </LinearGradient>
-            <TouchableOpacity style={styles.confirmar} onPress={() => router.push('/(auth)/login')}>
-                <Text style={styles.textconfirmar}>
-                    Voltar ao login
+            <TouchableOpacity style={styles.prosseguir} onPress={() => router.push('/(auth)/login')}>
+                <Text style={styles.textprosseguir}>
+                    Ir para login
                 </Text>
             </TouchableOpacity>
+
 
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -62,7 +60,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 30,
         fontWeight: 'bold',
-
     },
     text2: {
         color: '#A8A7D5',
@@ -73,7 +70,7 @@ const styles = StyleSheet.create({
         width: 300,
         letterSpacing: 0.6,
     },
-    confirmar: {
+    prosseguir: {
         width: '70%',
         height: 56,
         backgroundColor: '#FFFFFF',
@@ -83,7 +80,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         justifyContent: 'center',
     },
-    textconfirmar: {
+    textprosseguir: {
         color: '#1D1252',
         fontSize: 18,
         fontWeight: 'bold',
@@ -97,4 +94,5 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderRadius: 25,
     },
+
 });

@@ -29,8 +29,6 @@ export default function telaInical(){
                           </TouchableOpacity>
             </Link>
 
-            <Link href={'/metas'} asChild>
-
             {/* botao para teste das telas novas  */}
             <Link href={'/(tabs)/home'} asChild>
                             <TouchableOpacity style={styles.button}>
@@ -38,8 +36,6 @@ export default function telaInical(){
                             </TouchableOpacity>
 
             </Link>
-
-            
 
         </View>
     )

@@ -1,34 +1,38 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
 
-import InputLogin from '../../../components/auth/inputlogin';
-import InputSenha from '@/src/components/auth/inputsenha';
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
 import EscolhaAvatar from '@/src/components/auth/escolhaavantar';
 import InputDate from '@/src/components/auth/inputdata';
+import InputSenha from '@/src/components/auth/inputsenha';
+import InputLogin from '../../../components/auth/inputlogin';
 
 import { Link } from "expo-router";
 
 export default function Cadastro() {
 
-    
+
 
     const [avatarEscolhido, setAvatarEscolhido] = useState('../../assets/images/avatarcapivara.png');
 
-    const [inputNome,setInputNome]=useState('')
-    const [inputUserName,setUserName]=useState('')
-    const [inputEmail,setInputEmail]=useState('')
-    const [inputSenha,setInputSenha]=useState('')
-    const [inputSenhaConfirmada,setInputSenhaConfirmada]=useState('')
+    const [inputNome, setInputNome] = useState('')
+    const [inputUserName, setUserName] = useState('')
+    const [inputEmail, setInputEmail] = useState('')
+    const [inputSenha, setInputSenha] = useState('')
+    const [inputSenhaConfirmada, setInputSenhaConfirmada] = useState('')
     const [inputData, setInputData] = useState<Date | null>(null);
 
     const [termosAceitos, setTermosAceitos] = useState(false);
-    
+
 
     function debugando() {
-        console.log(inputNome,inputEmail,inputUserName,inputSenha,inputSenhaConfirmada,inputData,avatarEscolhido)
+        console.log(inputNome, inputEmail, inputUserName, inputSenha, inputSenhaConfirmada, inputData, avatarEscolhido)
+
+        router.replace('/(auth)/cadastro-sucesso');
     }
+
 
     return (
         // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -93,9 +97,9 @@ export default function Cadastro() {
                             iconVisibilidade={require('../../../assets/icons/iconeolho.svg')}
                             value={inputSenhaConfirmada}
                         />
-                        <InputDate label='Data de nascimento:' 
-                        icon={require('../../../assets/icons/iconedata.svg')}
-                        onChange={(dataPronta) => setInputData(dataPronta)}
+                        <InputDate label='Data de nascimento:'
+                            icon={require('../../../assets/icons/iconedata.svg')}
+                            onChange={(dataPronta) => setInputData(dataPronta)}
                         ></InputDate>
 
                     </View>
@@ -119,7 +123,7 @@ export default function Cadastro() {
                 </View>
 
                 <View style={styles.containerlinklogin}>
-                    
+
                     <Text style={{ color: '#867DC1' }}>Já tem uma conta?</Text>
                     <Link href={'/(auth)/login'} asChild>
                         <TouchableOpacity>
@@ -168,25 +172,25 @@ const styles = StyleSheet.create({
         padding: 20,
         gap: 30,
         width: '90%',
-        alignItems:'center',
-        justifyContent:'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
-    mainFrase:{
-        color:'#1D1252',
-        fontSize:24,
-        fontWeight:'bold'
+    mainFrase: {
+        color: '#1D1252',
+        fontSize: 24,
+        fontWeight: 'bold'
     },
 
-    subFrase:{
-        color:'#575F67',
-        fontSize:16
+    subFrase: {
+        color: '#575F67',
+        fontSize: 16
     },
 
-    
-    containercadastro:{
-        alignContent:'center',
-        justifyContent:'center'
+
+    containercadastro: {
+        alignContent: 'center',
+        justifyContent: 'center'
     },
 
     checkboxContainer: {

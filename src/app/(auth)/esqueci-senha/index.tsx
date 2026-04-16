@@ -1,15 +1,13 @@
 // arquivo que sera responsavel pela tela de recuperação de senha
 
 
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from 'react-native'
 import ButtonComeBack from '@/src/components/buttoncomeback';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
 import { recuperarSenha } from '@/src/services/authService';
-import { Alert } from 'react-native';
-import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 
 export default function EsqueciSenha() {
@@ -53,7 +51,7 @@ export default function EsqueciSenha() {
                 keyboardShouldPersistTaps='handled'
             >
                 <TouchableOpacity style={styles.header}>
-                    <ButtonComeBack label='Voltar' url='/app/' color='#1D1252'></ButtonComeBack>
+                    <ButtonComeBack label='Voltar' url='/(auth)/login' color='#1D1252'></ButtonComeBack>
                 </TouchableOpacity>
                 <View style={styles.icone}>
                     <Ionicons name="lock-closed" size={45} color="black" />
@@ -74,10 +72,10 @@ export default function EsqueciSenha() {
                 </View>
                 <TouchableOpacity style={styles.confirmar} onPress={handleRecuperarSenha}>
                     {carregando ? (
-                        <ActivityIndicator size="large" color="#FFFFFF" />
+                        <ActivityIndicator size="large" color="#1D1252" />
                     ) : (
                         <Text style={styles.textconfirmar}>
-                            ENVIAR LINK
+                            Enviar link
                         </Text>
                     )}
 
@@ -172,7 +170,7 @@ const styles = StyleSheet.create({
     confirmar: {
         width: '70%',
         height: 56,
-        backgroundColor: '#000000ff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 28,
         alignItems: 'center',
         alignSelf: 'center',
@@ -180,7 +178,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     textconfirmar: {
-        color: '#FFFFFF',
+        color: '#1D1252',
         fontSize: 18,
         fontWeight: 'bold',
         letterSpacing: 0.6,
