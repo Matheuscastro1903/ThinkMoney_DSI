@@ -52,9 +52,8 @@ export default function EsqueciSenha() {
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps='handled'
             >
-                <TouchableOpacity style={styles.header}>
-                    <ButtonComeBack label='Voltar' url='/app/' color='#1D1252'></ButtonComeBack>
-                </TouchableOpacity>
+                <ButtonComeBack label='Voltar' url='/' color='#1D1252'></ButtonComeBack>
+                                
                 <View style={styles.icone}>
                     <Ionicons name="lock-closed" size={45} color="black" />
                 </View>
@@ -111,6 +110,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1D1252',
+        flexDirection:'column',
+        justifyContent:'center',
+        gap:30,
+        paddingBottom: 40,        
+        paddingTop: 20,    
     },
     header: {
         flexDirection: 'row',
