@@ -38,6 +38,7 @@ export default function telaInical(){
                             </TouchableOpacity>
 
             </Link>
+            </Link>
 
             
 

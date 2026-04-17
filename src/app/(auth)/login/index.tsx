@@ -5,15 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: Sa
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
 import InputSenha from '@/src/components/auth/inputsenha';
 import InputLogin from '../../../components/auth/inputlogin';
-
+import { useRouter } from 'expo-router';
 import { Link } from "expo-router";
 
 import ButtonComeBack from '@/src/components/buttoncomeback';
 
 export default function Login() {
-
+    const router = useRouter();
     function debugando() {
         console.log(1)
+        router.push('/(tabs)/home')
     }
 
     const [manterConectado, setManterConectado] = useState(false);
@@ -60,7 +61,7 @@ export default function Login() {
                         <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
                     </TouchableOpacity>
 
-                    <ButtonConfirmar label='Entrar' onClick={Login} />
+                    <ButtonConfirmar label='Entrar' onClick={debugando} />
 
                 </View>
 
