@@ -31,6 +31,11 @@ export default function Cadastro() {
             return;
         }
 
+        if (!inputEmail.endsWith('@gmail.com')) {
+            setMensagemErro('O email deve ser um endereço do Gmail.');
+            return;
+        }
+
         if (inputSenha.length < 8) {
             setMensagemErro('A senha deve ter pelo menos 8 caracteres.');
             return;
