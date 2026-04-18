@@ -1,19 +1,22 @@
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // ADICIONADO: ScrollView
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'; // ADICIONADO: ScrollView
 import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
 import InputSenha from '@/src/components/auth/inputsenha';
 import InputLogin from '../../../components/auth/inputlogin';
-import { useRouter } from 'expo-router';
-import { Link } from "expo-router";
+import { useRouter, Link } from 'expo-router';
 
 import ButtonComeBack from '@/src/components/buttoncomeback';
 
 export default function Login() {
     const router = useRouter();
-    function debugando() {
-        console.log(1)
+    function handleLogin() {
+        if (inputEmail === '' || inputSenha === '') {
+            Alert.alert('Preencha todos os campos para continuar');
+            return;
+        }
+
         router.push('/(tabs)/home')
     }
 
@@ -61,7 +64,7 @@ export default function Login() {
                         <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
                     </TouchableOpacity>
 
-                    <ButtonConfirmar label='Entrar' onClick={debugando} />
+                    <ButtonConfirmar label='Entrar' onClick={handleLogin} />
 
                 </View>
 

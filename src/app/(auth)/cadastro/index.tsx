@@ -12,9 +12,6 @@ import InputLogin from '../../../components/auth/inputlogin';
 import { Link } from "expo-router";
 
 export default function Cadastro() {
-
-
-
     const [avatarEscolhido, setAvatarEscolhido] = useState('../../assets/images/avatarcapivara.png');
 
     const [inputNome, setInputNome] = useState('')
