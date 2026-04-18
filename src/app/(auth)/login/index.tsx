@@ -11,18 +11,29 @@ import ButtonComeBack from '@/src/components/buttoncomeback';
 
 export default function Login() {
     const router = useRouter();
-    function handleLogin() {
-        if (inputEmail === '' || inputSenha === '') {
-            Alert.alert('Preencha todos os campos para continuar');
-            return;
-        }
-
-        router.push('/(tabs)/home')
-    }
-
     const [manterConectado, setManterConectado] = useState(false);
     const [inputEmail, setInputEmail] = useState('')
     const [inputSenha, setInputSenha] = useState('')
+    const [camposVazios, setCamposVazios] = useState(false)
+    const [credenciaisIncorretas, setCredenciaisIncorretas] = useState(false)
+
+    function handleLogin() {
+        setCamposVazios(false);
+        setCredenciaisIncorretas(false);
+
+        if (inputEmail === '' || inputSenha === '') {
+            setCamposVazios(true);
+            return;
+        }
+
+        if (inputEmail !== 'admin' || inputSenha !== 'admin') {
+            setCredenciaisIncorretas(true);
+            return;
+        }
+
+        router.push('/(tabs)/home');
+        return;
+    }
 
     return (
         // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -64,7 +75,15 @@ export default function Login() {
                         <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
                     </TouchableOpacity>
 
-                    <ButtonConfirmar label='Entrar' onClick={handleLogin} />
+                    <View style={{ gap: 10 }}>
+                        {credenciaisIncorretas && (
+                            <Text style={{ color: 'red', textAlign: 'center' }}>Email ou senha incorretos. Tente novamente.</Text>
+                        )}
+                        {camposVazios && (
+                            <Text style={{ color: 'red', textAlign: 'center'}}>Preencha todos os campos para continuar.</Text>
+                        )}
+                        <ButtonConfirmar label='Entrar' onClick={handleLogin} />
+                    </View>
 
                 </View>
 
