@@ -23,14 +23,14 @@ export default function Login() {
             setMensagemErro('Preencha todos os campos para continuar.');
             return;
         }
-
-        if (inputEmail !== 'admin' || inputSenha !== 'admin') {
-            setMensagemErro('Email ou senha incorretos. Tente novamente.');
+        
+        if (inputSenha.length < 8) {
+            setMensagemErro('A senha deve ter pelo menos 8 caracteres.');
             return;
         }
 
-        if (inputSenha.length < 8) {
-            setMensagemErro('A senha deve ter pelo menos 8 caracteres.');
+        if (inputEmail !== 'admin' || inputSenha !== 'admin') {
+            setMensagemErro('Email ou senha incorretos. Tente novamente.');
             return;
         }
 
