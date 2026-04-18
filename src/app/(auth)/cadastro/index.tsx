@@ -23,11 +23,23 @@ export default function Cadastro() {
 
     const [termosAceitos, setTermosAceitos] = useState(false);
 
+    const [mensagemErro, setMensagemErro] = useState('')
 
-    function debugando() {
-        console.log(inputNome, inputEmail, inputUserName, inputSenha, inputSenhaConfirmada, inputData, avatarEscolhido)
+    function handleCadastro() {
+        setMensagemErro(''); // Limpa mensagens de erro anteriores
 
-        router.replace('/(auth)/cadastro-sucesso');
+        if (inputEmail === '' || inputSenha === '') {
+            setMensagemErro('Preencha todos os campos para continuar.');
+            return;
+        }
+
+        if (inputSenha.length < 8) {
+            setMensagemErro('A senha deve ter pelo menos 8 caracteres.');
+            return;
+        }
+
+        router.replace('./cadastro-sucesso');
+        return;
     }
 
 
@@ -115,7 +127,13 @@ export default function Cadastro() {
                         </Text>
                     </TouchableOpacity>
 
-                    <ButtonConfirmar label='Cadastrar' onClick={debugando} />
+                    <View style={{ gap: 10, alignItems: 'center' }}>
+                        {mensagemErro && (
+                            <Text style={{ color: 'red', textAlign: 'center'}}>{mensagemErro}</Text>
+                        )}
+
+                        <ButtonConfirmar label='Cadastrar' onClick={handleCadastro} />
+                    </View>
 
                 </View>
 

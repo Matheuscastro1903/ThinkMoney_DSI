@@ -14,20 +14,23 @@ export default function Login() {
     const [manterConectado, setManterConectado] = useState(false);
     const [inputEmail, setInputEmail] = useState('')
     const [inputSenha, setInputSenha] = useState('')
-    const [camposVazios, setCamposVazios] = useState(false)
-    const [credenciaisIncorretas, setCredenciaisIncorretas] = useState(false)
+    const [mensagemErro, setMensagemErro] = useState('')
 
     function handleLogin() {
-        setCamposVazios(false);
-        setCredenciaisIncorretas(false);
+        setMensagemErro(''); // Limpa mensagens de erro anteriores
 
         if (inputEmail === '' || inputSenha === '') {
-            setCamposVazios(true);
+            setMensagemErro('Preencha todos os campos para continuar.');
             return;
         }
 
         if (inputEmail !== 'admin' || inputSenha !== 'admin') {
-            setCredenciaisIncorretas(true);
+            setMensagemErro('Email ou senha incorretos. Tente novamente.');
+            return;
+        }
+
+        if (inputSenha.length < 8) {
+            setMensagemErro('A senha deve ter pelo menos 8 caracteres.');
             return;
         }
 
@@ -76,11 +79,8 @@ export default function Login() {
                     </TouchableOpacity>
 
                     <View style={{ gap: 10 }}>
-                        {credenciaisIncorretas && (
-                            <Text style={{ color: 'red', textAlign: 'center' }}>Email ou senha incorretos. Tente novamente.</Text>
-                        )}
-                        {camposVazios && (
-                            <Text style={{ color: 'red', textAlign: 'center'}}>Preencha todos os campos para continuar.</Text>
+                        {mensagemErro && (
+                            <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
                         )}
                         <ButtonConfirmar label='Entrar' onClick={handleLogin} />
                     </View>
