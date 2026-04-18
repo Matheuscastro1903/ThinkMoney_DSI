@@ -1,171 +1,231 @@
-import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // ADICIONADO: ScrollView
-import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
+import { useState } from "react";
+import {
+    ActivityIndicator,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native"; // ADICIONADO: ScrollView
+import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
-import ButtonConfirmar from '@/src/components/auth/buttonaction';
-import InputSenha from '@/src/components/auth/inputsenha';
-import InputLogin from '../../../components/auth/inputlogin';
-import { useRouter } from 'expo-router';
-import { Link } from "expo-router";
+import ButtonConfirmar from "@/src/components/auth/buttonaction";
+import InputSenha from "@/src/components/auth/inputsenha";
+import { Link, useRouter } from "expo-router";
+import InputLogin from "../../../components/auth/inputlogin";
 
-import ButtonComeBack from '@/src/components/buttoncomeback';
+import ButtonComeBack from "@/src/components/buttoncomeback";
 
 export default function Login() {
-    const router = useRouter();
-    function debugando() {
-        console.log(1)
-        router.push('/(tabs)/home')
+  const router = useRouter();
+  const [manterConectado, setManterConectado] = useState(false);
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputSenha, setInputSenha] = useState("");
+  const [mensagemErro, setMensagemErro] = useState("");
+  const [isloading, setIsLoading] = useState(false);
+
+  function handleLogin() {
+    setMensagemErro("");
+
+    const email = inputEmail.trim();
+
+    if (email === "" || inputSenha === "") {
+      setMensagemErro("Preencha todos os campos para continuar.");
+      return;
     }
 
-    const [manterConectado, setManterConectado] = useState(false);
-    const [inputEmail, setInputEmail] = useState('')
-    const [inputSenha, setInputSenha] = useState('')
+    if (!email.endsWith("@gmail.com")) {
+      setMensagemErro("O email deve ser um endereço do Gmail.");
+      return;
+    }
 
-    return (
-        // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
-        <SafeAreaView style={styles.safeArea}>
+    if (inputSenha.length < 8) {
+      setMensagemErro("A senha deve ter pelo menos 8 caracteres.");
+      return;
+    }
 
-            {/* ScrollView por dentro — permite rolar caso necessário */}
-            <ScrollView contentContainerStyle={styles.fundo}>
-                <ButtonComeBack label='Voltar' url='/' color='#1D1252'></ButtonComeBack>
-                <Image
-                    source={require('../../../assets/images/logothinkmoney.png')}
-                    style={styles.logo}
-                />
+    if (email !== "admin" || inputSenha !== "admin") {
+      setMensagemErro("Email ou senha incorretos. Tente novamente.");
+      return;
+    }
 
-                <View style={styles.main}>
+    setIsLoading(true);
+    try {
+      router.push("/(tabs)/home");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-                    <View>
-                        <InputLogin label='Digite seu email' placeholder='nome@gmail.com' atualizando={(valor) => setInputEmail(valor)} icon={require('../../../assets/icons/iconeusuario.svg')} value={inputEmail} />
+  return (
+    // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
+    <SafeAreaView style={styles.safeArea}>
+      {/* ScrollView por dentro — permite rolar caso necessário */}
+      <ScrollView contentContainerStyle={styles.fundo}>
+        <ButtonComeBack label="Voltar" url="/" color="#1D1252"></ButtonComeBack>
+        <Image
+          source={require("../../../assets/images/logothinkmoney.png")}
+          style={styles.logo}
+        />
 
-                        <InputSenha label='Digite sua senha' placeholder='Digite sua senha' atualizando={(valor) => setInputSenha(valor)} icon={require('../../../assets/icons/iconecadeado.svg')} iconVisibilidade={require('../../../assets/icons/iconeolho.svg')} value={inputSenha} />
+        <View style={styles.main}>
+          <View>
+            <InputLogin
+              label="Digite seu email"
+              placeholder="nome@gmail.com"
+              atualizando={(valor) => setInputEmail(valor)}
+              icon={require("../../../assets/icons/iconeusuario.svg")}
+              value={inputEmail}
+            />
 
-                        <View style={styles.esqueceusenha}>
-                            <Link href={'/(auth)/esqueci-senha'} asChild>
-                                <TouchableOpacity>
-                                    <Text style={styles.textesqueceu}>Esqueci a senha</Text>
-                                </TouchableOpacity>
-                            </Link>
-                        </View>
-                    </View>
+            <InputSenha
+              label="Digite sua senha"
+              placeholder="Digite sua senha"
+              atualizando={(valor) => setInputSenha(valor)}
+              icon={require("../../../assets/icons/iconecadeado.svg")}
+              iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
+              value={inputSenha}
+            />
 
-                    <TouchableOpacity
-                        style={styles.checkboxContainer}
-                        onPress={() => setManterConectado(!manterConectado)}
-                        activeOpacity={0.7}
-                    >
-                        <View style={[styles.checkbox, manterConectado && styles.checkboxMarcado]}>
-                            {manterConectado && <Text style={styles.checkmark}>✓</Text>}
-                        </View>
+            <View style={styles.esqueceusenha}>
+              <Link href={"/(auth)/esqueci-senha"} asChild>
+                <TouchableOpacity>
+                  <Text style={styles.textesqueceu}>Esqueci a senha</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
 
-                        <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
-                    </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setManterConectado(!manterConectado)}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                manterConectado && styles.checkboxMarcado,
+              ]}
+            >
+              {manterConectado && <Text style={styles.checkmark}>✓</Text>}
+            </View>
 
-                    <ButtonConfirmar label='Entrar' onClick={debugando} />
+            <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
+          </TouchableOpacity>
 
-                </View>
+          <View style={{ gap: 10 }}>
+            {mensagemErro && (
+              <Text style={{ color: "red", textAlign: "center" }}>
+                {mensagemErro}
+              </Text>
+            )}
+            {isloading ? (
+              <ActivityIndicator size="large" color="#1D1252" />
+            ) : (
+              <ButtonConfirmar label="Entrar" onClick={handleLogin} />
+            )}
+          </View>
+        </View>
 
-                <View style={styles.containerlinkcadastro}>
-                    <Text style={{ color: '#867DC1' }}>Novo por aqui ?</Text>
-                    <Link href={'/(auth)/cadastro'} asChild>
-                        <TouchableOpacity>
-                            <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
-                        </TouchableOpacity>
-                    </Link>
-                </View>
-
-            </ScrollView>
-
-        </SafeAreaView>
-    )
+        <View style={styles.containerlinkcadastro}>
+          <Text style={{ color: "#867DC1" }}>Novo por aqui ?</Text>
+          <Link href={"/(auth)/cadastro"} asChild>
+            <TouchableOpacity>
+              <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
+  // ADICIONADO: estilo exclusivo do SafeAreaView
+  // backgroundColor aqui evita flash branco nas bordas do dispositivo
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#1D1252",
+  },
 
-    // ADICIONADO: estilo exclusivo do SafeAreaView
-    // backgroundColor aqui evita flash branco nas bordas do dispositivo
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#1D1252',
-    },
+  fundo: {
+    flexGrow: 1, // MUDANÇA: flexGrow:1 no lugar de height:'100%' — necessário para ScrollView expandir corretamente
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#1D1252",
+    width: "100%",
+    gap: 30,
+    paddingBottom: 40, // ADICIONADO: respiro no final ao scrollar
+    paddingTop: 20, // ADICIONADO: respiro no topo após a SafeArea
+  },
 
-    fundo: {
-        flexGrow: 1,              // MUDANÇA: flexGrow:1 no lugar de height:'100%' — necessário para ScrollView expandir corretamente
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        backgroundColor: '#1D1252',
-        width: '100%',
-        gap: 30,
-        paddingBottom: 40,        // ADICIONADO: respiro no final ao scrollar
-        paddingTop: 20,           // ADICIONADO: respiro no topo após a SafeArea
-    },
+  logo: {
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
+  },
 
-    logo: {
-        width: 150,
-        height: 150,
-        resizeMode: 'contain'
-    },
+  main: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 20,
+    gap: 30,
+    width: "90%", // ADICIONADO: largura relativa para não bater nas laterais
+  },
 
-    main: {
-        backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 20,
-        gap: 30,
-        width: '90%',             // ADICIONADO: largura relativa para não bater nas laterais
-    },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginHorizontal: 10,
+    alignSelf: "flex-start",
+  },
 
-    checkboxContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginHorizontal: 10,
-        alignSelf: 'flex-start',
-    },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
 
-    checkbox: {
-        width: 20,
-        height: 20,
-        borderRadius: 4,
-        borderWidth: 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-    },
+  checkboxMarcado: {
+    backgroundColor: "#0D7FF2",
+  },
 
-    checkboxMarcado: {
-        backgroundColor: '#0D7FF2',
-    },
+  checkmark: {
+    color: "white",
+    fontSize: 13,
+    fontWeight: "bold",
+  },
 
-    checkmark: {
-        color: 'white',
-        fontSize: 13,
-        fontWeight: 'bold',
-    },
+  checkboxLabel: {
+    fontSize: 13,
+    color: "#484550",
+    fontWeight: "500",
+  },
 
-    checkboxLabel: {
-        fontSize: 13,
-        color: '#484550',
-        fontWeight: '500',
-    },
+  esqueceusenha: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
 
-    esqueceusenha: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end'
-    },
+  textesqueceu: {
+    fontWeight: "bold",
+  },
 
-    textesqueceu: {
-        fontWeight: 'bold'
-    },
+  containerlinkcadastro: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 4,
+  },
 
-    containerlinkcadastro: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        gap: 4
-    },
-
-    textlinkcadastro: {
-        color: 'white',
-        fontWeight: 'bold'
-    },
+  textlinkcadastro: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });

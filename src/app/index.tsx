@@ -6,12 +6,7 @@ import { Link } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 
 
-export default function telaInical(){
-
-    function debugando(){
-        console.log(1)
-    }
-     
+export default function telaInical(){  
     return(
         <View style={styles.main}>
 
@@ -36,8 +31,6 @@ export default function telaInical(){
                             </TouchableOpacity>
 
             </Link>
-            </Link>
-
         </View>
     )
 }
