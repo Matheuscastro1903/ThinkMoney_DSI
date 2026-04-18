@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'; // ADICIONADO: ScrollView
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // ADICIONADO: ScrollView
 import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from '@/src/components/auth/buttonaction';

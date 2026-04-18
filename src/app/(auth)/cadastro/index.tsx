@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 import { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
@@ -9,9 +9,7 @@ import InputDate from '@/src/components/auth/inputdata';
 import InputSenha from '@/src/components/auth/inputsenha';
 import InputLogin from '../../../components/auth/inputlogin';
 
-import { Link } from "expo-router";
-
-export default function Cadastro() {
+export default function Cadastro() { 
     const [avatarEscolhido, setAvatarEscolhido] = useState('../../assets/images/avatarcapivara.png');
 
     const [inputNome, setInputNome] = useState('')
