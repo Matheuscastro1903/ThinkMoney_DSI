@@ -45,7 +45,7 @@ export default function Login() {
       return;
     }
 
-    if (email !== "admin" || inputSenha !== "admin") {
+    if (email !== "admin@gmail.com" || inputSenha !== "admin123") {
       setMensagemErro("Email ou senha incorretos. Tente novamente.");
       return;
     }
