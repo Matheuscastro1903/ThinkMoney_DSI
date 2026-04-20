@@ -56,6 +56,16 @@ export default function TelaCreateLembrete() {
             onChange={setEscolhaGastos} 
           />
 
+          <InputTexto 
+            label='Valor do Gasto' 
+            placeholder='Ex: 67,00' 
+            atualizando={setInputNomeGasto} 
+            value={inputNomeGasto}
+            width={300} 
+            height={56}
+            multline={false}
+          />
+
           <InputDateLembretes 
             label="Escolha a data:" 
             icon={require('../../../../../assets/icons/iconedata.svg')}
@@ -86,6 +96,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1D1252', 
+    paddingBottom:50
   },
   scrollContent: {
     flexGrow: 1,
