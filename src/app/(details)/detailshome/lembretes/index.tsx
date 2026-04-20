@@ -5,7 +5,7 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
-
+import { Link } from "expo-router";
 
 export default function Lembretes() {
     const router = useRouter();
@@ -94,16 +94,25 @@ export default function Lembretes() {
 
                 </LinearGradient>
                 <View style={styles.containerExtra}>
-                    <View style={styles.addIconCircle}>
-                        <Ionicons name="add" size={40} color="#000000" />
-                    </View>
+                    
+
+                    <Link href="/detailshome/lembretes/createLembrete/page" asChild>
+                        <TouchableOpacity style={styles.addIconCircle}>
+                            <Ionicons name="add" size={40} color="#000000" />
+                        </TouchableOpacity>
+                    </Link>
 
                     <Text style={styles.text4}>Nova despesa?</Text>
                     <Text style={styles.text5}>Automatize o acompanhamento de
                         suas contas recorrentes.</Text>
-                    <TouchableOpacity style={styles.buttonAdd}>
-                        <Text style={styles.buttonText}>ADICIONAR LEMBRETE</Text>
-                    </TouchableOpacity>
+                    
+
+                    <Link href="/detailshome/lembretes/createLembrete/page" asChild>
+                        <TouchableOpacity style={styles.buttonAdd}>
+                            <Text style={styles.buttonText}>ADICIONAR LEMBRETE</Text>
+                        </TouchableOpacity>
+                    </Link>
+                    
                 </View>
             </ScrollView>
         </LayoutNavBar>
