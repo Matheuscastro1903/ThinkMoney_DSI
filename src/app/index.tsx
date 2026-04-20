@@ -25,7 +25,7 @@ export default function telaInical(){
             </Link>
 
             {/* botao para teste das telas novas  */}
-            <Link href={'/metas'} asChild>
+            <Link href={'/(tabs)/mapa'} asChild>
                             <TouchableOpacity style={styles.button}>
                                 <Ionicons name="arrow-forward" size={32} color="white" />
                             </TouchableOpacity>
