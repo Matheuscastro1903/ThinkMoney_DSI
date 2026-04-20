@@ -4,9 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: Sa
 
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
 import InputSenha from '@/src/components/auth/inputsenha';
+import { Link, useRouter } from 'expo-router';
 import InputLogin from '../../../components/auth/inputlogin';
-import { useRouter } from 'expo-router';
-import { Link } from "expo-router";
 
 import ButtonComeBack from '@/src/components/buttoncomeback';
 

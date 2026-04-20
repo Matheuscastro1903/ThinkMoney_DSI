@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // ADICIONADO: SafeAreaView
 
-import InputLogin from '../../../components/auth/inputlogin';
-import InputSenha from '@/src/components/auth/inputsenha';
 import ButtonConfirmar from '@/src/components/auth/buttonaction';
 import EscolhaAvatar from '@/src/components/auth/escolhaavantar';
-import InputDate from '@/src/components/auth/inputdata';
+import InputSenha from '@/src/components/auth/inputsenha';
+import InputDate from '@/src/components/inputdata';
+import InputLogin from '../../../components/auth/inputlogin';
 
 import { Link } from "expo-router";
 
