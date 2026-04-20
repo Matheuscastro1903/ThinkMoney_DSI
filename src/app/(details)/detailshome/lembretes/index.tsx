@@ -9,6 +9,19 @@ import { Link } from "expo-router";
 
 export default function Lembretes() {
     const router = useRouter();
+
+    //Função que envia os parâmetros para a tela de atualização
+    const handleUpdate = (titulo: string, categoria: string, valor: string) => {
+        router.push({
+            pathname: "/detailshome/lembretes/attlembrete/page" as any,
+            params: {
+                titulo,
+                categoria,
+                valor,
+            }
+        });
+    };
+
     return (
         <LayoutNavBar>
             <HeaderBack />
@@ -18,7 +31,13 @@ export default function Lembretes() {
                     <Text style={styles.text2}>Gerencie seus compromissos financeiros recorrentes.</Text>
                     <Text style={styles.text3}>Compromissos próximos</Text>
                 </View>
-                <View style={styles.containerLembretes}>
+
+                {/*Aluguel */}
+                <TouchableOpacity 
+                    style={styles.containerLembretes} 
+                    activeOpacity={0.7}
+                    onPress={() => handleUpdate('Aluguel', 'MORADIA', '2.800,00')}
+                >
                     <View style={styles.lembreteIcone}>
                         <Ionicons name="home-outline" size={20} color="#1D1252" />
                     </View>
@@ -32,8 +51,14 @@ export default function Lembretes() {
                             <Text style={styles.badgeTextPendente}>PENDENTE</Text>
                         </View>
                     </View>
-                </View>
-                <View style={styles.containerLembretes}>
+                </TouchableOpacity>
+
+                {/*Netflix */}
+                <TouchableOpacity 
+                    style={styles.containerLembretes} 
+                    activeOpacity={0.7}
+                    onPress={() => handleUpdate('Netflix', 'ENTRETENIMENTO','55,90')}
+                >
                     <View style={styles.lembreteIcone}>
                         <Ionicons name="film-outline" size={20} color="#1D1252" />
                     </View>
@@ -47,8 +72,14 @@ export default function Lembretes() {
                             <Text style={styles.badgeTextPago}>PAGO</Text>
                         </View>
                     </View>
-                </View>
-                <View style={styles.containerLembretes}>
+                </TouchableOpacity>
+
+                {/* Lembrete: Seguro Carro */}
+                <TouchableOpacity 
+                    style={styles.containerLembretes} 
+                    activeOpacity={0.7}
+                    onPress={() => handleUpdate('Seguro Carro', 'TRANSPORTE','420,00')}
+                >
                     <View style={styles.lembreteIcone}>
                         <Ionicons name="car-outline" size={20} color="#1D1252" />
                     </View>
@@ -62,8 +93,14 @@ export default function Lembretes() {
                             <Text style={styles.badgeTextPendente}>PENDENTE</Text>
                         </View>
                     </View>
-                </View>
-                <View style={styles.containerLembretes}>
+                </TouchableOpacity>
+
+                {/* Lembrete: Energia Elétrica */}
+                <TouchableOpacity 
+                    style={styles.containerLembretes} 
+                    activeOpacity={0.7}
+                    onPress={() => handleUpdate('Energia Elétrica', 'FIXOS','215,40')}
+                >
                     <View style={styles.lembreteIcone}>
                         <Ionicons name="flash-outline" size={20} color="#1D1252" />
                     </View>
@@ -77,7 +114,7 @@ export default function Lembretes() {
                             <Text style={styles.badgeTextPendente}>PENDENTE</Text>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.verTodosContainer}>
                     <TouchableOpacity style={styles.verTodosButton} onPress={() => router.push("/detailshome/lembretes/vertodoslembretes" as any)}>
@@ -91,11 +128,9 @@ export default function Lembretes() {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.linhaSeparadora}>
-
                 </LinearGradient>
-                <View style={styles.containerExtra}>
-                    
 
+                <View style={styles.containerExtra}>
                     <Link href="/detailshome/lembretes/createLembrete/page" asChild>
                         <TouchableOpacity style={styles.addIconCircle}>
                             <Ionicons name="add" size={40} color="#000000" />
@@ -103,22 +138,18 @@ export default function Lembretes() {
                     </Link>
 
                     <Text style={styles.text4}>Nova despesa?</Text>
-                    <Text style={styles.text5}>Automatize o acompanhamento de
-                        suas contas recorrentes.</Text>
-                    
+                    <Text style={styles.text5}>Automatize o acompanhamento de suas contas recorrentes.</Text>
 
                     <Link href="/detailshome/lembretes/createLembrete/page" asChild>
                         <TouchableOpacity style={styles.buttonAdd}>
                             <Text style={styles.buttonText}>ADICIONAR LEMBRETE</Text>
                         </TouchableOpacity>
                     </Link>
-                    
                 </View>
             </ScrollView>
         </LayoutNavBar>
-    )
+    );
 }
-
 
 const styles = StyleSheet.create({
     main: {
@@ -143,11 +174,9 @@ const styles = StyleSheet.create({
     text3: {
         fontSize: 14,
         color: '#94A3B8',
-        fontFamily: 'Inter',
         letterSpacing: 2.4,
         paddingTop: 40,
         paddingLeft: 1,
-
     },
     containerLembretes: {
         height: 72,
@@ -167,12 +196,12 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 12,
-        backgroundColor: '#F1F5F9', // Cinza clarinho
+        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
     },
     lembreteInfo: {
-        flex: 1, // Usa todo o espaço livre
+        flex: 1,
         marginLeft: 12,
     },
     lembreteTitulo: {
@@ -186,7 +215,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     lembreteDireita: {
-        alignItems: 'flex-end', // Alinha textos pra direita
+        alignItems: 'flex-end',
     },
     lembreteMoeda: {
         fontSize: 12,
@@ -197,19 +226,19 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     badgePendente: {
-        backgroundColor: '#FEE2E2', // Vermelho bem claro
+        backgroundColor: '#FEE2E2',
         paddingVertical: 3,
         paddingHorizontal: 8,
         borderRadius: 12,
         marginTop: 5,
     },
     badgeTextPendente: {
-        color: '#B91C1C', // Vermelho escuro
+        color: '#B91C1C',
         fontSize: 9,
         fontWeight: 'bold',
     },
     badgePago: {
-        backgroundColor: '#E2E8F0', // Cinza clarinho
+        backgroundColor: '#E2E8F0',
         paddingVertical: 3,
         paddingHorizontal: 8,
         borderRadius: 12,
@@ -251,7 +280,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 0,
         padding: 24,
-
     },
     linhaSeparadora: {
         width: '80%',
@@ -264,20 +292,16 @@ const styles = StyleSheet.create({
     text4: {
         fontSize: 22,
         color: '#FFFFFF',
-        fontFamily: 'Inter',
         paddingTop: 5,
         paddingLeft: 1,
         fontWeight: 'bold',
-
     },
     text5: {
         fontSize: 14,
         color: '#94A3B8',
-        fontFamily: 'Inter',
         letterSpacing: 2.4,
         paddingTop: 10,
         textAlign: 'center',
-
     },
     buttonAdd: {
         width: '90%',
@@ -303,11 +327,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8,
     },
-
-})
-
-
-
+});
 
 
 
