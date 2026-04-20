@@ -2,9 +2,9 @@
 
 
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import CircularProgress from 'react-native-circular-progress-indicator';
 import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import CircularProgress from 'react-native-circular-progress-indicator';
 
 
 export default function Home() {
@@ -66,19 +66,27 @@ export default function Home() {
                     </View>
                 </View>
                 <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => console.log('clicou para registrar um novo gasto!')}>
-                    <Ionicons name="add-circle-outline" size={24} color="black" />
+                    <Ionicons name="wallet-outline" size={22} color="#1D1252" />
                     <Text style={styles.text5}>
-                        REGISTRAR NOVO GASTO
+                        Registrar novo gasto
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
                     <TouchableOpacity style={styles.metasPessoais} onPress={() => console.log('clicou em metas pessoais!')}>
-                        <Text style={styles.text6}>METAS PESSOAIS</Text>
+                        <Ionicons name="rocket-outline" size={18} color="#1D1252" />
+                        <Text style={styles.text6}>Metas</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.lembretes} onPress={() => router.push('/(details)/detailshome/lembretes')}>
-                        <Text style={styles.text6}>LEMBRETES</Text>
+                        <Ionicons name="notifications-outline" size={18} color="#1D1252" />
+                        <Text style={styles.text6}>Lembretes</Text>
                     </TouchableOpacity>
                 </View>
+                <TouchableOpacity
+                    style={{ ...styles.registrarNovoGasto, backgroundColor: '#FFD700', marginTop: 15, height: 45 }}
+                    onPress={() => router.push('/(details)/detailsmapa/visualizar-gastos')}
+                >
+                    <Text style={styles.text6}>[DEV] TESTAR TELA DE GASTOS</Text>
+                </TouchableOpacity>
                 <View>
                     <Text style={styles.ultimosGastos}>ÚLTIMOS GASTOS</Text>
                 </View>
@@ -151,17 +159,18 @@ const styles = StyleSheet.create({
     },
     text1: {
         fontSize: 14,
-        color: '#000000',
+        color: '#64748B',
         fontFamily: 'Inter',
+        fontWeight: 'bold',
         letterSpacing: 2.4,
         marginBottom: 8
 
     },
     text2: {
-        fontSize: 30,
+        fontSize: 32,
         fontWeight: 'bold',
         fontFamily: 'Inter',
-        color: '#000000',
+        color: '#1D1252',
     },
     grafico: {
         alignItems: 'center',
@@ -216,49 +225,47 @@ const styles = StyleSheet.create({
         height: 55,
         width: '90%',
         backgroundColor: '#FFFFFF',
-        borderRadius: 48,
+        borderRadius: 12,
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 35,
         flexDirection: 'row',
-        gap: 20,
+        gap: 5,
     },
     text5: {
-        fontSize: 14,
-        color: '#000000',
-        fontFamily: 'Inter',
-        letterSpacing: 2.4,
+        fontSize: 15,
+        color: '#1D1252',
+        fontWeight: 'bold',
     },
     text6: {
-        fontSize: 14,
-        color: '#000000',
-        fontFamily: 'Inter',
-        letterSpacing: 2.4,
+        fontSize: 15,
+        color: '#1D1252',
+        fontWeight: 'bold',
     },
     metasPessoais: {
         height: 55,
         width: '43%',
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: 12,
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
         flexDirection: 'row',
-        gap: 1,
+        gap: 5,
     },
     lembretes: {
         height: 55,
         width: '43%',
         backgroundColor: '#FFFFFF',
-        borderRadius: 24,
+        borderRadius: 12,
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
         flexDirection: 'row',
-        gap: 1,
+        gap: 5,
     },
     linhaBotao: {
         flexDirection: 'row',
