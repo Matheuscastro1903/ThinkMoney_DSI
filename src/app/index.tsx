@@ -6,12 +6,7 @@ import { Link } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 
 
-export default function telaInical(){
-
-    function debugando(){
-        console.log(1)
-    }
-     
+export default function telaInical(){  
     return(
         <View style={styles.main}>
 
@@ -29,8 +24,6 @@ export default function telaInical(){
                           </TouchableOpacity>
             </Link>
 
-            <Link href={'/metas'} asChild>
-
             {/* botao para teste das telas novas  */}
             <Link href={'/(tabs)/home'} asChild>
                             <TouchableOpacity style={styles.button}>
@@ -38,10 +31,6 @@ export default function telaInical(){
                             </TouchableOpacity>
 
             </Link>
-            </Link>
-
-            
-
         </View>
     )
 }
