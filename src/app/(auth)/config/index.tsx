@@ -1,22 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import HeaderBack from "../../../components/headerBack"
+
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="black" />
-      <View style={styles.header}>
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color="white"
-          style={styles.arrow}
-        />
-        <Text style={styles.textHeader}>Voltar</Text>
-      </View>
-
+      
+      <HeaderBack 
+      />
+      <ScrollView>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container2}>
           <Image
@@ -101,6 +96,7 @@ export default function App() {
           </View>
         </TouchableOpacity>
       </SafeAreaView>
+      </ScrollView>
     </View>
   );
 }
@@ -108,6 +104,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#1D1252"
   },
   header: {
     position: "absolute",

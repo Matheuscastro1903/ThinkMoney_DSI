@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link } from "expo-router";
@@ -7,8 +7,12 @@ import HeaderBack from "@/src/components/headerBack";
 
 export default function ChatBot() {
     return (
+        
+
+        
         <View style={styles.container}>
             <HeaderBack />
+            <ScrollView>
 
             <View style={styles.chat}>
                 <View style={styles.int}>
@@ -54,7 +58,9 @@ export default function ChatBot() {
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.footer}>
+            </View>
+            </ScrollView>
+            <View style={styles.footer}>
                     <View style={styles.inputContainer}>
                         <TextInput
                         placeholder="Escreva sua mensagem..."
@@ -68,19 +74,16 @@ export default function ChatBot() {
                            
                        </TouchableOpacity>
                     </View>
-                </View>
-
-
             </View>
-
         </View>
+        
     )
 }
 
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "white"
+        flex: 1,
     },
     int: {
         flexDirection: "column",
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#e9e9e9",
         marginTop: 12,
         borderRadius: 40,
-        height: 80,
+        height: 50,
         justifyContent: 'center',
         paddingHorizontal: 16,
     },
