@@ -14,7 +14,7 @@ import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import InputSenha from "@/src/components/auth/inputsenha";
 import { Link, useRouter } from "expo-router";
 import InputLogin from "../../../components/auth/inputlogin";
-
+import { loginUsuario } from "@/src/services/authService";
 import ButtonComeBack from "@/src/components/buttoncomeback";
 
 export default function Login() {
@@ -25,10 +25,13 @@ export default function Login() {
   const [mensagemErro, setMensagemErro] = useState("");
   const [isloading, setIsLoading] = useState(false);
 
-  function handleLogin() {
+  async function handleLogin() {
+    console.log("🔥 handleLogin foi chamado");
     setMensagemErro("");
 
     const email = inputEmail.trim();
+    console.log("📩 Email:", email);
+    console.log("🔒 Senha:", inputSenha);
 
     if (email === "" || inputSenha === "") {
       setMensagemErro("Preencha todos os campos para continuar.");
@@ -45,18 +48,44 @@ export default function Login() {
       return;
     }
 
-    if (email !== "admin@gmail.com" || inputSenha !== "admin123") {
-      setMensagemErro("Email ou senha incorretos. Tente novamente.");
-      return;
-    }
-
+    
+    console.log("🚀 Iniciando processo de login...");
     setIsLoading(true);
-    try {
+   try {
+      console.log("Chamando firebase...")
+      const user = await loginUsuario({
+        email: email,
+        senha: inputSenha,
+      })
+      
+      console.log("✅ Login realizado com sucesso!");
+      console.log("👤 Usuário:", user);
+      console.log("🆔 UID:", user.uid);
+      console.log("📧 Email Firebase:", user.email);
+
       router.push("/(tabs)/home");
+    } catch (error: any) {
+
+      console.log("❌ ERRO NO LOGIN");
+      console.log("Código:", error.code);
+      console.log("Mensagem:", error.message);
+     // tratamento básico (já resolve 90% dos casos)
+     if(error.code === "auth/user-not-found") {
+        setMensagemErro("Usuário não encontrado.")
+     } else if (error.code === "auth/wrong-password") {
+      setMensagemErro("Senha incorreta.")
+     } else if(error.code === "auth/invalid-email") {
+      setMensagemErro("Email inválido.")
+     } else {
+      setMensagemErro("Erro ao fazer login")
+     }
     } finally {
-      setIsLoading(false);
+      console.log("🏁 Finalizou tentativa de login");
+      setIsLoading(false)
     }
   }
+
+
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema

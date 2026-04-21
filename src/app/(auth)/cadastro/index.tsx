@@ -9,12 +9,21 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
+import { cadastrarUsuario } from "@/src/services/authService";
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
+
+interface CadastroUsuario {
+  nome: string
+  email: string
+  senha: string
+  dataNascimento: string,
+  username: string  // formato "YYYY-MM-DD"
+}
 
 export default function Cadastro() {
   const [avatarEscolhido, setAvatarEscolhido] = useState(
@@ -33,7 +42,7 @@ export default function Cadastro() {
 
   const [mensagemErro, setMensagemErro] = useState("");
 
-  function handleCadastro() {
+  async function handleCadastro() {
     setMensagemErro("");
 
     const nome = inputNome.trim();
@@ -75,12 +84,34 @@ export default function Cadastro() {
     }
 
     setIsLoading(true);
-    try {
-      router.replace("/(auth)/cadastro-sucesso");
+     try {
+      const dadosUsuario: CadastroUsuario = {
+        nome, 
+        email,
+        senha,
+        username: userName,
+        dataNascimento: inputData.toISOString().split("T")[0], // "YYYY-MM-DD"
+      };
+       await cadastrarUsuario(dadosUsuario)
+       router.replace("/(auth)/cadastro-sucesso");
+  } catch (error: any) {
+    // traduz os erros mais comuns do firebase
+      const  mensagens: Record<string, string> = {
+        "auth/email-already-in-use": "Este email já está cadastrado",
+        "auth/invalid-email": "Email inválido",
+        "auth/weak-password": "Senha muito fraca",
+        "auth/network-request-failed": "Erro de conexão. Verfique sua internet"
+
+
+      }
+
+       setMensagemErro(mensagens[error.code] ?? "Erro ao cadastrar. Tente novamente.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
+   
+
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
