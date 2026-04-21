@@ -1,13 +1,12 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import HeaderBack from "../../components/headerBack";
 
 export default function Metas() {
@@ -20,10 +19,10 @@ export default function Metas() {
   const valorAtual2 = 10000;
   const progresso2 = valorAtual2 / metaTotal2;
   return (
-    
-      <View style={styles.container}>
-        <HeaderBack />
-        <ScrollView>
+
+    <View style={styles.container}>
+      <HeaderBack />
+      <ScrollView>
         <View>
           <Text style={styles.metas}>Metas Pessoais</Text>
 
@@ -141,9 +140,9 @@ export default function Metas() {
             </TouchableOpacity>
           </Link>
         </View>
-        </ScrollView>
-      </View>
-    
+      </ScrollView>
+    </View>
+
   );
 }
 
