@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from "expo-router";
+import HeaderBack from "../../components/headerBack"
 
 const CATEGORIAS = [
     { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -18,19 +19,13 @@ export default function AddMeta() {
     const [descricao, setDescricao] = useState("");
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Link href={'/metas'} asChild>
-                    <TouchableOpacity style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="white" />
-                        <Text style={styles.backText}>Voltar</Text>
-                    </TouchableOpacity>
-                </Link>
-            </View>
 
+        <View style={styles.container}>
+             {/* Header */}
+            <HeaderBack/>
+            
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
+                <SafeAreaView style={styles.safeArea}>
                 {/* Título */}
                 <Text style={styles.title}>Refina seu amanhã</Text>
 
@@ -131,15 +126,22 @@ export default function AddMeta() {
                     {/* Footer */}
                     <Text style={styles.footerText}>THINKMONEY SECURE INFRASTRUCTURE</Text>
                 </View>
+                </SafeAreaView>
             </ScrollView>
-        </SafeAreaView>
+       
+        </View>
+        
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: "#F4F4F8",
+        backgroundColor: "#ffffff",
+    },
+    container: {
+        flex: 1,
+        
     },
     header: {
         backgroundColor: "#0A0A0A",
