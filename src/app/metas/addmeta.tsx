@@ -1,9 +1,7 @@
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from "expo-router";
-import HeaderBack from "../../components/headerBack"
+import { useState } from "react";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import HeaderBack from "../../components/headerBack";
 
 
 const CATEGORIAS = [
@@ -20,10 +18,10 @@ export default function AddMeta() {
     const [descricao, setDescricao] = useState("");
 
     return (
-            <View style={styles.container}>
+        <View style={styles.container}>
             {/* Header */}
-            <HeaderBack/>
-          
+            <HeaderBack />
+
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Badge */}
                 <View style={styles.badge}>
@@ -117,8 +115,8 @@ export default function AddMeta() {
                     <Text style={styles.footerText}>THINKMONEY SECURE INFRASTRUCTURE</Text>
                 </View>
             </ScrollView>
-            
-            </View>
+
+        </View>
     );
 }
 

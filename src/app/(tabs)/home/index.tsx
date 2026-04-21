@@ -2,7 +2,7 @@
 
 
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
@@ -16,42 +16,65 @@ export default function Home() {
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={styles.saldo}>
-                    <Text style={styles.text1}>
-                        SALDO RESTANTE
-                    </Text>
-                    <Text style={styles.text2}>
-                        R$ 340,00
-                    </Text>
-
+                    <View style={styles.saldoHeader}>
+                        <View style={styles.saldoHeaderLeft}>
+                            <Ionicons name="wallet-outline" size={20} color="#34D399" />
+                            <Text style={styles.text1}>SALDO DISPONÍVEL</Text>
+                        </View>
+                        <Ionicons name="eye-outline" size={20} color="#94A3B8" />
+                    </View>
+                    <Text style={styles.text2}>R$ 340,00</Text>
+                    <View style={styles.saldoFooter}>
+                        <Feather name="arrow-up-right" size={16} color="#34D399" />
+                        <Text style={styles.saldoTrend}>R$ 1.250,00 entraram hoje</Text>
+                    </View>
                 </View>
                 <View style={styles.linhaDegraficos}>
-                    <View style={styles.grafico}>
-                        <CircularProgress
-                            value={72}
-                            activeStrokeWidth={12}
-                            inActiveStrokeWidth={12}
-                            progressValueColor={'#FFFFFF'}
-                            progressValueFontSize={30}
-                            radius={60}
-                            valueSuffix='%'
-                            activeStrokeColor={'#4ADE80'}
-                            inActiveStrokeColor={'#FFFFFF'}
-                            inActiveStrokeOpacity={0.05} />
-                        <Text style={styles.limiteEreserva}>Limite</Text>
+                    <View style={styles.stackedCard}>
+                        <View style={styles.stackedHeaderRow}>
+                            <Text style={styles.stackedTitle}>RESERVA DE EMERGÊNCIA</Text>
+                            <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
+                        </View>
+                        <View style={styles.stackedValueRow}>
+                            <Text style={styles.stackedValue}>30.0%</Text>
+                        </View>
+
+                        <View style={styles.barChartContainer}>
+                            <View style={[styles.bar, { height: '30%', backgroundColor: 'rgba(139, 92, 246, 0.3)' }]} />
+                            <View style={[styles.bar, { height: '50%', backgroundColor: 'rgba(139, 92, 246, 0.5)' }]} />
+                            <View style={[styles.bar, { height: '25%', backgroundColor: 'rgba(139, 92, 246, 0.7)' }]} />
+                            <View style={[styles.bar, { height: '80%', backgroundColor: 'rgba(139, 92, 246, 0.85)' }]} />
+                            <View style={[styles.bar, { height: '100%', backgroundColor: 'rgba(139, 92, 246, 1.0)' }]} />
+                        </View>
+
+                        <Text style={styles.stackedFooterText}>Sua reserva cresceu <Text style={{ color: '#8B5CF6' }}>12%</Text> comparado ao mês anterior.</Text>
                     </View>
-                    <View style={styles.grafico}>
-                        <CircularProgress
-                            value={30}
-                            activeStrokeWidth={12}
-                            inActiveStrokeWidth={12}
-                            progressValueColor={'#FFFFFF'}
-                            progressValueFontSize={30}
-                            radius={60}
-                            valueSuffix='%'
-                            activeStrokeColor={'#4ADE80'}
-                            inActiveStrokeColor={'#FFFFFF'}
-                            inActiveStrokeOpacity={0.05} />
-                        <Text style={styles.limiteEreserva}>Reserva</Text>
+
+                    <View style={styles.stackedCard}>
+                        <View style={styles.stackedHeaderRow}>
+                            <Text style={styles.stackedTitle}>LIMITE CONSUMIDO</Text>
+                            <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
+                        </View>
+                        <View style={styles.stackedValueRow}>
+                            <Text style={styles.stackedValue}>72.0%</Text>
+                            <Text style={styles.stackedTrend}>↗ +5.0%</Text>
+                        </View>
+
+                        <View style={styles.stackedChartContainer}>
+                            <CircularProgress
+                                value={72}
+                                showProgressValue={false}
+                                activeStrokeWidth={12}
+                                inActiveStrokeWidth={12}
+                                radius={55}
+                                activeStrokeColor={'#34D399'}
+                                inActiveStrokeColor={'#1A1340'}
+                                inActiveStrokeOpacity={1}
+                            />
+                            <View style={styles.chartCenterTextContainer}>
+                                <Ionicons name="card-outline" size={32} color="#34D399" />
+                            </View>
+                        </View>
                     </View>
                 </View>
                 <View style={styles.gastosDoMes}>
@@ -72,21 +95,17 @@ export default function Home() {
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
-                    <TouchableOpacity style={styles.metasPessoais} onPress={() => console.log('clicou em metas pessoais!')}>
-                        <Ionicons name="rocket-outline" size={18} color="#1D1252" />
-                        <Text style={styles.text6}>Metas</Text>
-                    </TouchableOpacity>
+                    <Link href="/metas" asChild>
+                        <TouchableOpacity style={styles.metasPessoais}>
+                            <Ionicons name="rocket-outline" size={18} color="#1D1252" />
+                            <Text style={styles.text6}>Metas</Text>
+                        </TouchableOpacity>
+                    </Link>
                     <TouchableOpacity style={styles.lembretes} onPress={() => router.push('/(details)/detailshome/lembretes')}>
                         <Ionicons name="notifications-outline" size={18} color="#1D1252" />
                         <Text style={styles.text6}>Lembretes</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                    style={{ ...styles.registrarNovoGasto, backgroundColor: '#FFD700', marginTop: 15, height: 45 }}
-                    onPress={() => router.push('/(details)/detailsmapa/visualizar-gastos')}
-                >
-                    <Text style={styles.text6}>[DEV] TESTAR TELA DE GASTOS</Text>
-                </TouchableOpacity>
                 <View>
                     <Text style={styles.ultimosGastos}>ÚLTIMOS GASTOS</Text>
                 </View>
@@ -143,63 +162,144 @@ const styles = StyleSheet.create({
         backgroundColor: '#1D1252',
     },
     saldo: {
-        height: 116,
         width: '90%',
         backgroundColor: '#FFFFFF',
-        borderRadius: 48,
+        borderRadius: 24,
         alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
         marginTop: 35,
-
-        paddingTop: 32,
-        paddingRight: 24,
-        paddingBottom: 24,
-        paddingLeft: 24,
+        padding: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.1,
+        shadowRadius: 16,
+        elevation: 8,
+    },
+    saldoHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    saldoHeaderLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
     },
     text1: {
-        fontSize: 14,
+        fontSize: 12,
         color: '#64748B',
-        fontFamily: 'Inter',
         fontWeight: 'bold',
-        letterSpacing: 2.4,
-        marginBottom: 8
-
+        letterSpacing: 1.5,
     },
     text2: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        fontFamily: 'Inter',
+        fontSize: 42,
+        fontWeight: '900',
         color: '#1D1252',
+        letterSpacing: -1.5,
     },
-    grafico: {
+    saldoFooter: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 35,
-        backgroundColor: '#281E5D',
-        width: 170,
-        height: 190,
-        borderRadius: 24,
+        marginTop: 16,
+        paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#F1F5F9',
+        gap: 6,
+    },
+    saldoTrend: {
+        fontSize: 12,
+        color: '#64748B',
+        fontWeight: '600',
     },
     linhaDegraficos: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: 5,
-        gap: 30,
+        flexDirection: 'column',
+        width: '100%',
+        marginTop: 35,
     },
-    limiteEreserva: {
-        fontSize: 14,
+    stackedCard: {
+        width: '90%',
+        alignSelf: 'center',
+        backgroundColor: '#281E5D',
+        borderRadius: 20,
+        padding: 24,
+        marginBottom: 20,
+    },
+    stackedHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    stackedTitle: {
+        fontSize: 11,
+        color: '#94A3B8',
+        fontWeight: 'bold',
+        letterSpacing: 1.2,
+    },
+    stackedValueRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 12,
+        marginBottom: 24,
+    },
+    stackedValue: {
+        fontSize: 28,
+        fontWeight: '900',
         color: '#FFFFFF',
-        fontFamily: 'Inter',
-        letterSpacing: 2.4,
-        marginTop: 14,
+        letterSpacing: -1,
+    },
+    stackedTrend: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: '#34D399',
+        marginLeft: 12,
+    },
+    stackedChartContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    chartCenterTextContainer: {
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    chartCenterTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+    },
+    chartCenterSubtitle: {
+        fontSize: 10,
+        color: '#94A3B8',
+        marginTop: 2,
+    },
+    barChartContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        height: 110,
+        marginTop: 10,
+        marginBottom: 24,
+        paddingHorizontal: 10,
+    },
+    bar: {
+        width: '14%',
+        borderTopLeftRadius: 6,
+        borderTopRightRadius: 6,
+    },
+    stackedFooterText: {
+        fontSize: 12,
+        color: '#94A3B8',
+        marginTop: 5,
+        lineHeight: 18,
     },
     gastosDoMes: {
         height: 96,
         width: '90%',
         backgroundColor: '#08082F',
         alignSelf: 'center',
-        marginTop: 35,
+        marginTop: 15,
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
@@ -245,10 +345,9 @@ const styles = StyleSheet.create({
     },
     metasPessoais: {
         height: 55,
-        width: '43%',
+        width: '48%',
         backgroundColor: '#FFFFFF',
         borderRadius: 12,
-        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
@@ -257,10 +356,9 @@ const styles = StyleSheet.create({
     },
     lembretes: {
         height: 55,
-        width: '43%',
+        width: '48%',
         backgroundColor: '#FFFFFF',
         borderRadius: 12,
-        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 10,
@@ -269,9 +367,10 @@ const styles = StyleSheet.create({
     },
     linhaBotao: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        width: '90%',
+        alignSelf: 'center',
         marginTop: 1,
-        gap: 10,
     },
     ultimosGastos: {
         fontSize: 14,

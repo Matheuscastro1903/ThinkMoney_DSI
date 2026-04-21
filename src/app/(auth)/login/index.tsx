@@ -15,7 +15,7 @@ import InputSenha from "@/src/components/auth/inputsenha";
 import { Link, useRouter } from "expo-router";
 import InputLogin from "../../../components/auth/inputlogin";
 
-import ButtonComeBack from "@/src/components/buttoncomeback";
+import HeaderBack from "@/src/components/headerBack";
 
 export default function Login() {
   const router = useRouter();
@@ -63,7 +63,9 @@ export default function Login() {
     <SafeAreaView style={styles.safeArea}>
       {/* ScrollView por dentro — permite rolar caso necessário */}
       <ScrollView contentContainerStyle={styles.fundo}>
-        <ButtonComeBack label="Voltar" url="/" color="#1D1252"></ButtonComeBack>
+        <View style={{ width: "100%", marginBottom: -40 }}>
+          <HeaderBack />
+        </View>
         <Image
           source={require("../../../assets/images/logothinkmoney.png")}
           style={styles.logo}

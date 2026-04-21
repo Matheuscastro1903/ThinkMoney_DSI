@@ -1,6 +1,6 @@
 // arquivo que sera responsavel pela tela de recuperação de senha
 
-import ButtonComeBack from "@/src/components/buttoncomeback";
+import HeaderBack from "@/src/components/headerBack";
 import { recuperarSenha } from "@/src/services/authService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,6 +15,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EsqueciSenha() {
   const [email, setEmail] = useState("");
@@ -54,18 +55,14 @@ export default function EsqueciSenha() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity style={styles.header}>
-          <ButtonComeBack
-            label="Voltar"
-            url="/(auth)/login"
-            color="#1D1252"
-          ></ButtonComeBack>
-        </TouchableOpacity>
+        <View style={{ width: "100%", marginBottom: -40 }}>
+          <HeaderBack />
+        </View>
         <View style={styles.icone}>
           <Ionicons name="lock-closed" size={45} color="black" />
         </View>
@@ -113,7 +110,7 @@ export default function EsqueciSenha() {
           </Link>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
