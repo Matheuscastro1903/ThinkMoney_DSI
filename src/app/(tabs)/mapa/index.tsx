@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "expo-router";
 import {
     ScrollView,
     StyleSheet,
@@ -9,6 +10,8 @@ import {
 import MapView, { Marker } from "react-native-maps";
 
 export default function Mapa() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -32,7 +35,7 @@ export default function Mapa() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Registro de Transações</Text>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(details)/detailsmapa/visualizar-gastos')}>
             <Text style={styles.seeAll}>Ver tudo</Text>
           </TouchableOpacity>
         </View>

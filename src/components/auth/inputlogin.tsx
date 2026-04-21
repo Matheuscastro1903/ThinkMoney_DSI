@@ -11,7 +11,7 @@ interface campoInputProps{
 
 }
 
-export default function inputLogin({label,placeholder,atualizando,icon,value}:campoInputProps){
+export default function InputLogin({label,placeholder,atualizando,icon,value}:campoInputProps){
     
 
     
