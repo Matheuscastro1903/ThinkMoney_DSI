@@ -7,6 +7,8 @@ import {
     Text,
     TouchableOpacity,
     View,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native"; // ADICIONADO: ScrollView
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
@@ -91,84 +93,85 @@ export default function Login() {
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
     <SafeAreaView style={styles.safeArea}>
-      {/* ScrollView por dentro — permite rolar caso necessário */}
-      <ScrollView contentContainerStyle={styles.fundo}>
-        <View style={{ width: "100%", marginBottom: -40 }}>
-          <HeaderBack />
-        </View>
-        <Image
-          source={require("../../../assets/images/logothinkmoney.png")}
-          style={styles.logo}
-        />
-
-        <View style={styles.main}>
-          <View>
-            <InputLogin
-              label="Digite seu email"
-              placeholder="nome@gmail.com"
-              atualizando={(valor) => setInputEmail(valor)}
-              icon={require("../../../assets/icons/iconeusuario.svg")}
-              value={inputEmail}
-            />
-
-            <InputSenha
-              label="Digite sua senha"
-              placeholder="Digite sua senha"
-              atualizando={(valor) => setInputSenha(valor)}
-              icon={require("../../../assets/icons/iconecadeado.svg")}
-              iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
-              value={inputSenha}
-            />
-
-            <View style={styles.esqueceusenha}>
-              <Link href={"/(auth)/esqueci-senha"} asChild>
-                <TouchableOpacity>
-                  <Text style={styles.textesqueceu}>Esqueci a senha</Text>
-                </TouchableOpacity>
-              </Link>
-            </View>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+        {/* ScrollView por dentro — permite rolar caso necessário */}
+        <ScrollView 
+        contentContainerStyle={styles.fundo}
+        keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ width: "100%", marginBottom: -40 }}>
+            <HeaderBack />
           </View>
-
-          <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={() => setManterConectado(!manterConectado)}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                manterConectado && styles.checkboxMarcado,
-              ]}
+          <Image
+            source={require("../../../assets/images/logothinkmoney.png")}
+            style={styles.logo}
+          />
+          <View style={styles.main}>
+            <View>
+              <InputLogin
+                label="Digite seu email"
+                placeholder="nome@gmail.com"
+                atualizando={(valor) => setInputEmail(valor)}
+                icon={require("../../../assets/icons/iconeusuario.svg")}
+                value={inputEmail}
+              />
+              <InputSenha
+                label="Digite sua senha"
+                placeholder="Digite sua senha"
+                atualizando={(valor) => setInputSenha(valor)}
+                icon={require("../../../assets/icons/iconecadeado.svg")}
+                iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
+                value={inputSenha}
+              />
+              <View style={styles.esqueceusenha}>
+                <Link href={"/(auth)/esqueci-senha"} asChild>
+                  <TouchableOpacity>
+                    <Text style={styles.textesqueceu}>Esqueci a senha</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setManterConectado(!manterConectado)}
+              activeOpacity={0.7}
             >
-              {manterConectado && <Text style={styles.checkmark}>✓</Text>}
-            </View>
-
-            <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
-          </TouchableOpacity>
-
-          <View style={{ gap: 10 }}>
-            {mensagemErro && (
-              <Text style={{ color: "red", textAlign: "center" }}>
-                {mensagemErro}
-              </Text>
-            )}
-            {isloading ? (
-              <ActivityIndicator size="large" color="#1D1252" />
-            ) : (
-              <ButtonConfirmar label="Entrar" onClick={handleLogin} />
-            )}
-          </View>
-        </View>
-
-        <View style={styles.containerlinkcadastro}>
-          <Text style={{ color: "#867DC1" }}>Novo por aqui ?</Text>
-          <Link href={"/(auth)/cadastro"} asChild>
-            <TouchableOpacity>
-              <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
+              <View
+                style={[
+                  styles.checkbox,
+                  manterConectado && styles.checkboxMarcado,
+                ]}
+              >
+                {manterConectado && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
             </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
+            <View style={{ gap: 10 }}>
+              {mensagemErro && (
+                <Text style={{ color: "red", textAlign: "center" }}>
+                  {mensagemErro}
+                </Text>
+              )}
+              {isloading ? (
+                <ActivityIndicator size="large" color="#1D1252" />
+              ) : (
+                <ButtonConfirmar label="Entrar" onClick={handleLogin} />
+              )}
+            </View>
+          </View>
+          <View style={styles.containerlinkcadastro}>
+            <Text style={{ color: "#867DC1" }}>Novo por aqui ?</Text>
+            <Link href={"/(auth)/cadastro"} asChild>
+              <TouchableOpacity>
+                <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </ScrollView>
+    </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -1,10 +1,12 @@
 // arquivo destinado a guardar a "primeira tela da família"
 import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { useRouter } from "expo-router";
@@ -12,7 +14,6 @@ import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useState } from "react";
 
 export default function Familia() {
   const router = useRouter();
@@ -32,50 +33,57 @@ export default function Familia() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.familyIcon}>
-          <MaterialIcons name="family-restroom" size={50} color="#000000" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, justifyContent: "center" }}
+      >
+        <View style={styles.header}>
+          <View style={styles.familyIcon}>
+            <MaterialIcons name="family-restroom" size={50} color="#000000" />
+          </View>
+
+          <Text style={styles.title}>Bem Vindo À Gestão Familiar</Text>
+
+          <Text style={styles.subtitle}>
+            Você ainda não faz parte de um grupo familiar. Conecte-se com seus
+            entes queridos para gerir o patrimônio em conjunto.
+          </Text>
         </View>
 
-        <Text style={styles.title}>Bem Vindo À Gestão Familiar</Text>
+        <View style={styles.body}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite o código da família"
+            placeholderTextColor="#787581"
+            keyboardType="default"
+          />
 
-        <Text style={styles.subtitle}>
-          Você ainda não faz parte de um grupo familiar. Conecte-se com seus
-          entes queridos para gerir o patrimônio em conjunto.
-        </Text>
-      </View>
+          <TouchableOpacity
+            style={styles.confirmarButton}
+            activeOpacity={0.7}
+            onPress={entrarEmFamilia}
+          >
+            <Text style={styles.textConfirmarButton}>Confirmar e Entrar</Text>
+          </TouchableOpacity>
 
-      <View style={styles.body}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite o código da família"
-          placeholderTextColor="#787581"
-          keyboardType="default"
-        />
+          <TouchableOpacity
+            style={styles.criarFamiliaButton}
+            activeOpacity={0.7}
+            onPress={criarFamilia}
+          >
+            <Text style={styles.textCriarFamiliaButton}>
+              Criar minha família
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.confirmarButton}
-          activeOpacity={0.7}
-          onPress={entrarEmFamilia}
-        >
-          <Text style={styles.textConfirmarButton}>Confirmar e Entrar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.criarFamiliaButton}
-          activeOpacity={0.7}
-          onPress={criarFamilia}
-        >
-          <Text style={styles.textCriarFamiliaButton}>Criar minha família</Text>
-        </TouchableOpacity>
-
-        <Text>
-          Não tem um código?{" "}
-          <Text style={styles.textLink} onPress={abrirSaibaMaisFamilia}>
-            Saiba mais.
+          <Text>
+            Não tem um código?{" "}
+            <Text style={styles.textLink} onPress={abrirSaibaMaisFamilia}>
+              Saiba mais.
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
