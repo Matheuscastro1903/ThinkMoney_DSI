@@ -1,32 +1,30 @@
 import { useState } from 'react';
-import {View,TextInput,TouchableOpacity, StyleSheet,Text,Image} from 'react-native'
+import {View,TextInput,TouchableOpacity, StyleSheet,Text} from 'react-native'
+import { Ionicons } from '@expo/vector-icons';
 
 
 interface campoInputProps{
     label:string,
     placeholder:string,
-    atualizando: (texto: string) => void; // Esta é a função que o pai vai enviar
-    icon:any
-    value: string; // ADICIONADO: para receber o valor do estado do pai
+    atualizando: (texto: string) => void;
+    icon?:any
+    value: string;
 
 }
 
-export default function InputLogin({label,placeholder,atualizando,icon,value}:campoInputProps){
-    
+export default function InputLogin({label,placeholder,atualizando,value}:campoInputProps){
 
-    
+
+
 
     return(
         <View style={styles.containerText}>
 
                 <Text style={styles.label}>{label}</Text>
-                
+
                 <View style={styles.input}>
 
-                    <Image 
-                                    source={icon}
-                                    style={styles.icon} 
-                                />
+                    <Ionicons name="mail-outline" size={20} color="#888" />
 
                     <TextInput style={styles.textinput}
                         placeholder={placeholder}
@@ -92,11 +90,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,            // Afasta o texto do ícone
 },
 
-    icon: {
-    width: 15,                
-    height: 15,
-    resizeMode: 'contain'
-    },
 
 
   label: {
