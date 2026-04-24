@@ -11,7 +11,7 @@ interface campoInputSenhaProps {
     value:string
 }
 
-export default function inputSenha({ label, placeholder, atualizando, icon, iconVisibilidade,value}: campoInputSenhaProps) {
+export default function InputSenha({ label, placeholder, atualizando, icon, iconVisibilidade,value}: campoInputSenhaProps) {
 
     // MUDANÇA 2: Estado local para controlar visibilidade da senha (era controlado pelo pai antes)
     const [protegido, setProtegido] = useState(true);

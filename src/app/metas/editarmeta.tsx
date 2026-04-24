@@ -1,8 +1,9 @@
-import { useState } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from "expo-router";
+import { useState } from "react";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import HeaderBack from "../../components/headerBack";
 
 const CATEGORIAS = [
     { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -18,128 +19,129 @@ export default function AddMeta() {
     const [descricao, setDescricao] = useState("");
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+
+        <View style={styles.container}>
             {/* Header */}
-            <View style={styles.header}>
-                <Link href={'/metas'} asChild>
-                    <TouchableOpacity style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="white" />
-                        <Text style={styles.backText}>Voltar</Text>
-                    </TouchableOpacity>
-                </Link>
-            </View>
+            <HeaderBack />
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <SafeAreaView style={styles.safeArea}>
+                    {/* Título */}
+                    <Text style={styles.title}>Refina seu amanhã</Text>
 
-                {/* Título */}
-                <Text style={styles.title}>Refina seu amanhã</Text>
+                    {/* Subtítulo */}
+                    <Text style={styles.subtitle}>
+                        Atualize suas metas para acompanhar a evolução em tempo real
+                    </Text>
 
-                {/* Subtítulo */}
-                <Text style={styles.subtitle}>
-                    Atualize suas metas para acompanhar a evolução em tempo real
-                </Text>
+                    {/* Card principal */}
+                    <View style={styles.card}>
 
-                {/* Card principal */}
-                <View style={styles.card}>
+                        {/* Tipo de Meta */}
+                        <Text style={styles.labelSection}>TIPO DE META</Text>
+                        <View style={styles.gridContainer}>
+                            {CATEGORIAS.map((cat) => {
+                                const ativo = categoriaSelecionada === cat.key;
+                                return (
+                                    <TouchableOpacity
+                                        key={cat.key}
+                                        style={[styles.categoryCard, ativo && styles.categoryCardActive]}
+                                        onPress={() => setCategoriaSelecionada(cat.key)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Ionicons
+                                            name={cat.icon as any}
+                                            size={30}
+                                            color={ativo ? "#FFFFFF" : "#1D1252"}
+                                        />
+                                        <Text style={[styles.categoryText, ativo && styles.categoryTextActive]}>
+                                            {cat.label}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
 
-                    {/* Tipo de Meta */}
-                    <Text style={styles.labelSection}>TIPO DE META</Text>
-                    <View style={styles.gridContainer}>
-                        {CATEGORIAS.map((cat) => {
-                            const ativo = categoriaSelecionada === cat.key;
-                            return (
-                                <TouchableOpacity
-                                    key={cat.key}
-                                    style={[styles.categoryCard, ativo && styles.categoryCardActive]}
-                                    onPress={() => setCategoriaSelecionada(cat.key)}
-                                    activeOpacity={0.8}
-                                >
-                                    <Ionicons
-                                        name={cat.icon as any}
-                                        size={30}
-                                        color={ativo ? "#FFFFFF" : "#1D1252"}
-                                    />
-                                    <Text style={[styles.categoryText, ativo && styles.categoryTextActive]}>
-                                        {cat.label}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
+                        {/* Capital Necessário */}
+                        <Text style={styles.label}>CAPITAL NECESSÁRIO</Text>
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.currencyPrefix}>R$</Text>
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="0,00"
+                                placeholderTextColor="#BBBBBB"
+                                keyboardType="numeric"
+                                value={capital}
+                                onChangeText={setCapital}
+                            />
+                        </View>
 
-                    {/* Capital Necessário */}
-                    <Text style={styles.label}>CAPITAL NECESSÁRIO</Text>
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.currencyPrefix}>R$</Text>
-                        <TextInput
-                            style={styles.inputText}
-                            placeholder="0,00"
-                            placeholderTextColor="#BBBBBB"
-                            keyboardType="numeric"
-                            value={capital}
-                            onChangeText={setCapital}
-                        />
-                    </View>
+                        {/* Data de Realização */}
+                        <Text style={styles.label}>DATA DE REALIZAÇÃO</Text>
+                        <View style={styles.inputWrapper}>
+                            <Ionicons name="calendar-outline" size={18} color="#BBBBBB" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder="Selecione o prazo"
+                                placeholderTextColor="#BBBBBB"
+                                value={data}
+                                onChangeText={setData}
+                            />
+                        </View>
 
-                    {/* Data de Realização */}
-                    <Text style={styles.label}>DATA DE REALIZAÇÃO</Text>
-                    <View style={styles.inputWrapper}>
-                        <Ionicons name="calendar-outline" size={18} color="#BBBBBB" style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.inputText}
-                            placeholder="Selecione o prazo"
-                            placeholderTextColor="#BBBBBB"
-                            value={data}
-                            onChangeText={setData}
-                        />
-                    </View>
+                        {/* Descrição */}
+                        <Text style={styles.label}>DESCRIÇÃO (OPCIONAL)</Text>
+                        <View style={[styles.inputWrapper, styles.inputMultiline]}>
+                            <TextInput
+                                style={[styles.inputText, { flex: 1 }]}
+                                placeholder={"Ex: Viagem de 10 anos de\ncasados"}
+                                placeholderTextColor="#BBBBBB"
+                                multiline
+                                numberOfLines={3}
+                                value={descricao}
+                                onChangeText={setDescricao}
+                            />
+                        </View>
 
-                    {/* Descrição */}
-                    <Text style={styles.label}>DESCRIÇÃO (OPCIONAL)</Text>
-                    <View style={[styles.inputWrapper, styles.inputMultiline]}>
-                        <TextInput
-                            style={[styles.inputText, { flex: 1 }]}
-                            placeholder={"Ex: Viagem de 10 anos de\ncasados"}
-                            placeholderTextColor="#BBBBBB"
-                            multiline
-                            numberOfLines={3}
-                            value={descricao}
-                            onChangeText={setDescricao}
-                        />
-                    </View>
-
-                    {/* Botão para editar */}
-                    <TouchableOpacity style={styles.button} activeOpacity={0.85}>
-                        <Text style={styles.buttonText}>Salvar alterações</Text>
-                        <Ionicons name="pencil-outline" size={20} color="white" />
-                    </TouchableOpacity>
-
-                    {/* Botão para excluir */}
-                    <TouchableOpacity style={styles.button2} activeOpacity={0.85}>
-                        <Text style={styles.buttonText}>Excluir Meta Pessoal</Text>
-                        <Ionicons name="trash-outline" size={20} color="white" />
-                    </TouchableOpacity>
-                    
-                    {/* Botão para cancelar */}
-                    <Link href={'/metas'} asChild>
-                        <TouchableOpacity style={styles.cancelar}>
-                            <Text style={styles.textocancelar}>Cancelar</Text>
+                        {/* Botão para editar */}
+                        <TouchableOpacity style={styles.button} activeOpacity={0.85}>
+                            <Text style={styles.buttonText}>Salvar alterações</Text>
+                            <Ionicons name="pencil-outline" size={20} color="white" />
                         </TouchableOpacity>
-                    </Link>
-                    
 
-                    {/* Footer */}
-                    <Text style={styles.footerText}>THINKMONEY SECURE INFRASTRUCTURE</Text>
-                </View>
+                        {/* Botão para excluir */}
+                        <TouchableOpacity style={styles.button2} activeOpacity={0.85}>
+                            <Text style={styles.buttonText}>Excluir Meta Pessoal</Text>
+                            <Ionicons name="trash-outline" size={20} color="white" />
+                        </TouchableOpacity>
+
+                        {/* Botão para cancelar */}
+                        <Link href={'/metas'} asChild>
+                            <TouchableOpacity style={styles.cancelar}>
+                                <Text style={styles.textocancelar}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </Link>
+
+
+                        {/* Footer */}
+                        <Text style={styles.footerText}>THINKMONEY SECURE INFRASTRUCTURE</Text>
+                    </View>
+                </SafeAreaView>
             </ScrollView>
-        </SafeAreaView>
+
+        </View>
+
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: "#F4F4F8",
+        backgroundColor: "#ffffff",
+    },
+    container: {
+        flex: 1,
+
     },
     header: {
         backgroundColor: "#0A0A0A",
@@ -301,7 +303,7 @@ const styles = StyleSheet.create({
         gap: 10,
         marginTop: 4,
         marginBottom: 16,
-        
+
     },
     cancelar: {
         justifyContent: "center",

@@ -1,7 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import HeaderBack from "../../components/headerBack";
 
 export default function Metas() {
   // Valores da meta
@@ -13,32 +19,10 @@ export default function Metas() {
   const valorAtual2 = 10000;
   const progresso2 = valorAtual2 / metaTotal2;
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Link href={"/(tabs)/home"} asChild>
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: 20,
-              }}
-            >
-              <Ionicons name="arrow-back" size={32} color="white" />
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 15,
-                  fontWeight: "bold",
-                  marginLeft: 15,
-                }}
-              >
-                Voltar
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
 
+    <View style={styles.container}>
+      <HeaderBack />
+      <ScrollView>
         <View>
           <Text style={styles.metas}>Metas Pessoais</Text>
 
@@ -156,15 +140,16 @@ export default function Metas() {
             </TouchableOpacity>
           </Link>
         </View>
-      </View>
-    </SafeAreaView>
+      </ScrollView>
+    </View>
+
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#1D1252",
   },
   header: {
     backgroundColor: "black",
