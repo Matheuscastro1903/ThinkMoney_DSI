@@ -1,10 +1,12 @@
 // arquivo destinado a guardar a "primeira tela da família"
 import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { useState } from "react";
@@ -35,65 +37,70 @@ export default function Familia() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.familyIcon}>
-          <MaterialIcons name="family-restroom" size={50} color="#000000" />
-        </View>
-
-        <Text style={styles.title}>Criar Família</Text>
-      </View>
-
-      <View style={styles.inputCodeContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite um nome para a família"
-          placeholderTextColor="#dfdbeb"
-          keyboardType="default"
-          value={familyName}
-          onChangeText={setFamilyName}
-        />
-
-        <TouchableOpacity
-          style={styles.gerarCodigoButton}
-          activeOpacity={0.7}
-          onPress={gerarCodigo}
-        >
-          <Text style={styles.textGerarCodigoButton}>
-            Gerar código de família
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.codeContainer}>
-        <View style={styles.codeContentContainer}>
-          <Text style={styles.codeTitle}>Código de Acesso da Família</Text>
-
-          <Text style={styles.codeText}>THKM-X7R2-89</Text>
-
-          <View style={styles.infoCodeContainer}>
-            <MaterialIcons name="info-outline" size={18} color="#1D1252" />
-            <Text style={styles.infoCodeText}>
-              Compartilhe este código com quem deseja convidar para o grupo.
-            </Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.copiarCodigoFamiliaButton}
-          activeOpacity={0.7}
-          onPress={copiarCodigo}
-        >
-          <MaterialIcons name="content-copy" size={20} color="#ffffff" />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={styles.prontoButton}
-        activeOpacity={0.7}
-        onPress={entrarEmFamilia}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, justifyContent: "center" }}
       >
-        <Text style={styles.textProntoButton}>Pronto</Text>
-      </TouchableOpacity>
+        <View style={styles.header}>
+          <View style={styles.familyIcon}>
+            <MaterialIcons name="family-restroom" size={50} color="#000000" />
+          </View>
+
+          <Text style={styles.title}>Criar Família</Text>
+        </View>
+
+        <View style={styles.inputCodeContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite um nome para a família"
+            placeholderTextColor="#dfdbeb"
+            keyboardType="default"
+            value={familyName}
+            onChangeText={setFamilyName}
+          />
+
+          <TouchableOpacity
+            style={styles.gerarCodigoButton}
+            activeOpacity={0.7}
+            onPress={gerarCodigo}
+          >
+            <Text style={styles.textGerarCodigoButton}>
+              Gerar código de família
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.codeContainer}>
+          <View style={styles.codeContentContainer}>
+            <Text style={styles.codeTitle}>Código de Acesso da Família</Text>
+
+            <Text style={styles.codeText}>THKM-X7R2-89</Text>
+
+            <View style={styles.infoCodeContainer}>
+              <MaterialIcons name="info-outline" size={18} color="#1D1252" />
+              <Text style={styles.infoCodeText}>
+                Compartilhe este código com quem deseja convidar para o grupo.
+              </Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.copiarCodigoFamiliaButton}
+            activeOpacity={0.7}
+            onPress={copiarCodigo}
+          >
+            <MaterialIcons name="content-copy" size={20} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.prontoButton}
+          activeOpacity={0.7}
+          onPress={entrarEmFamilia}
+        >
+          <Text style={styles.textProntoButton}>Pronto</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

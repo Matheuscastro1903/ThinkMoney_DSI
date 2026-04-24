@@ -7,6 +7,8 @@ import {
     Text,
     TouchableOpacity,
     View,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 import { cadastrarUsuario } from "@/src/services/authService";
@@ -111,17 +113,21 @@ export default function Cadastro() {
     }
   }
    
-
-
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
     <SafeAreaView style={styles.safeArea}>
-      {/* ScrollView por dentro — permite rolar quando o conteúdo ultrapassar a tela */}
-      <ScrollView contentContainerStyle={styles.fundo}>
-        <Image
-          source={require("../../../assets/images/logothinkmoney.png")}
-          style={styles.logo}
-        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        {/* ScrollView por dentro — permite rolar quando o conteúdo ultrapassar a tela */}
+        <ScrollView contentContainerStyle={styles.fundo}
+        keyboardShouldPersistTaps="handled"
+        >
+          <Image
+            source={require("../../../assets/images/logothinkmoney.png")}
+            style={styles.logo}
+          />
 
         <View style={styles.main}>
           <View>
@@ -225,6 +231,7 @@ export default function Cadastro() {
           </Link>
         </View>
       </ScrollView>
+    </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
