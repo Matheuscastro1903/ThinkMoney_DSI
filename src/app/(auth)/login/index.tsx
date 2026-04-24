@@ -112,7 +112,7 @@ export default function Login() {
             />
 
             <InputSenha
-              label="Digite sua senha"
+              label="Digite sua senha asd"
               placeholder="Digite sua senha"
               atualizando={(valor) => setInputSenha(valor)}
               icon={require("../../../assets/icons/iconecadeado.svg")}

@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native'
+import { Ionicons } from '@expo/vector-icons';
 
 interface campoInputSenhaProps {
     label: string,
     placeholder: string,
     atualizando: (texto: string) => void,
-    icon: any,
-    // MUDANÇA 1: Nova prop para receber o ícone do botão de mostrar/esconder senha
-    iconVisibilidade: any,
+    icon?: any,
+    iconVisibilidade?: any,
     value:string
 }
 
-export default function InputSenha({ label, placeholder, atualizando, icon, iconVisibilidade,value}: campoInputSenhaProps) {
+export default function InputSenha({ label, placeholder, atualizando, value}: campoInputSenhaProps) {
 
-    // MUDANÇA 2: Estado local para controlar visibilidade da senha (era controlado pelo pai antes)
     const [protegido, setProtegido] = useState(true);
 
     return (
@@ -23,10 +22,7 @@ export default function InputSenha({ label, placeholder, atualizando, icon, icon
 
             <View style={styles.input}>
 
-                <Image
-                    source={icon}
-                    style={styles.icon}
-                />
+                <Ionicons name="lock-closed-outline" size={20} color="#888" />
 
                 <TextInput
                     style={styles.textinput}
@@ -46,9 +42,10 @@ export default function InputSenha({ label, placeholder, atualizando, icon, icon
                 
                    
                 <TouchableOpacity onPress={() => setProtegido(!protegido)}>
-                    <Image
-                        source={iconVisibilidade}
-                        style={styles.icon}
+                    <Ionicons
+                        name={protegido ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color="#888"
                     />
                 </TouchableOpacity>
 
@@ -85,11 +82,6 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
 
-    icon: {
-        width: 15,
-        height: 15,
-        resizeMode: 'contain'
-    },
 
     label: {
         color: '#484550',
