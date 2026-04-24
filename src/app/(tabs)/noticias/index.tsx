@@ -361,6 +361,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 46,
+  
   },
 
   // Estilo reservado para ícone de busca (caso seja utilizado futuramente).
@@ -373,11 +374,12 @@ const styles = StyleSheet.create({
   searchInput: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#ffffff',
     borderRadius: 8,
     padding: 10,
     fontSize: 14,
     color: '#111827',
+    width: '100%',
   },
   // Botão para limpar o texto da busca.
   clearButton: {

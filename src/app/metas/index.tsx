@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
 
 export default function Metas() {
@@ -20,7 +21,7 @@ export default function Metas() {
   const progresso2 = valorAtual2 / metaTotal2;
   return (
 
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <HeaderBack />
       <ScrollView>
         <View>
@@ -141,7 +142,7 @@ export default function Metas() {
           </Link>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
 
   );
 }
