@@ -1,22 +1,22 @@
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    KeyboardAvoidingView,
-    Platform
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native"; // ADICIONADO: ScrollView
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import InputSenha from "@/src/components/auth/inputsenha";
+import { loginUsuario } from "@/src/services/authService";
 import { Link, useRouter } from "expo-router";
 import InputLogin from "../../../components/auth/inputlogin";
-import { loginUsuario } from "@/src/services/authService";
 
 import HeaderBack from "@/src/components/headerBack";
 
@@ -51,16 +51,15 @@ export default function Login() {
       return;
     }
 
-    
     console.log("🚀 Iniciando processo de login...");
     setIsLoading(true);
-   try {
-      console.log("Chamando firebase...")
+    try {
+      console.log("Chamando firebase...");
       const user = await loginUsuario({
         email: email,
         senha: inputSenha,
-      })
-      
+      });
+
       console.log("✅ Login realizado com sucesso!");
       console.log("👤 Usuário:", user);
       console.log("🆔 UID:", user.uid);
@@ -68,39 +67,36 @@ export default function Login() {
 
       router.push("/(tabs)/home");
     } catch (error: any) {
-
       console.log("❌ ERRO NO LOGIN");
       console.log("Código:", error.code);
       console.log("Mensagem:", error.message);
-     // tratamento básico (já resolve 90% dos casos)
-     if(error.code === "auth/user-not-found") {
-        setMensagemErro("Usuário não encontrado.")
-     } else if (error.code === "auth/wrong-password") {
-      setMensagemErro("Senha incorreta.")
-     } else if(error.code === "auth/invalid-email") {
-      setMensagemErro("Email inválido.")
-     } else {
-      setMensagemErro("Erro ao fazer login")
-     }
+      // tratamento básico (já resolve 90% dos casos)
+      if (error.code === "auth/user-not-found") {
+        setMensagemErro("Usuário não encontrado.");
+      } else if (error.code === "auth/wrong-password") {
+        setMensagemErro("Senha incorreta.");
+      } else if (error.code === "auth/invalid-email") {
+        setMensagemErro("Email inválido.");
+      } else {
+        setMensagemErro("Erro ao fazer login");
+      }
     } finally {
       console.log("🏁 Finalizou tentativa de login");
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
-
-
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
         {/* ScrollView por dentro — permite rolar caso necessário */}
-        <ScrollView 
-        contentContainerStyle={styles.fundo}
-        keyboardShouldPersistTaps="handled"
+        <ScrollView
+          contentContainerStyle={styles.fundo}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={{ width: "100%", marginBottom: -40 }}>
             <HeaderBack />
@@ -171,7 +167,7 @@ export default function Login() {
             </Link>
           </View>
         </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -191,14 +187,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     backgroundColor: "#1D1252",
     width: "100%",
-    gap: 30,
+    gap: 16,
     paddingBottom: 40, // ADICIONADO: respiro no final ao scrollar
-    paddingTop: 20, // ADICIONADO: respiro no topo após a SafeArea
+    paddingTop: 8, // Ajuste: sobe o conteúdo para deixar os inputs mais no alto
   },
 
   logo: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     resizeMode: "contain",
   },
 
@@ -206,7 +202,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
-    gap: 30,
+    gap: 20,
     width: "90%", // ADICIONADO: largura relativa para não bater nas laterais
   },
 

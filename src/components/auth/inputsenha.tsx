@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: '#EDEEEF',
         borderRadius: 10,
-        width: 320,
+        width: '100%',
         height: 56,
         flexDirection: 'row',
         alignItems: 'center',
