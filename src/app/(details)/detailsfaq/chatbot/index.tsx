@@ -1,14 +1,14 @@
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,29 +23,29 @@ export default function ChatBot() {
           <HeaderBack />
         </View>
 
-        {/* CABEÇALHO DO ROBÔ FIXO */}
-        <View style={styles.int}>
-          <View style={styles.logo}>
-            <MaterialCommunityIcons
-              name="robot"
-              size={30}
-              color="white"
-              style={styles.icon}
-            />
-          </View>
-          <Text style={styles.title}>Olá, sou o Din$</Text>
-          <Text style={styles.subtitle}>
-            Sua inteligência artificial para gestão de patrimônio e
-            investimentos
-          </Text>
-        </View>
-
         {/* MENSAGENS FLEXÍVEIS */}
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 24, paddingTop: 10 }}
           keyboardShouldPersistTaps="handled"
         >
+          {/* CABEÇALHO DO ROBÔ */}
+          <View style={styles.int}>
+            <View style={styles.logo}>
+              <MaterialCommunityIcons
+                name="robot"
+                size={30}
+                color="white"
+                style={styles.icon}
+              />
+            </View>
+            <Text style={styles.title}>Olá, sou o Din$</Text>
+            <Text style={styles.subtitle}>
+              Sua inteligência artificial para gestão de patrimônio e
+              investimentos
+            </Text>
+          </View>
+
           <View style={styles.chat}>
             <View style={styles.ia}>
               <Text style={{ lineHeight: 20 }}>
@@ -71,22 +71,22 @@ export default function ChatBot() {
               </Text>
             </View>
             <Text style={styles.time1}>10:24 AM</Text>
-
-            <View style={styles.sugestao}>
-              <TouchableOpacity style={styles.buttonSugestions}>
-                <Text style={styles.textSugestions}>Como investir?</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.buttonSugestions}>
-                <Text style={styles.textSugestions}>Ver saldo total</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.buttonSugestions}>
-                <Text style={styles.textSugestions}>Onde gastei mais?</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </ScrollView>
+
+        <View style={styles.sugestao}>
+          <TouchableOpacity style={styles.buttonSugestions}>
+            <Text style={styles.textSugestions}>Como investir?</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.buttonSugestions}>
+            <Text style={styles.textSugestions}>Ver saldo total</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.buttonSugestions}>
+            <Text style={styles.textSugestions}>Onde gastei mais?</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* FOOTER FIXO NA BASE */}
         <View style={styles.footerContainer}>
@@ -122,6 +122,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     paddingHorizontal: 24,
+    paddingBottom: 6,
+    marginTop: 0,
   },
   title: {
     fontSize: 18,
@@ -134,6 +136,7 @@ const styles = StyleSheet.create({
     color: "#333",
     lineHeight: 22,
     paddingHorizontal: 8,
+    paddingBottom: 6,
   },
   chat: {},
   logo: {
@@ -143,8 +146,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 64,
     height: 64,
-    marginBottom: 16,
-    marginTop: 10,
+    marginBottom: 10,
+    marginTop: 4,
   },
   icon: {
     color: "#1D1252",
@@ -190,7 +193,8 @@ const styles = StyleSheet.create({
   sugestao: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 16,
+    marginTop: 6,
+    marginBottom: 8,
     paddingHorizontal: 16,
   },
   textSugestions: {
@@ -198,6 +202,7 @@ const styles = StyleSheet.create({
     color: "#1D1252",
     fontWeight: "bold",
     fontSize: 12,
+    paddingVertical: 1,
   },
   input: {
     flex: 1,
@@ -209,7 +214,8 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingBottom: -20,
+    marginTop: 0,
   },
   footer: {
     backgroundColor: "#e9e9e9",
@@ -217,10 +223,12 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     paddingHorizontal: 8,
+    marginBottom: -26,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+   
   },
   sendButton: {
     padding: 6,
