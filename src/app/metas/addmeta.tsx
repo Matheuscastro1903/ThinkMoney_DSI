@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 import HeaderBack from "../../components/headerBack";
 
 const CATEGORIAS = [
@@ -28,12 +29,13 @@ export default function AddMeta() {
   const [descricao, setDescricao] = useState("");
 
   return (
-    <View style={styles.container}>
+    
+    <SafeAreaView style={styles.safeArea}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        {/* Header */}
+        
         <HeaderBack />
 
         <ScrollView
@@ -149,14 +151,14 @@ export default function AddMeta() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView> 
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F4F4F8",
+    backgroundColor: "#FFFFFF", // MODIFICADO: Definida cor de fundo para a área segura (ajuste conforme seu design)
   },
   container: {
     flex: 1,
@@ -168,6 +170,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
   },
+  // ... resto dos estilos mantidos
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -181,6 +184,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
+    paddingTop: 10, // ADICIONADO: Um pequeno respiro entre o Header e o conteúdo inicial (Badge/Título)
   },
   badge: {
     backgroundColor: "#D6D0F0",

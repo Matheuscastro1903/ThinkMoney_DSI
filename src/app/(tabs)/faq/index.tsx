@@ -91,7 +91,7 @@ export default function Faq() {
     >
       <View style={styles.suporte}>
         <Text style={styles.titulo}>ChatBot</Text>
-        <Link href="../chatbot" asChild>
+        <Link href="../../(details)/detailsfaq/chatbot/" asChild>
           <TouchableOpacity style={styles.botaoPrimario} activeOpacity={0.85}>
             <Ionicons name="chatbubble" size={20} color="#1D1252" />
             <Text style={styles.botaoPrimarioTexto}>Chatbot</Text>

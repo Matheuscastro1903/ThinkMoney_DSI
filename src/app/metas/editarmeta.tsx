@@ -30,7 +30,8 @@ export default function AddMeta() {
   const [descricao, setDescricao] = useState("");
 
   return (
-    <View style={styles.container}>
+    
+    <SafeAreaView style={styles.safeArea}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -43,7 +44,8 @@ export default function AddMeta() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <SafeAreaView style={styles.safeArea}>
+           
+            
             {/* Título */}
             <Text style={styles.title}>Refina seu amanhã</Text>
 
@@ -157,21 +159,22 @@ export default function AddMeta() {
                 THINKMONEY SECURE INFRASTRUCTURE
               </Text>
             </View>
-          </SafeAreaView>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView> 
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffff", 
   },
   container: {
     flex: 1,
+    
   },
+  
   header: {
     backgroundColor: "#0A0A0A",
     height: 56,
@@ -192,6 +195,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
+    paddingTop: 10, //pequeno respiro entre o Header e o Título
   },
   badge: {
     backgroundColor: "#D6D0F0",
