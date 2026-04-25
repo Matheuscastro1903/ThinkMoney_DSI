@@ -1,15 +1,12 @@
-//Arquivo responsável pela tema "home" do nosso app.
-
-
+import { useState } from 'react';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
-
 export default function Home() {
     const router = useRouter();
-
+    const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
     return (
         <View style={styles.container}>
@@ -21,9 +18,11 @@ export default function Home() {
                             <Ionicons name="wallet-outline" size={20} color="#34D399" />
                             <Text style={styles.text1}>SALDO DISPONÍVEL</Text>
                         </View>
-                        <Ionicons name="eye-outline" size={20} color="#94A3B8" />
+                        <TouchableOpacity onPress={() => setIsBalanceVisible(!isBalanceVisible)}>
+                            <Ionicons name={isBalanceVisible ? "eye-outline" : "eye-off-outline"} size={20} color="#94A3B8" />
+                        </TouchableOpacity>
                     </View>
-                    <Text style={styles.text2}>R$ 340,00</Text>
+                    <Text style={styles.text2}>{isBalanceVisible ? "R$ 340,00" : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
                         <Feather name="arrow-up-right" size={16} color="#34D399" />
                         <Text style={styles.saldoTrend}>R$ 1.250,00 entraram hoje</Text>
@@ -418,7 +417,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 12,
-        backgroundColor: '#F1F5F9', // Cinza clarinho padrão
+        backgroundColor: '#F1F5F9',
         justifyContent: 'center',
         alignItems: 'center',
     },
