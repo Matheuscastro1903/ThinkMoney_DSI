@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     input:{
         backgroundColor:'#EDEEEF',
         borderRadius: 10,
-        width: 320,
+        width: '100%',
         height: 56,
         // CORREÇÕES AQUI:
         flexDirection: 'row',     // Coloca ícone e texto um ao lado do outro
