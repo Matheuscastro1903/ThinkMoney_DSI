@@ -1,17 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 import HeaderBack from "../../components/headerBack";
+import { useRouter } from "expo-router";
+import { criarMeta } from "../../services/metasService";
+import { auth } from "../../services/firebaseConfig";
 
 const CATEGORIAS = [
   { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -21,21 +26,60 @@ const CATEGORIAS = [
 ];
 
 export default function AddMeta() {
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState<
-    string | null
-  >(null);
+  const router = useRouter();
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
+  const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
   const [data, setData] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSalvarMeta = async () => {
+    if (!categoriaSelecionada || !nomeMeta || !capital || !data) {
+      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (Categoria, Nome, Capital e Data).");
+      return;
+    }
+
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      Alert.alert("Erro", "Usuário não autenticado.");
+      return;
+    }
+
+    const valorFormatado = parseFloat(capital.replace(/\./g, "").replace(",", "."));
+    
+    if (isNaN(valorFormatado) || valorFormatado <= 0) {
+      Alert.alert("Atenção", "Insira um valor numérico válido (ex: 1500,00).");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await criarMeta(userId, {
+        nomeMeta,
+        categoria: categoriaSelecionada,
+        valorTotal: valorFormatado,
+        dataLimite: data,
+        descricao,
+      });
+      Alert.alert("Sucesso", "Sua meta foi criada!");
+      router.back();
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao salvar sua meta.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    
-    <SafeAreaView style={styles.safeArea}> 
+
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        
+
         <HeaderBack />
 
         <ScrollView
@@ -92,6 +136,18 @@ export default function AddMeta() {
               })}
             </View>
 
+            {/* Nome da Meta */}
+            <Text style={styles.label}>NOME DA META</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.inputText}
+                placeholder="Ex: Viagem para a Europa"
+                placeholderTextColor="#BBBBBB"
+                value={nomeMeta}
+                onChangeText={setNomeMeta}
+              />
+            </View>
+
             {/* Capital Necessário */}
             <Text style={styles.label}>CAPITAL NECESSÁRIO</Text>
             <View style={styles.inputWrapper}>
@@ -139,9 +195,20 @@ export default function AddMeta() {
             </View>
 
             {/* Botão */}
-            <TouchableOpacity style={styles.button} activeOpacity={0.85}>
-              <Text style={styles.buttonText}>Criar Meta Pessoal</Text>
-              <Ionicons name="arrow-forward" size={20} color="white" />
+            <TouchableOpacity 
+              style={[styles.button, isLoading && { opacity: 0.7 }]} 
+              activeOpacity={0.85}
+              onPress={handleSalvarMeta}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Text style={styles.buttonText}>Criar Meta Pessoal</Text>
+                  <Ionicons name="arrow-forward" size={20} color="white" />
+                </>
+              )}
             </TouchableOpacity>
 
             {/* Footer */}
@@ -151,7 +218,7 @@ export default function AddMeta() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView> 
+    </SafeAreaView>
   );
 }
 

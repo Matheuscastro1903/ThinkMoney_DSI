@@ -1,11 +1,13 @@
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, increment, Timestamp } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
-interface Meta {
-  nomeObjetivo: string
+export interface Meta {
+  nomeMeta: string
   valorTotal: number
   valorPoupado: number
   dataLimite: string   // "YYYY-MM-DD"
+  categoria: string
+  descricao?: string
 }
 
 // Criar meta
