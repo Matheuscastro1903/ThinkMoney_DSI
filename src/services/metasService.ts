@@ -1,11 +1,13 @@
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, increment, Timestamp } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
-interface Meta {
-  nomeObjetivo: string
+export interface Meta {
+  nomeMeta: string
   valorTotal: number
   valorPoupado: number
   dataLimite: string   // "YYYY-MM-DD"
+  categoria: string
+  descricao?: string
 }
 
 // Criar meta
@@ -31,6 +33,11 @@ export async function contribuirMeta(userId: string, metaId: string, valor: numb
   await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), {
     valorPoupado: increment(valor)   // soma sem precisar ler antes
   })
+}
+
+// Atualizar informações da meta
+export async function atualizarMeta(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>): Promise<void> {
+  await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), dados)
 }
 
 // Excluir meta

@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,18 +11,48 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
+import { buscarMetas, Meta } from "../../services/metasService";
+import { auth } from "../../services/firebaseConfig";
 
 export default function Metas() {
-  // Valores da meta
-  const metaTotal = 15000;
-  const valorAtual = 8500;
-  const progresso = valorAtual / metaTotal;
+  const [metas, setMetas] = useState<(Meta & { id: string })[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const metaTotal2 = 30000;
-  const valorAtual2 = 10000;
-  const progresso2 = valorAtual2 / metaTotal2;
+  useFocusEffect(
+    useCallback(() => {
+      async function loadMetas() {
+        const userId = auth.currentUser?.uid;
+        if (!userId) return;
+
+        try {
+          setIsLoading(true);
+          const data = await buscarMetas(userId);
+          setMetas(data);
+        } catch (error) {
+          console.error("Erro ao buscar metas:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      loadMetas();
+    }, [])
+  );
+
+  const patrimonioTotal = metas.reduce((acc, meta) => acc + meta.valorPoupado, 0);
+
+  // Helper para os icones com base na categoria
+  const getIconeCategoria = (categoria: string) => {
+    switch (categoria) {
+      case "viagem": return "airplane";
+      case "casa": return "home";
+      case "carro": return "car";
+      case "reserva": return "wallet";
+      default: return "star";
+    }
+  };
+
   return (
-
     <SafeAreaView style={styles.container}>
       <HeaderBack />
       <ScrollView>
@@ -29,10 +61,12 @@ export default function Metas() {
 
           <View style={styles.boxPatrimonio}>
             <Text style={styles.patrimonio}>PATRIMÔNIO EM METAS</Text>
-            <Text style={styles.valor}>R$ 45.000,00</Text>
+            <Text style={styles.valor}>
+              R$ {patrimonioTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </Text>
             <View style={styles.boxRendimento}>
               <Ionicons name="trending-up" size={18} color="#1D1252" />
-              <Text> +R$ 2.450,00 este mês</Text>
+              <Text> Seu dinheiro trabalhando</Text>
             </View>
           </View>
         </View>
@@ -40,99 +74,60 @@ export default function Metas() {
         <View style={styles.listaMetas}>
           <Text style={styles.suasMetas}>Suas Metas</Text>
 
-          <Link href={"/metas/editarmeta"} asChild>
-            <TouchableOpacity>
-              <View style={styles.meta1}>
-                <View style={styles.iconMeta}>
-                  <Ionicons name="airplane" size={25} color="#1D1252" />
-                </View>
-                <View style={styles.textMeta}>
-                  <Text style={styles.tituloMeta}>Viagem para Europa</Text>
-                  <Text style={styles.descricaoMeta}>LAZER & FAMÍLIA</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="white" style={{ marginTop: 20 }} />
+          ) : metas.length === 0 ? (
+            <Text style={{ color: "white", marginTop: 20 }}>Nenhuma meta encontrada.</Text>
+          ) : (
+            metas.map((meta) => {
+              const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
+              
+              return (
+                <Link key={meta.id} href={`/metas/editarmeta?id=${meta.id}`} asChild>
+                  <TouchableOpacity>
+                    <View style={styles.meta1}>
+                      <View style={styles.iconMeta}>
+                        <Ionicons name={getIconeCategoria(meta.categoria) as any} size={25} color="#1D1252" />
+                      </View>
+                      <View style={styles.textMeta}>
+                        <Text style={styles.tituloMeta}>{meta.nomeMeta}</Text>
+                        <Text style={styles.descricaoMeta}>
+                          {meta.descricao ? meta.descricao.toUpperCase() : "SEM DESCRIÇÃO"}
+                        </Text>
 
-                  {/* Valores */}
-                  <View style={styles.progressValues}>
-                    <Text style={styles.progressValueStart}>
-                      R${" "}
-                      {valorAtual.toLocaleString("pt-BR", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Text>
-                    <Text style={styles.progressValueEnd}>
-                      de R${" "}
-                      {metaTotal.toLocaleString("pt-BR", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Text>
-                  </View>
+                        {/* Valores */}
+                        <View style={styles.progressValues}>
+                          <Text style={styles.progressValueStart}>
+                            R$ {meta.valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                          <Text style={styles.progressValueEnd}>
+                            de R$ {meta.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                        </View>
 
-                  {/* Barra de Progresso */}
-                  <View style={styles.progressBarContainer}>
-                    <View
-                      style={[
-                        styles.progressBar,
-                        { width: `${progresso * 100}%` },
-                      ]}
-                    />
-                  </View>
-                </View>
+                        {/* Barra de Progresso */}
+                        <View style={styles.progressBarContainer}>
+                          <View
+                            style={[
+                              styles.progressBar,
+                              { width: `${Math.min(progresso * 100, 100)}%` },
+                            ]}
+                          />
+                        </View>
+                      </View>
 
-                {/* Porcentagem no canto superior direito */}
-                <View style={styles.percentageContainer}>
-                  <Text style={styles.percentageText}>
-                    {Math.round(progresso * 100)}%
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </Link>
-
-          <Link href={"/metas/editarmeta"} asChild>
-            <TouchableOpacity>
-              <View style={styles.meta2}>
-                <View style={styles.iconMeta2}>
-                  <Ionicons name="airplane" size={25} color="#1D1252" />
-                </View>
-                <View style={styles.textMeta2}>
-                  <Text style={styles.tituloMeta2}>Reserva de Emergência</Text>
-                  <Text style={styles.descricaoMeta2}>SEGURANÇA</Text>
-
-                  {/* Valores */}
-                  <View style={styles.progressValues2}>
-                    <Text style={styles.progressValueStart2}>
-                      R${" "}
-                      {valorAtual2.toLocaleString("pt-BR", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Text>
-                    <Text style={styles.progressValueEnd2}>
-                      de R${" "}
-                      {metaTotal2.toLocaleString("pt-BR", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Text>
-                  </View>
-
-                  {/* Barra de Progresso */}
-                  <View style={styles.progressBarContainer2}>
-                    <View
-                      style={[
-                        styles.progressBar2,
-                        { width: `${progresso * 100}%` },
-                      ]}
-                    />
-                  </View>
-                </View>
-
-                {/* Porcentagem no canto superior direito */}
-                <View style={styles.percentageContainer2}>
-                  <Text style={styles.percentageText2}>
-                    {Math.round(progresso2 * 100)}%
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </Link>
+                      {/* Porcentagem no canto superior direito */}
+                      <View style={styles.percentageContainer}>
+                        <Text style={styles.percentageText}>
+                          {Math.round(progresso * 100)}%
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </Link>
+              );
+            })
+          )}
 
           <Link href={"/metas/addmeta"} asChild>
             <TouchableOpacity style={styles.addMetaButton}>
