@@ -35,6 +35,11 @@ export async function contribuirMeta(userId: string, metaId: string, valor: numb
   })
 }
 
+// Atualizar informações da meta
+export async function atualizarMeta(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>): Promise<void> {
+  await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), dados)
+}
+
 // Excluir meta
 export async function excluirMeta(userId: string, metaId: string): Promise<void> {
   await deleteDoc(doc(db, 'usuarios', userId, 'metas', metaId))
