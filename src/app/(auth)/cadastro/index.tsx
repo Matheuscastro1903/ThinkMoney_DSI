@@ -18,6 +18,7 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
+import InputRenda from "@/src/components/auth/inputrenda";
 
 interface CadastroUsuario {
   nome: string;
@@ -25,6 +26,7 @@ interface CadastroUsuario {
   senha: string;
   dataNascimento: string;
   username: string; // formato "YYYY-MM-DD"
+  renda: string
 }
 
 export default function Cadastro() {
@@ -38,6 +40,9 @@ export default function Cadastro() {
   const [inputSenha, setInputSenha] = useState("");
   const [inputSenhaConfirmada, setInputSenhaConfirmada] = useState("");
   const [inputData, setInputData] = useState<Date | null>(null);
+  const [inputRenda, setInputRenda] = useState("") // adição de espaço para renda
+
+  const [erroRenda, setErroRenda] = useState<string | null>(null);
 
   const [termosAceitos, setTermosAceitos] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +68,12 @@ export default function Cadastro() {
     ) {
       setMensagemErro("Preencha todos os campos para continuar.");
       return;
+    }
+
+    const erroRendaAtual = validarRenda(inputRenda);
+    if (erroRendaAtual) {
+      setErroRenda(erroRendaAtual);
+      return; // para o fluxo se renda for inválida
     }
 
     if (!termosAceitos) {
@@ -93,6 +104,7 @@ export default function Cadastro() {
         senha,
         username: userName,
         dataNascimento: inputData.toISOString().split("T")[0], // "YYYY-MM-DD"
+        renda: inputRenda
       };
       await cadastrarUsuario(dadosUsuario);
       router.replace("/(auth)/cadastro-sucesso");
@@ -112,6 +124,23 @@ export default function Cadastro() {
       setIsLoading(false);
     }
   }
+
+  function validarRenda(valor: string): string | null {
+    const apenasNumeros = valor.replace(/\D/g, '');
+
+    if (!apenasNumeros || apenasNumeros === '000') {
+      return 'Informe um valor válido';
+    }
+
+    const numero = parseInt(apenasNumeros) / 100;
+
+    if (numero > 999999.99) {
+      return 'Valor muito alto';
+    }
+
+    return null;
+  }
+
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -187,6 +216,20 @@ export default function Cadastro() {
                 icon={require("../../../assets/icons/iconedata.svg")}
                 onChange={(dataPronta) => setInputData(dataPronta)}
               ></InputDate>
+
+              <InputRenda
+                label="Digite sua Renda média"
+                placeholder="Ex: 3.000"
+                //atualizando={(valor) => setInputRenda(valor)}
+                icon={require("../../../assets/icons/iconecadeado.svg")}
+                iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
+                value={inputRenda}
+                atualizando= {(texto) => {
+                  setInputRenda(texto);
+                  setErroRenda(null); // limpa o erro enquanto digita
+                }}
+                erro={erroRenda}
+              />
             </View>
 
             <TouchableOpacity

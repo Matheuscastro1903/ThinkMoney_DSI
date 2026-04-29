@@ -1,12 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react"
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
+
+// Informacoes firebase
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/src/services/firebaseConfig';
+
 export default function Home() {
     const router = useRouter();
     const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+
+    const [usuario, setUsuario] = useState<any>(null);
+
+    useEffect(() => {
+        async function carregarDados() {
+        const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+
+        if (!uid) return;
+
+        const docRef = doc(db, 'usuarios', uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            setUsuario(docSnap.data());
+        }
+        }
+
+        carregarDados();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -22,7 +46,7 @@ export default function Home() {
                             <Ionicons name={isBalanceVisible ? "eye-outline" : "eye-off-outline"} size={20} color="#94A3B8" />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.text2}>{isBalanceVisible ? "R$ 340,00" : "R$ •••••"}</Text>
+                    <Text style={styles.text2}>{isBalanceVisible ? `R$ ${usuario?.renda}` : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
                         <Feather name="arrow-up-right" size={16} color="#34D399" />
                         <Text style={styles.saldoTrend}>R$ 1.250,00 entraram hoje</Text>
