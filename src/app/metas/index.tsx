@@ -10,9 +10,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import HeaderBack from "../../components/headerBack";
-import { buscarMetas, Meta } from "../../services/metasService";
 import { auth } from "../../services/firebaseConfig";
+import { buscarMetas, Meta } from "../../services/metasService";
 
 export default function Metas() {
   const [metas, setMetas] = useState<(Meta & { id: string })[]>([]);
@@ -55,19 +56,25 @@ export default function Metas() {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderBack />
-      <ScrollView>
-        <View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={styles.mainContainer}>
           <Text style={styles.metas}>Metas Pessoais</Text>
+          <Text style={styles.subtituloMetas}>Acompanhe e alcance seus grandes objetivos financeiros.</Text>
+        </View>
 
-          <View style={styles.boxPatrimonio}>
-            <Text style={styles.patrimonio}>PATRIMÔNIO EM METAS</Text>
-            <Text style={styles.valor}>
-              R$ {patrimonioTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </Text>
-            <View style={styles.boxRendimento}>
-              <Ionicons name="trending-up" size={18} color="#1D1252" />
-              <Text> Seu dinheiro trabalhando</Text>
+        <View style={styles.boxPatrimonio}>
+          <View style={styles.saldoHeader}>
+            <View style={styles.saldoHeaderLeft}>
+              <Ionicons name="rocket-outline" size={20} color="#34D399" />
+              <Text style={styles.patrimonio}>PATRIMÔNIO EM METAS</Text>
             </View>
+          </View>
+          <Text style={styles.valor}>
+            R$ {patrimonioTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </Text>
+          <View style={styles.saldoFooter}>
+            <Ionicons name="trending-up" size={16} color="#34D399" />
+            <Text style={styles.saldoTrend}>Seu dinheiro trabalhando</Text>
           </View>
         </View>
 
@@ -81,18 +88,17 @@ export default function Metas() {
           ) : (
             metas.map((meta) => {
               const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
-              
+
               return (
                 <Link key={meta.id} href={`/metas/editarmeta?id=${meta.id}`} asChild>
-                  <TouchableOpacity>
+                  <TouchableOpacity style={{ width: "100%" }}>
                     <View style={styles.meta1}>
                       <View style={styles.iconMeta}>
-                        <Ionicons name={getIconeCategoria(meta.categoria) as any} size={25} color="#1D1252" />
+                        <Ionicons name={getIconeCategoria(meta.categoria) as any} size={28} color="#1D1252" />
                       </View>
                       <View style={styles.textMeta}>
-                        <Text style={styles.tituloMeta}>{meta.nomeMeta}</Text>
-                        <Text style={styles.descricaoMeta}>
-                          {meta.descricao ? meta.descricao.toUpperCase() : "SEM DESCRIÇÃO"}
+                        <Text style={styles.tituloMeta} numberOfLines={1} ellipsizeMode="tail">
+                          {meta.nomeMeta}
                         </Text>
 
                         {/* Valores */}
@@ -129,9 +135,16 @@ export default function Metas() {
             })
           )}
 
+          <LinearGradient
+            colors={['transparent', '#3E346B', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.linhaSeparadora}>
+          </LinearGradient>
+
           <Link href={"/metas/addmeta"} asChild>
             <TouchableOpacity style={styles.addMetaButton}>
-              <Ionicons name="add-outline" size={25} color="#1D1252" />
+              <Ionicons name="add-outline" size={20} color="#1D1252" />
               <Text style={styles.addMetaText}>Nova Meta Pessoal</Text>
             </TouchableOpacity>
           </Link>
@@ -157,87 +170,124 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1252",
     flex: 1,
   },
+  mainContainer: {
+    flexDirection: 'column',
+    paddingLeft: 20,
+    marginTop: 15,
+  },
   metas: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 25,
-    textAlign: "center",
-    marginTop: 20,
+    color: '#FFFFFF',
+    fontSize: 35,
+    fontWeight: 'bold',
+  },
+  subtituloMetas: {
+    color: '#A8A7D5',
+    fontSize: 14,
+    textAlign: 'left',
+    paddingTop: 5,
+    height: 52,
+    width: 290,
+    letterSpacing: 0.6,
   },
   boxPatrimonio: {
-    backgroundColor: "white",
-    borderRadius: 25,
-    height: 150,
-    width: "70%",
-    padding: 20,
-    marginTop: 30,
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '90%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  saldoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  saldoHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   patrimonio: {
-    fontWeight: 200,
-    marginRight: 100,
-    fontSize: 10,
-    marginBottom: 10,
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
   },
   valor: {
-    fontSize: 23,
-    fontWeight: "bold",
-    color: "#1D1252",
-    marginRight: 63,
+    fontSize: 38,
+    fontWeight: '900',
+    color: '#1D1252',
+    letterSpacing: -1.5,
   },
-  boxRendimento: {
-    marginTop: 10,
-    marginRight: 63,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 5,
-    marginLeft: 20,
+  saldoFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+    gap: 6,
+  },
+  saldoTrend: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '600',
   },
   listaMetas: {
     marginTop: 25,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    marginLeft: 60,
+    paddingHorizontal: "5%",
+    alignItems: "center",
+    width: "100%",
   },
   suasMetas: {
     color: "white",
     fontWeight: "bold",
     fontSize: 20,
+    alignSelf: "flex-start",
+    marginBottom: 5,
   },
   meta1: {
     backgroundColor: "white",
     borderRadius: 15,
-    width: 300,
-    height: 110,
-    marginTop: 20,
+    width: "100%",
+    height: 100,
+    marginTop: 15,
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
   },
   iconMeta: {
     marginRight: 15,
-    backgroundColor: "#e9e9e9",
-    borderRadius: 10,
-    padding: 3,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 12,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
   textMeta: {
     flex: 1,
   },
   tituloMeta: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#1D1252",
   },
   descricaoMeta: {
-    fontSize: 10,
-    color: "#666",
-    marginTop: 5,
+    fontSize: 12,
+    color: "#64748B",
+    marginTop: 4,
+    lineHeight: 16,
   },
   valorMeta: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#1D1252",
     marginTop: 8,
     fontWeight: "600",
@@ -251,16 +301,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 10,
   },
   progressValueStart: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#1D1252",
-    fontWeight: "600",
+    fontWeight: "bold",
   },
   progressValueEnd: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 13,
+    color: "#64748B",
   },
   progressBarContainer: {
     height: 12,
@@ -291,7 +341,7 @@ const styles = StyleSheet.create({
   },
   percentageText: {
     color: "#1D1252",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
   },
   meta2: {
@@ -381,28 +431,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
-  addMeta: {
-    backgroundColor: "white",
-    marginTop: 30,
-    borderRadius: 10,
-    padding: 5,
-    width: 300,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   addMetaButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    backgroundColor: "white",
-    marginTop: 30,
-    borderRadius: 15,
-    width: 300,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 16,
+    gap: 10,
+    width: "100%",
   },
   addMetaText: {
-    marginLeft: 10,
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: "bold",
     color: "#1D1252",
+  },
+  linhaSeparadora: {
+    width: '80%',
+    height: 1,
+    alignSelf: 'center',
+    marginTop: 40,
+    marginBottom: 40,
+    borderRadius: 25,
   },
 });
