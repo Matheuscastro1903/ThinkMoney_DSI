@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
-import { atualizarMeta, excluirMeta, buscarMetas } from "../../services/metasService";
+import { atualizarMeta, excluirMeta, buscarMetas, contribuirMeta } from "../../services/metasService";
 import { auth } from "../../services/firebaseConfig";
 
 const CATEGORIAS = [
@@ -35,7 +35,11 @@ export default function EditMeta() {
   const [capital, setCapital] = useState("");
   const [data, setData] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [valorAporte, setValorAporte] = useState("");
+  const [valorPoupado, setValorPoupado] = useState(0);
+  const [valorTotalMeta, setValorTotalMeta] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAporteLoading, setIsAporteLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
@@ -53,6 +57,8 @@ export default function EditMeta() {
           setNomeMeta(meta.nomeMeta);
           setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
           setData(meta.dataLimite);
+          setValorPoupado(meta.valorPoupado);
+          setValorTotalMeta(meta.valorTotal);
           if (meta.descricao) setDescricao(meta.descricao);
         } else {
           Alert.alert("Erro", "Meta não encontrada.");
@@ -99,6 +105,33 @@ export default function EditMeta() {
       Alert.alert("Erro", "Ocorreu um erro ao atualizar a meta.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleContribuir = async () => {
+    if (!valorAporte) return;
+
+    const valorFormatado = parseFloat(valorAporte.replace(/\./g, "").replace(",", "."));
+    
+    if (isNaN(valorFormatado) || valorFormatado <= 0) {
+      Alert.alert("Atenção", "Insira um valor numérico válido para o aporte.");
+      return;
+    }
+
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    setIsAporteLoading(true);
+
+    try {
+      await contribuirMeta(userId, id, valorFormatado);
+      setValorPoupado((prev) => prev + valorFormatado);
+      setValorAporte("");
+      Alert.alert("Sucesso", "Dinheiro adicionado à meta!");
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao adicionar o valor.");
+    } finally {
+      setIsAporteLoading(false);
     }
   };
 
@@ -244,6 +277,44 @@ export default function EditMeta() {
                   onChangeText={setDescricao}
                 />
               </View>
+
+              <View style={styles.separator} />
+
+              <Text style={styles.labelSection}>GUARDAR DINHEIRO</Text>
+              
+              <Text style={styles.progressInfo}>
+                Você já guardou <Text style={styles.progressHighlight}>R$ {valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text> de R$ {valorTotalMeta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </Text>
+
+              <View style={styles.inputWrapper}>
+                <Text style={styles.currencyPrefix}>R$</Text>
+                <TextInput
+                  style={styles.inputText}
+                  placeholder="0,00"
+                  placeholderTextColor="#BBBBBB"
+                  keyboardType="numeric"
+                  value={valorAporte}
+                  onChangeText={setValorAporte}
+                />
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.buttonAporte, isAporteLoading && { opacity: 0.7 }]} 
+                activeOpacity={0.85}
+                onPress={handleContribuir}
+                disabled={isAporteLoading || isFetching}
+              >
+                {isAporteLoading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <Text style={styles.buttonText}>Adicionar valor</Text>
+                    <Ionicons name="trending-up" size={20} color="white" />
+                  </>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.separator} />
 
               {/* Botão para editar */}
               <TouchableOpacity 
@@ -470,4 +541,29 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   textocancelar: {},
+  separator: {
+    height: 1,
+    backgroundColor: "#F0F0F5",
+    marginVertical: 20,
+    width: "100%",
+  },
+  progressInfo: {
+    fontSize: 12,
+    color: "#64748B",
+    marginBottom: 12,
+  },
+  progressHighlight: {
+    color: "#34D399",
+    fontWeight: "bold",
+  },
+  buttonAporte: {
+    backgroundColor: "#34D399",
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
 });
