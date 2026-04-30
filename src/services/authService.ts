@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth'
-import { doc, setDoc, Timestamp } from 'firebase/firestore'
+import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore'
 import { auth, db } from './firebaseConfig'
 
 
@@ -10,7 +10,8 @@ interface CadastroUsuario {
   email: string
   senha: string
   dataNascimento: string,
-  username: string  // formato "YYYY-MM-DD"
+  username: string,  // formato "YYYY-MM-DD"
+  renda: string
 }
 
 export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
@@ -23,6 +24,7 @@ export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
     email: dados.email,
     dataNascimento: dados.dataNascimento,
     username: dados.username,
+    renda: dados.renda,
     criadoEm: Timestamp.now()
   })
 }

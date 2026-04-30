@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
 
 export default function Metas() {
@@ -20,7 +21,7 @@ export default function Metas() {
   const progresso2 = valorAtual2 / metaTotal2;
   return (
 
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <HeaderBack />
       <ScrollView>
         <View>
@@ -122,16 +123,16 @@ export default function Metas() {
                     />
                   </View>
                 </View>
+
+                {/* Porcentagem no canto superior direito */}
+                <View style={styles.percentageContainer2}>
+                  <Text style={styles.percentageText2}>
+                    {Math.round(progresso2 * 100)}%
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           </Link>
-
-          {/* Porcentagem no canto superior direito */}
-          <View style={styles.percentageContainer2}>
-            <Text style={styles.percentageText2}>
-              {Math.round(progresso2 * 100)}%
-            </Text>
-          </View>
 
           <Link href={"/metas/addmeta"} asChild>
             <TouchableOpacity style={styles.addMetaButton}>
@@ -141,7 +142,7 @@ export default function Metas() {
           </Link>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
 
   );
 }
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 25,
     textAlign: "center",
-    marginTop: 70,
+    marginTop: 20,
   },
   boxPatrimonio: {
     backgroundColor: "white",
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   percentageText: {
-    color: "black",
+    color: "#1D1252",
     fontSize: 12,
     fontWeight: "bold",
   },
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   percentageText2: {
-    color: "black",
+    color: "#1D1252",
     fontSize: 12,
     fontWeight: "bold",
   },

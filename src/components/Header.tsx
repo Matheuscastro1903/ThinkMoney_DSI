@@ -1,14 +1,15 @@
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { useRouter } from 'expo-router'
 
 export default function Header() {
+    const router = useRouter();
     return (
         <View style={styles.header}>
             
             <Image source={require('../assets/images/logothink.png')} style={styles.logo} />
             
             
-            <TouchableOpacity onPress={() =>
-                console.log('clicou no perfil')}>
+            <TouchableOpacity onPress={() => router.push('/config')}>
                 <Image source={require('../assets/images/onca.png')}
                     style={styles.avatar} />
             </TouchableOpacity>

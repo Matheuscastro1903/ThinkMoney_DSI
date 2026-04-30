@@ -14,6 +14,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -56,60 +58,65 @@ export default function EsqueciSenha() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
-      >
-        <View style={{ width: "100%", marginBottom: -40 }}>
-          <HeaderBack />
-        </View>
-        <View style={styles.icone}>
-          <Ionicons name="lock-closed" size={45} color="black" />
-        </View>
-        <View style={styles.main}>
-          <Text style={styles.text1}>Esqueceu sua senha?</Text>
-          <Text style={styles.text2}>
-            Digite seu email cadastrado e enviaremos um link para redefinir sua
-            senha.
-          </Text>
-        </View>
-        <View style={styles.inputcontainer}>
-          <Ionicons name="mail" size={24} color="black" />
-          <TextInput
-            style={styles.inputReal}
-            placeholder="Digite seu email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        {mensagemErro !== "" && (
-          <Text style={styles.textErro}>{mensagemErro}</Text>
-        )}
-        <TouchableOpacity
-          style={styles.confirmar}
-          onPress={handleRecuperarSenha}
         >
-          {carregando ? (
-            <ActivityIndicator size="large" color="#1D1252" />
-          ) : (
-            <Text style={styles.textconfirmar}>Enviar link</Text>
+          <View style={{ width: "100%", marginBottom: -40 }}>
+            <HeaderBack />
+          </View>
+          <View style={styles.icone}>
+            <Ionicons name="lock-closed" size={45} color="black" />
+          </View>
+          <View style={styles.main}>
+            <Text style={styles.text1}>Esqueceu sua senha?</Text>
+            <Text style={styles.text2}>
+              Digite seu email cadastrado e enviaremos um link para redefinir sua
+              senha.
+            </Text>
+          </View>
+          <View style={styles.inputcontainer}>
+            <Ionicons name="mail" size={24} color="black" />
+            <TextInput
+              style={styles.inputReal}
+              placeholder="Digite seu email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          {mensagemErro !== "" && (
+            <Text style={styles.textErro}>{mensagemErro}</Text>
           )}
-        </TouchableOpacity>
-        <LinearGradient
-          colors={["transparent", "#3E346B", "transparent"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.linhaSeparadora}
-        ></LinearGradient>
-        <View style={styles.containerbacklogin}>
-          <Text style={styles.textbacklogin}>Lembrou a senha?</Text>
-          <Link href="/(auth)/login">
-            <Text style={styles.textbacklogin2}>Faça login</Text>
-          </Link>
-        </View>
-      </ScrollView>
+          <TouchableOpacity
+            style={styles.confirmar}
+            onPress={handleRecuperarSenha}
+          >
+            {carregando ? (
+              <ActivityIndicator size="large" color="#1D1252" />
+            ) : (
+              <Text style={styles.textconfirmar}>Enviar link</Text>
+            )}
+          </TouchableOpacity>
+          <LinearGradient
+            colors={["transparent", "#3E346B", "transparent"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.linhaSeparadora}
+          ></LinearGradient>
+          <View style={styles.containerbacklogin}>
+            <Text style={styles.textbacklogin}>Lembrou a senha?</Text>
+            <Link href="/(auth)/login">
+              <Text style={styles.textbacklogin2}>Faça login</Text>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

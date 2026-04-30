@@ -1,20 +1,24 @@
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native"; // ADICIONADO: ScrollView
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import InputSenha from "@/src/components/auth/inputsenha";
+import { loginUsuario, buscarDadosUsuario } from "@/src/services/authService";
 import { Link, useRouter } from "expo-router";
 import InputLogin from "../../../components/auth/inputlogin";
-import { loginUsuario } from "@/src/services/authService";
+
+
 
 import HeaderBack from "@/src/components/headerBack";
 
@@ -49,126 +53,131 @@ export default function Login() {
       return;
     }
 
-    
     console.log("🚀 Iniciando processo de login...");
     setIsLoading(true);
-   try {
-      console.log("Chamando firebase...")
+    try {
+      console.log("Chamando firebase...");
       const user = await loginUsuario({
         email: email,
         senha: inputSenha,
-      })
-      
+      });
+
       console.log("✅ Login realizado com sucesso!");
       console.log("👤 Usuário:", user);
       console.log("🆔 UID:", user.uid);
       console.log("📧 Email Firebase:", user.email);
 
+      // ✅ Busca os dados do usuário no Firestore
+      const dadosUsuario = await buscarDadosUsuario(user.uid);
+      console.log("Renda do usuário:", dadosUsuario?.renda);
+
+      router.push("/(tabs)/home");
+
       router.push("/(tabs)/home");
     } catch (error: any) {
-
       console.log("❌ ERRO NO LOGIN");
       console.log("Código:", error.code);
       console.log("Mensagem:", error.message);
-     // tratamento básico (já resolve 90% dos casos)
-     if(error.code === "auth/user-not-found") {
-        setMensagemErro("Usuário não encontrado.")
-     } else if (error.code === "auth/wrong-password") {
-      setMensagemErro("Senha incorreta.")
-     } else if(error.code === "auth/invalid-email") {
-      setMensagemErro("Email inválido.")
-     } else {
-      setMensagemErro("Erro ao fazer login")
-     }
+      // tratamento básico (já resolve 90% dos casos)
+      if (error.code === "auth/user-not-found") {
+        setMensagemErro("Usuário não encontrado.");
+      } else if (error.code === "auth/wrong-password") {
+        setMensagemErro("Senha incorreta.");
+      } else if (error.code === "auth/invalid-email") {
+        setMensagemErro("Email inválido.");
+      } else {
+        setMensagemErro("Erro ao fazer login");
+      }
     } finally {
       console.log("🏁 Finalizou tentativa de login");
-      setIsLoading(false)
+      setIsLoading(false);
     }
+
+    
   }
-
-
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
     <SafeAreaView style={styles.safeArea}>
-      {/* ScrollView por dentro — permite rolar caso necessário */}
-      <ScrollView contentContainerStyle={styles.fundo}>
-        <View style={{ width: "100%", marginBottom: -40 }}>
-          <HeaderBack />
-        </View>
-        <Image
-          source={require("../../../assets/images/logothinkmoney.png")}
-          style={styles.logo}
-        />
-
-        <View style={styles.main}>
-          <View>
-            <InputLogin
-              label="Digite seu email"
-              placeholder="nome@gmail.com"
-              atualizando={(valor) => setInputEmail(valor)}
-              icon={require("../../../assets/icons/iconeusuario.svg")}
-              value={inputEmail}
-            />
-
-            <InputSenha
-              label="Digite sua senha"
-              placeholder="Digite sua senha"
-              atualizando={(valor) => setInputSenha(valor)}
-              icon={require("../../../assets/icons/iconecadeado.svg")}
-              iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
-              value={inputSenha}
-            />
-
-            <View style={styles.esqueceusenha}>
-              <Link href={"/(auth)/esqueci-senha"} asChild>
-                <TouchableOpacity>
-                  <Text style={styles.textesqueceu}>Esqueci a senha</Text>
-                </TouchableOpacity>
-              </Link>
-            </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        {/* ScrollView por dentro — permite rolar caso necessário */}
+        <ScrollView
+          contentContainerStyle={styles.fundo}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ width: "100%", marginBottom: -40 }}>
+            <HeaderBack />
           </View>
-
-          <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={() => setManterConectado(!manterConectado)}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                manterConectado && styles.checkboxMarcado,
-              ]}
+          <Image
+            source={require("../../../assets/images/logothinkmoney.png")}
+            style={styles.logo}
+          />
+          <View style={styles.main}>
+            <View>
+              <InputLogin
+                label="Digite seu email"
+                placeholder="nome@gmail.com"
+                atualizando={(valor) => setInputEmail(valor)}
+                icon={require("../../../assets/icons/iconeusuario.svg")}
+                value={inputEmail}
+              />
+              <InputSenha
+                label="Digite sua senha"
+                placeholder="Digite sua senha"
+                atualizando={(valor) => setInputSenha(valor)}
+                icon={require("../../../assets/icons/iconecadeado.svg")}
+                iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
+                value={inputSenha}
+              />
+              <View style={styles.esqueceusenha}>
+                <Link href={"/(auth)/esqueci-senha"} asChild>
+                  <TouchableOpacity>
+                    <Text style={styles.textesqueceu}>Esqueci a senha</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setManterConectado(!manterConectado)}
+              activeOpacity={0.7}
             >
-              {manterConectado && <Text style={styles.checkmark}>✓</Text>}
-            </View>
-
-            <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
-          </TouchableOpacity>
-
-          <View style={{ gap: 10 }}>
-            {mensagemErro && (
-              <Text style={{ color: "red", textAlign: "center" }}>
-                {mensagemErro}
-              </Text>
-            )}
-            {isloading ? (
-              <ActivityIndicator size="large" color="#1D1252" />
-            ) : (
-              <ButtonConfirmar label="Entrar" onClick={handleLogin} />
-            )}
-          </View>
-        </View>
-
-        <View style={styles.containerlinkcadastro}>
-          <Text style={{ color: "#867DC1" }}>Novo por aqui ?</Text>
-          <Link href={"/(auth)/cadastro"} asChild>
-            <TouchableOpacity>
-              <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
+              <View
+                style={[
+                  styles.checkbox,
+                  manterConectado && styles.checkboxMarcado,
+                ]}
+              >
+                {manterConectado && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
             </TouchableOpacity>
-          </Link>
-        </View>
-      </ScrollView>
+            <View style={{ gap: 10 }}>
+              {mensagemErro && (
+                <Text style={{ color: "red", textAlign: "center" }}>
+                  {mensagemErro}
+                </Text>
+              )}
+              {isloading ? (
+                <ActivityIndicator size="large" color="#1D1252" />
+              ) : (
+                <ButtonConfirmar label="Entrar" onClick={handleLogin} />
+              )}
+            </View>
+          </View>
+          <View style={styles.containerlinkcadastro}>
+            <Text style={{ color: "#867DC1" }}>Novo por aqui ?</Text>
+            <Link href={"/(auth)/cadastro"} asChild>
+              <TouchableOpacity>
+                <Text style={styles.textlinkcadastro}>Crie sua conta</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -188,14 +197,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     backgroundColor: "#1D1252",
     width: "100%",
-    gap: 30,
+    gap: 16,
     paddingBottom: 40, // ADICIONADO: respiro no final ao scrollar
-    paddingTop: 20, // ADICIONADO: respiro no topo após a SafeArea
+    paddingTop: 8, // Ajuste: sobe o conteúdo para deixar os inputs mais no alto
   },
 
   logo: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
     resizeMode: "contain",
   },
 
@@ -203,7 +212,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
-    gap: 30,
+    gap: 20,
     width: "90%", // ADICIONADO: largura relativa para não bater nas laterais
   },
 
