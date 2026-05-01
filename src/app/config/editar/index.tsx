@@ -15,7 +15,7 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
-import InputEndereco from "../../../components/InputEndereco";
+import InputEndereco, { Endereco } from "../../../components/InputEndereco";
 import InputTelefone from "../../../components/InputTelefone";
 import HeaderBack from "@/src/components/headerBack";
 
@@ -27,7 +27,13 @@ export default function EditarConta() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputSenha, setInputSenha] = useState("");
   const [inputTelefone, setInputTelefone] = useState("");
-  const [inputEndereco, setInputEndereco] = useState("");
+  const [inputEndereco, setInputEndereco] = useState({
+    logradouro: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    cep: "",
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -103,7 +109,8 @@ export default function EditarConta() {
             />
 
             <InputEndereco
-              atualizando={(endereco) => setInputEndereco(endereco)}
+              inputEndereco={inputEndereco}
+              atualizando={(patch: Partial<Endereco>) => setInputEndereco(prev => ({ ...prev, ...patch }))}
             />
 
             <View style={styles.aviso}>

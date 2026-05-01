@@ -1,12 +1,19 @@
 import { View, TextInput, Text, StyleSheet } from "react-native";
 
-export default function InputEndereco() {
-    const logradouro = null;
-    const numero = null;
-    const bairro = null;
-    const cidade = null;
-    const cep = null;
+export interface Endereco {
+    logradouro: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    cep: string;
+}
 
+interface InputEnderecoProps {
+    inputEndereco: Endereco;
+    atualizando: (patch: Partial<Endereco>) => void;
+}
+
+export default function InputEndereco({ inputEndereco, atualizando }: InputEnderecoProps) {
   return (
     <View style={styles.container}>
         <View style={styles.row}>
@@ -15,7 +22,8 @@ export default function InputEndereco() {
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="#ccc"
-                    placeholder={logradouro ? logradouro : "ex. rua das flores"}
+                    placeholder={inputEndereco.logradouro ? inputEndereco.logradouro : "ex. rua das flores"}
+                    onChangeText={(value) => atualizando({logradouro: value})}
                 />
             </View>
             
@@ -24,7 +32,8 @@ export default function InputEndereco() {
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="#ccc"
-                    placeholder={numero ? numero : "ex. 123"}
+                    placeholder={inputEndereco.numero ? inputEndereco.numero : "ex. 123"}
+                    onChangeText={(value) => atualizando({numero: value})}
                 />
             </View>
         </View>
@@ -34,16 +43,18 @@ export default function InputEndereco() {
                 <Text style={styles.label}>Bairro</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder={bairro ? bairro : "ex. bairro novo"}
+                    placeholder={inputEndereco.bairro ? inputEndereco.bairro : "ex. bairro novo"}
                     placeholderTextColor="#ccc"
+                    onChangeText={(value) => atualizando({bairro: value})}
                 />
             </View>
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Cidade</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder={cidade ? cidade : "ex. São Paulo"}
+                    placeholder={inputEndereco.cidade ? inputEndereco.cidade : "ex. São Paulo"}
                     placeholderTextColor="#ccc"
+                    onChangeText={(value) => atualizando({cidade: value})}
                 />
             </View>
         </View>
@@ -53,7 +64,8 @@ export default function InputEndereco() {
             <TextInput
                 style={styles.input}
                 placeholderTextColor="#ccc"
-                placeholder={cep ? cep : "ex. 12345-678"}
+                placeholder={inputEndereco.cep ? inputEndereco.cep : "ex. 12345-678"}
+                onChangeText={(value) => atualizando({cep: value})}
             />
         </View>
 
