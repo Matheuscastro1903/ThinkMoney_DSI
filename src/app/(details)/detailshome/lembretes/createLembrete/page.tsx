@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -8,22 +9,42 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
 import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
+import { auth } from "@/src/services/firebaseConfig";
+import { criarLembrete } from "@/src/services/lembretesService";
 
 export default function TelaCreateLembrete() {
+  const router = useRouter();
   const [escolhaGastos, setEscolhaGastos] = useState("");
   const [inputData, setInputData] = useState<Date | null>(null);
   const [inputNomeGasto, setInputNomeGasto] = useState("");
   const [valorGasto, setValorGasto] = useState("");
   const [descricao, setDescricao] = useState("");
 
-  function teste() {
-    console.log("teste");
+  async function handleCriar() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    if (!inputNomeGasto || !escolhaGastos || !valorGasto || !inputData) {
+      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    await criarLembrete(user.uid, {
+      nomeGasto: inputNomeGasto,
+      categoria: escolhaGastos,
+      vencimento: inputData.toISOString().split("T")[0],
+      valor: parseFloat(valorGasto.replace(",", ".")),
+      status: "PENDENTE",
+    });
+
+    router.back();
   }
 
   const opcoesGastos = [
@@ -95,7 +116,7 @@ export default function TelaCreateLembrete() {
             />
           </View>
           <View style={styles.viewbotao}>
-            <ButtonConfirmar label="Criar lembrete" onClick={teste} />
+            <ButtonConfirmar label="Criar lembrete" onClick={handleCriar} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -8,19 +9,19 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
-//usado para capturar 'atributos' passados
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
-import { useLocalSearchParams } from "expo-router";
-
 import ButtonDeletarLembretes from "@/src/components/details/lembretes/buttondell/page";
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
 import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import HeaderBack from "@/src/components/headerBack";
+import { auth } from "@/src/services/firebaseConfig";
+import { atualizarLembrete, excluirLembrete } from "@/src/services/lembretesService";
 
 export default function TelaUpdateLembrete() {
-  //capturando os parametros(ira retornar no formato de dicionário)
+  const router = useRouter();
   const params = useLocalSearchParams();
 
   const [inputNomeGasto, setInputNomeGasto] = useState(
@@ -31,7 +32,7 @@ export default function TelaUpdateLembrete() {
   );
   const [valorGasto, setValorGasto] = useState((params.valor as string) || "");
   const [data, setData] = useState<Date | null>(null);
-  const [descricao, setDescricao] = useState("");
+  const [descricao, setDescricao] = useState((params.descricao as string) || "");
 
   const opcoesGastos = [
     { value: "ENTRETENIMENTO", label: "Entretenimento" },
@@ -41,16 +42,38 @@ export default function TelaUpdateLembrete() {
     { value: "OUTROS", label: "Outros" },
   ];
 
-  function handleAtualizar() {
-    console.log("Dados atualizados:", {
-      inputNomeGasto,
-      escolhaGastos,
-      valorGasto,
+  async function handleAtualizar() {
+    const user = auth.currentUser;
+    const id = params.id as string;
+    if (!user || !id) return;
+
+    await atualizarLembrete(user.uid, id, {
+      nomeGasto: inputNomeGasto,
+      categoria: escolhaGastos,
+      valor: parseFloat(valorGasto.replace(",", ".")),
+      ...(data ? { vencimento: data.toISOString().split("T")[0] } : {}),
+      ...(descricao ? { descricao } : {}),
     });
+
+    router.back();
   }
 
-  function deletarlembrete() {
-    console.log(1);
+  async function handleDeletar() {
+    const user = auth.currentUser;
+    const id = params.id as string;
+    if (!user || !id) return;
+
+    Alert.alert("Deletar lembrete", "Tem certeza que deseja deletar?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Deletar",
+        style: "destructive",
+        onPress: async () => {
+          await excluirLembrete(user.uid, id);
+          router.back();
+        },
+      },
+    ]);
   }
 
   return (
@@ -118,7 +141,7 @@ export default function TelaUpdateLembrete() {
             />
             <ButtonDeletarLembretes
               label="Deletar lembrete"
-              onClick={deletarlembrete}
+              onClick={handleDeletar}
             />
           </View>
         </ScrollView>
