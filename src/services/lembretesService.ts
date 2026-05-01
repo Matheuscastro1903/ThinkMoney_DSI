@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore'
+import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
 interface Lembrete {
@@ -6,6 +6,7 @@ interface Lembrete {
   categoria: string
   vencimento: string   // "YYYY-MM-DD"
   valor: number
+  status: 'PENDENTE' | 'PAGO'
 }
 
 // Criar lembrete
@@ -23,6 +24,11 @@ export async function buscarLembretes(userId: string): Promise<(Lembrete & { id:
   )
   const snapshot = await getDocs(q)
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Lembrete }))
+}
+
+// Atualizar lembrete
+export async function atualizarLembrete(userId: string, lembreteId: string, dados: Partial<Lembrete>): Promise<void> {
+  await updateDoc(doc(db, 'usuarios', userId, 'lembretes', lembreteId), dados)
 }
 
 // Excluir lembrete
