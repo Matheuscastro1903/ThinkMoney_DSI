@@ -71,8 +71,8 @@ export default function TelaCreateLembrete() {
             <InputTexto
               label="Valor do Gasto"
               placeholder="Ex: 67,00"
-              atualizando={setInputNomeGasto}
-              value={inputNomeGasto}
+              atualizando={setValorGasto}
+              value={valorGasto}
               width={300}
               height={56}
               multline={false}
