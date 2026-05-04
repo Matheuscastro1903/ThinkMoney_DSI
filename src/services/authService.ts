@@ -9,9 +9,16 @@ interface CadastroUsuario {
   nome: string
   email: string
   senha: string
-  dataNascimento: string,
+  datanascimento: string,
   username: string,  // formato "YYYY-MM-DD"
-  renda: string
+  renda: string,
+  telefone: string,
+  profissao: string,
+  logradouro: string,
+  numero: string,
+  bairro: string,
+  cidade: string, 
+  cep: string
 }
 
 export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
@@ -22,10 +29,17 @@ export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
   await setDoc(doc(db, 'usuarios', user.uid), {
     nome: dados.nome,
     email: dados.email,
-    dataNascimento: dados.dataNascimento,
+    datanascimento: dados.datanascimento,
     username: dados.username,
     renda: dados.renda,
-    criadoEm: Timestamp.now()
+    criadoEm: Timestamp.now(),
+    telefone: dados.telefone,
+    profissao: dados.profissao,
+    logradouro: dados.logradouro,
+    numero: dados.numero,
+    bairro: dados.bairro,
+    cidade: dados.cidade,
+    cep: dados.cep
   })
 }
 

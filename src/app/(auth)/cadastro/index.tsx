@@ -2,14 +2,14 @@ import { cadastrarUsuario } from "@/src/services/authService";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
@@ -20,13 +20,30 @@ import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
 import InputRenda from "@/src/components/auth/inputrenda";
 
+// Criação de componentes para inputs de endereço e mais informacoes pessoais
+import InputTelefone from "@/src/components/auth/inputtelefone";
+import InputProfissao from "@/src/components/auth/inputprofissao";
+import InputLogradouro from "@/src/components/auth/inputlogradouro";
+import InputNumero from "@/src/components/auth/inputnumero";
+import InputBairro from "@/src/components/auth/inputbairro";
+import InputCidade from "@/src/components/auth/inputcidade";
+import InputCep from "@/src/components/auth/inputcep";
+import { Ionicons } from "@expo/vector-icons";
+
 interface CadastroUsuario {
   nome: string;
   email: string;
   senha: string;
-  dataNascimento: string;
+  datanascimento: string;
   username: string; // formato "YYYY-MM-DD"
-  renda: string
+  renda: string;
+  telefone: string;
+  profissao: string;
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  cep: string;
 }
 
 export default function Cadastro() {
@@ -40,7 +57,25 @@ export default function Cadastro() {
   const [inputSenha, setInputSenha] = useState("");
   const [inputSenhaConfirmada, setInputSenhaConfirmada] = useState("");
   const [inputData, setInputData] = useState<Date | null>(null);
-  const [inputRenda, setInputRenda] = useState("") // adição de espaço para renda
+  const [inputRenda, setInputRenda] = useState(""); // adição de espaço para renda
+
+  const [inputTelefone, setInputTelefone] = useState("");
+  const [inputProfissao, setInputProfissao] = useState("");
+  const [inputLogradouro, setInputLogradouro] = useState("");
+  const [inputNumero, setInputNumero] = useState("");
+  const [inputBairro, setInputBairro] = useState("");
+  const [inputCidade, setInputCidade] = useState("");
+  const [inputCep, setInputCep] = useState("");
+
+  // Estados de erro
+
+  const [erroProfissao, setErroProfissao] = useState<string | null>(null);
+  const [erroTelefone, setErroTelefone] = useState<string | null>(null);
+  const [erroLogradouro, setErroLogradouro] = useState<string | null>(null);
+  const [erroNumero, setErroNumero] = useState<string | null>(null);
+  const [erroBairro, setErroBairro] = useState<string | null>(null);
+  const [erroCidade, setErroCidade] = useState<string | null>(null);
+  const [erroCep, setErroCep] = useState<string | null>(null);
 
   const [erroRenda, setErroRenda] = useState<string | null>(null);
 
@@ -96,6 +131,33 @@ export default function Cadastro() {
       return;
     }
 
+    const erroProfissaoAtual = validarProfissao(inputProfissao);
+    const erroTelefoneAtual = validarTelefone(inputTelefone);
+    const erroLogradouroAtual = validarLogradouro(inputLogradouro);
+    const erroNumeroAtual = validarNumero(inputNumero);
+    const erroBairroAtual = validarBairro(inputBairro);
+    const erroCidadeAtual = validarCidade(inputCidade);
+    const erroCepAtual = validarCep(inputCep);
+
+    if (
+      erroProfissaoAtual ||
+      erroTelefoneAtual ||
+      erroLogradouroAtual ||
+      erroNumeroAtual ||
+      erroBairroAtual ||
+      erroCidadeAtual ||
+      erroCepAtual
+    ) {
+      setErroProfissao(erroProfissaoAtual);
+      setErroTelefone(erroTelefoneAtual);
+      setErroLogradouro(erroLogradouroAtual);
+      setErroNumero(erroNumeroAtual);
+      setErroBairro(erroBairroAtual);
+      setErroCidade(erroCidadeAtual);
+      setErroCep(erroCepAtual);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const dadosUsuario: CadastroUsuario = {
@@ -103,8 +165,15 @@ export default function Cadastro() {
         email,
         senha,
         username: userName,
-        dataNascimento: inputData.toISOString().split("T")[0], // "YYYY-MM-DD"
-        renda: inputRenda
+        datanascimento: inputData.toISOString().split("T")[0], // "YYYY-MM-DD"
+        renda: inputRenda,
+        telefone: inputTelefone,
+        profissao: inputProfissao,
+        logradouro: inputLogradouro,
+        numero: inputNumero,
+        bairro: inputBairro,
+        cidade: inputCidade,
+        cep: inputCep,
       };
       await cadastrarUsuario(dadosUsuario);
       router.replace("/(auth)/cadastro-sucesso");
@@ -126,21 +195,74 @@ export default function Cadastro() {
   }
 
   function validarRenda(valor: string): string | null {
-    const apenasNumeros = valor.replace(/\D/g, '');
+    const apenasNumeros = valor.replace(/\D/g, "");
 
-    if (!apenasNumeros || apenasNumeros === '000') {
-      return 'Informe um valor válido';
+    if (!apenasNumeros || apenasNumeros === "000") {
+      return "Informe um valor válido";
     }
 
     const numero = parseInt(apenasNumeros) / 100;
 
     if (numero > 999999.99) {
-      return 'Valor muito alto';
+      return "Valor muito alto";
     }
 
     return null;
   }
 
+  function validarProfissao(valor: string): string | null {
+    if (valor.trim().length < 3) return "Informe uma profissão válida.";
+    if (valor.trim().length > 50) return "Profissão muito longa.";
+    return null;
+  }
+
+  function validarTelefone(valor: string): string | null {
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
+      return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
+    return null;
+  }
+
+  function validarLogradouro(valor: string): string | null {
+    if (valor.trim().length < 3) return "Informe um logradouro válido.";
+    return null;
+  }
+
+  function validarNumero(valor: string): string | null {
+    if (valor.trim() === "") return "Informe o número.";
+    if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
+    return null;
+  }
+
+  function validarBairro(valor: string): string | null {
+    if (valor.trim().length < 2) return "Informe um bairro válido.";
+    return null;
+  }
+
+  function validarCidade(valor: string): string | null {
+    if (valor.trim().length < 2) return "Informe uma cidade válida.";
+    return null;
+  }
+
+  function validarCep(valor: string): string | null {
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
+    return null;
+  }
+
+  // Funcao para definir um padrão correto para o telefone
+  function mascaraTelefone(valor: string): string {
+    const nums = valor.replace(/\D/g, "").slice(0, 11);
+    if (nums.length <= 10)
+      return nums.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+    return nums.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+  }
+
+  // Funcao para definir um padrao correto para o cep
+  function mascaraCep(valor: string): string {
+    const nums = valor.replace(/\D/g, "").slice(0, 8);
+    return nums.replace(/(\d{5})(\d{0,3})/, "$1-$2");
+  }
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -224,12 +346,93 @@ export default function Cadastro() {
                 icon={require("../../../assets/icons/iconecadeado.svg")}
                 iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
                 value={inputRenda}
-                atualizando= {(texto) => {
+                atualizando={(texto) => {
                   setInputRenda(texto);
                   setErroRenda(null); // limpa o erro enquanto digita
                 }}
                 erro={erroRenda}
               />
+
+              {/* ── Dados Profissionais ── */}
+              <InputProfissao
+                value={inputProfissao}
+                atualizando={(valor) => {
+                  setInputProfissao(valor);
+                  setErroProfissao(null);
+                }}
+                erro={erroProfissao}
+              />
+
+              <InputTelefone
+                value={inputTelefone}
+                atualizando={(valor) => {
+                  setInputTelefone(valor);
+                  setErroTelefone(null);
+                }}
+                erro={erroTelefone}
+              />
+
+              {/* Grid de endereço */}
+              <View style={styles.enderecoGrid}>
+                <View style={styles.enderecoLinha}>
+                  <View style={styles.campoLogradouro}>
+                    <InputLogradouro
+                      value={inputLogradouro}
+                      atualizando={(valor) => {
+                        setInputLogradouro(valor);
+                        setErroLogradouro(null);
+                      }}
+                      erro={erroLogradouro}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  <View style={styles.campoNumero}>
+                    <InputNumero
+                      value={inputNumero}
+                      atualizando={(valor) => {
+                        setInputNumero(valor);
+                        setErroNumero(null);
+                      }}
+                      erro={erroNumero}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.enderecoLinha}>
+                  <View style={styles.campoBairro}>
+                    <InputBairro
+                      value={inputBairro}
+                      atualizando={(valor) => {
+                        setInputBairro(valor);
+                        setErroBairro(null);
+                      }}
+                      erro={erroBairro}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                  <View style={styles.campoCidade}>
+                    <InputCidade
+                      value={inputCidade}
+                      atualizando={(valor) => {
+                        setInputCidade(valor);
+                        setErroCidade(null);
+                      }}
+                      erro={erroCidade}
+                      style={{ flex: 1 }}
+                    />
+                  </View>
+                </View>
+
+                <InputCep
+                  value={inputCep}
+                  atualizando={(valor) => {
+                    setInputCep(valor);
+                    setErroCep(null);
+                  }}
+                  erro={erroCep}
+                />
+              </View>
             </View>
 
             <TouchableOpacity
@@ -330,6 +533,7 @@ const styles = StyleSheet.create({
   },
 
   containercadastro: {
+    width: "100%", // ✅ adicione isso
     alignContent: "center",
     justifyContent: "center",
   },
@@ -378,5 +582,36 @@ const styles = StyleSheet.create({
   textlinklogin: {
     color: "white",
     fontWeight: "bold",
+  },
+  erroInput: {
+    color: "red",
+    fontSize: 12,
+    marginTop: -8,
+    marginBottom: 4,
+    marginLeft: 4,
+  },
+  enderecoGrid: {
+    width: "100%",
+  },
+
+  enderecoLinha: {
+    flexDirection: "row",
+    gap: 0, // gap controlado pelos próprios filhos via margin do InputLogin
+  },
+
+  campoLogradouro: {
+    flex: 3, // ocupa 75% da linha
+  },
+
+  campoNumero: {
+    flex: 2, // ocupa 25% da linha
+  },
+
+  campoBairro: {
+    flex: 1, // 50% da linha
+  },
+
+  campoCidade: {
+    flex: 1, // 50% da linha
   },
 });
