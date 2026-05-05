@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 import HeaderBack from "../../components/headerBack";
 import { useRouter } from "expo-router";
-import { criarMeta } from "../../services/metasService";
+import { metasService } from "../../services/metasService";
 import { auth } from "../../services/firebaseConfig";
 
 const CATEGORIAS = [
@@ -56,7 +56,7 @@ export default function AddMeta() {
     setIsLoading(true);
 
     try {
-      await criarMeta(userId, {
+      await metasService.criar(userId, {
         nomeMeta,
         categoria: categoriaSelecionada,
         valorTotal: valorFormatado,

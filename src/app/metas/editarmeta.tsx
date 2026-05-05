@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
-import { atualizarMeta, excluirMeta, buscarMetas, contribuirMeta } from "../../services/metasService";
+import { metasService } from "../../services/metasService";
 import { auth } from "../../services/firebaseConfig";
 
 const CATEGORIAS = [
@@ -50,7 +50,7 @@ export default function EditMeta() {
         return;
       }
       try {
-        const dataMetas = await buscarMetas(userId);
+        const dataMetas = await metasService.buscarTodas(userId);
         const meta = dataMetas.find((m) => m.id === id);
         if (meta) {
           setCategoriaSelecionada(meta.categoria);
@@ -92,7 +92,7 @@ export default function EditMeta() {
     setIsLoading(true);
 
     try {
-      await atualizarMeta(userId, id, {
+      await metasService.atualizar(userId, id, {
         nomeMeta,
         categoria: categoriaSelecionada,
         valorTotal: valorFormatado,
@@ -124,7 +124,7 @@ export default function EditMeta() {
     setIsAporteLoading(true);
 
     try {
-      await contribuirMeta(userId, id, valorFormatado);
+      await metasService.contribuir(userId, id, valorFormatado);
       setValorPoupado((prev) => prev + valorFormatado);
       setValorAporte("");
       Alert.alert("Sucesso", "Dinheiro adicionado à meta!");
@@ -148,7 +148,7 @@ export default function EditMeta() {
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
-              await excluirMeta(userId, id);
+              await metasService.excluir(userId, id);
               Alert.alert("Sucesso", "Meta excluída.");
               router.back();
             } catch (error) {
