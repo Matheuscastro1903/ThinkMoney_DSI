@@ -6,13 +6,39 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View, 
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
+import { useEffect, useState } from "react"
+
+// Informacoes firebase
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/src/services/firebaseConfig';
 
 export default function App() {
   const router = useRouter();
+  const [usuario, setUsuario] = useState<any>(null);
+
+  useEffect(() => {
+          async function carregarDados() {
+          const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+  
+          if (!uid) return;
+  
+          const docRef = doc(db, 'usuarios', uid);
+          const docSnap = await getDoc(docRef);
+  
+          if (docSnap.exists()) {
+              setUsuario(docSnap.data());
+          }
+          }
+  
+          carregarDados();
+      }, []);
+  
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,9 +50,9 @@ export default function App() {
               source={require("../../assets/images/onca.png")}
               style={styles.avatar}
             />
-            <Text style={styles.name}>João Marcelo</Text>
-            <Text style={styles.email}>joaozin@thinkmoney.com.br</Text>
-            <Text style={styles.address}>UFRPE</Text>
+            <Text style={styles.name}>{usuario?.nome}</Text>
+            <Text style={styles.email}>{usuario?.email}</Text>
+            <Text style={styles.address}>{usuario?.cidade}</Text>
           </View>
 
           <View style={styles.container3}>
@@ -35,15 +61,15 @@ export default function App() {
                 <Ionicons name="at-circle" size={24} color="grey" />
                 <Text style={styles.rowLabel}>Username</Text>
               </View>
-              <Text style={styles.rowValue}>@joaomcoutinho</Text>
+              <Text style={styles.rowValue}>{usuario?.username}</Text>
             </View>
 
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="calendar-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Age</Text>
+                <Text style={styles.rowLabel}>Birth Date</Text>
               </View>
-              <Text style={styles.rowValue}>19 years</Text>
+              <Text style={styles.rowValue}>{usuario?.datanascimento}</Text>
             </View>
 
             <View style={styles.row}>
@@ -51,7 +77,7 @@ export default function App() {
                 <Ionicons name="briefcase-outline" size={24} color="grey" />
                 <Text style={styles.rowLabel}>Profile</Text>
               </View>
-              <Text style={styles.rowValue}>Professional</Text>
+              <Text style={styles.rowValue}>{usuario?.profissao}</Text>
             </View>
 
             <View style={styles.row}>
@@ -59,7 +85,7 @@ export default function App() {
                 <Ionicons name="location-outline" size={24} color="grey" />
                 <Text style={styles.rowLabel}>Endereco</Text>
               </View>
-              <Text style={styles.rowValue}>UFRPE</Text>
+              <Text style={styles.rowValue}>{usuario?.cidade}</Text>
             </View>
 
             <View style={styles.row}>
@@ -67,7 +93,7 @@ export default function App() {
                 <Ionicons name="call-outline" size={24} color="grey" />
                 <Text style={styles.rowLabel}>Telefone</Text>
               </View>
-              <Text style={styles.rowValue}>92138948232</Text>
+              <Text style={styles.rowValue}>{usuario?.telefone}</Text>
             </View>
 
             <View style={styles.row}>
