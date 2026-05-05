@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import HeaderBack from "../../components/headerBack";
 import { auth } from "../../services/firebaseConfig";
-import { buscarMetas, Meta } from "../../services/metasService";
+import { metasService, Meta } from "../../services/metasService";
 
 export default function Metas() {
   const [metas, setMetas] = useState<(Meta & { id: string })[]>([]);
@@ -27,7 +27,7 @@ export default function Metas() {
 
         try {
           setIsLoading(true);
-          const data = await buscarMetas(userId);
+          const data = await metasService.buscarTodas(userId);
           setMetas(data);
         } catch (error) {
           console.error("Erro ao buscar metas:", error);

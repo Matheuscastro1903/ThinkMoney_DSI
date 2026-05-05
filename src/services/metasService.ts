@@ -1,46 +1,46 @@
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, increment, Timestamp } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, increment, orderBy, query, Timestamp, updateDoc } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
 export interface Meta {
   nomeMeta: string
   valorTotal: number
   valorPoupado: number
-  dataLimite: string   // "YYYY-MM-DD"
+  dataLimite: string
   categoria: string
   descricao?: string
 }
 
-// Criar meta
-export async function criarMeta(userId: string, dados: Omit<Meta, 'valorPoupado'>): Promise<void> {
-  await addDoc(collection(db, 'usuarios', userId, 'metas'), {
-    ...dados,
-    valorPoupado: 0,   // sempre começa em zero
-    criadoEm: Timestamp.now()
-  })
+class MetasService {
+  async criar(userId: string, dados: Omit<Meta, 'valorPoupado'>): Promise<void> {
+    await addDoc(collection(db, 'usuarios', userId, 'metas'), {
+      ...dados,
+      valorPoupado: 0,
+      criadoEm: Timestamp.now()
+    })
+  }
+
+  async buscarTodas(userId: string): Promise<(Meta & { id: string })[]> {
+    const q = query(
+      collection(db, 'usuarios', userId, 'metas'),
+      orderBy('criadoEm', 'desc')
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Meta }))
+  }
+
+  async contribuir(userId: string, metaId: string, valor: number): Promise<void> {
+    await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), {
+      valorPoupado: increment(valor)
+    })
+  }
+
+  async atualizar(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>): Promise<void> {
+    await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), dados)
+  }
+
+  async excluir(userId: string, metaId: string): Promise<void> {
+    await deleteDoc(doc(db, 'usuarios', userId, 'metas', metaId))
+  }
 }
 
-// Buscar todas as metas
-export async function buscarMetas(userId: string): Promise<(Meta & { id: string })[]> {
-  const q = query(
-    collection(db, 'usuarios', userId, 'metas'),
-    orderBy('criadoEm', 'desc')
-  )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Meta }))
-}
-// Adicionar valor poupado à meta
-export async function contribuirMeta(userId: string, metaId: string, valor: number): Promise<void> {
-  await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), {
-    valorPoupado: increment(valor)   // soma sem precisar ler antes
-  })
-}
-
-// Atualizar informações da meta
-export async function atualizarMeta(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>): Promise<void> {
-  await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), dados)
-}
-
-// Excluir meta
-export async function excluirMeta(userId: string, metaId: string): Promise<void> {
-  await deleteDoc(doc(db, 'usuarios', userId, 'metas', metaId))
-}
+export const metasService = new MetasService()
