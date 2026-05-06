@@ -9,29 +9,27 @@ interface Lembrete {
   status: 'PENDENTE' | 'PAGO'
 }
 
-// Criar lembrete
-export async function criarLembrete(userId: string, dados: Lembrete): Promise<void> {
-  await addDoc(collection(db, 'usuarios', userId, 'lembretes'), {
-    ...dados,
-    criadoEm: Timestamp.now()
-  })
-}
-// Buscar lembretes ordenados pelo vencimento mais próximo
-export async function buscarLembretes(userId: string): Promise<(Lembrete & { id: string })[]> {
-  const q = query(
-    collection(db, 'usuarios', userId, 'lembretes'),
-    orderBy('vencimento', 'asc')
-  )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Lembrete }))
-}
+export class LembretesService {
+  constructor(private userId:string) {}
 
-// Atualizar lembrete
-export async function atualizarLembrete(userId: string, lembreteId: string, dados: Partial<Lembrete>): Promise<void> {
-  await updateDoc(doc(db, 'usuarios', userId, 'lembretes', lembreteId), dados)
-}
+  private col (){
+    return collection(db, 'usuarios', this.userId, 'lembretes')
+  }
 
-// Excluir lembrete
-export async function excluirLembrete(userId: string, lembreteId: string): Promise<void> {
-  await deleteDoc(doc(db, 'usuarios', userId, 'lembretes', lembreteId))
+  async criarLembrete(lembrete: Lembrete) {
+    await addDoc(this.col(), { ...lembrete, criadoEm: Timestamp.now() })
+  }
+
+  async buscarLembretes() {
+    const snapshot= await getDocs(query(this.col(), orderBy('vencimento', 'asc')))
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Lembrete }))
+  }
+
+  async atualizar(id:string, dados: Partial<Lembrete>) {
+    await updateDoc(doc(db, 'usuarios', this.userId, 'lembretes', id), dados)
+  }
+
+  async deletar(id:string) {
+    await deleteDoc(doc(db, 'usuarios', this.userId, 'lembretes', id))
+  }
 }

@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, Link, useFocusEffect } from "expo-router";
 import { auth } from "@/src/services/firebaseConfig";
-import { buscarLembretes } from "@/src/services/lembretesService";
+import { LembretesService } from "@/src/services/lembretesService";
 
 type Lembrete = {
   id: string;
@@ -27,7 +27,7 @@ export default function Lembretes() {
         const user = auth.currentUser;
         if (!user) return;
         setCarregando(true);
-        buscarLembretes(user.uid).then((dados) => {
+        new LembretesService(user.uid).buscarLembretes().then((dados) => {
           setLembretes(dados as Lembrete[]);
           setCarregando(false);
         });

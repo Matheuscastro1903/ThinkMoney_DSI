@@ -17,7 +17,7 @@ import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
-import { criarLembrete } from "@/src/services/lembretesService";
+import { LembretesService } from "@/src/services/lembretesService";
 
 export default function TelaCreateLembrete() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function TelaCreateLembrete() {
       return;
     }
 
-    await criarLembrete(user.uid, {
+    await new LembretesService(user.uid).criarLembrete({
       nomeGasto: inputNomeGasto,
       categoria: escolhaGastos,
       vencimento: inputData.toISOString().split("T")[0],

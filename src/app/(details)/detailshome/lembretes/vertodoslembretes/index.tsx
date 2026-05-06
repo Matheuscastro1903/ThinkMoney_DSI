@@ -15,7 +15,7 @@ import {
     View,
 } from "react-native";
 import { auth } from "@/src/services/firebaseConfig";
-import { buscarLembretes } from "@/src/services/lembretesService";
+import { LembretesService } from "@/src/services/lembretesService";
 
 type Lembrete = {
   id: string;
@@ -38,7 +38,7 @@ export default function VerTodosLembretes() {
       const user = auth.currentUser;
       if (!user) return;
       setCarregando(true);
-      buscarLembretes(user.uid).then((dados) => {
+      new LembretesService(user.uid).buscarLembretes().then((dados) => {
         setLembretes(dados as Lembrete[]);
         setCarregando(false);
       });
