@@ -1,32 +1,37 @@
-import { useState, useEffect } from "react"
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
+import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
 
 // Informacoes firebase
-import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/src/services/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { metasService } from '@/src/services/metasService';
 
 export default function Home() {
     const router = useRouter();
     const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
     const [usuario, setUsuario] = useState<any>(null);
+    const [entradasHoje, setEntradasHoje] = useState<number>(0);
 
     useEffect(() => {
         async function carregarDados() {
-        const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+            const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
 
-        if (!uid) return;
+            if (!uid) return;
 
-        const docRef = doc(db, 'usuarios', uid);
-        const docSnap = await getDoc(docRef);
+            const docRef = doc(db, 'usuarios', uid);
+            const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            setUsuario(docSnap.data());
-        }
+            if (docSnap.exists()) {
+                setUsuario(docSnap.data());
+            }
+
+            const entradas = await metasService.buscarContribuicoesDoDia(uid);
+            setEntradasHoje(entradas);
         }
 
         carregarDados();
@@ -49,7 +54,7 @@ export default function Home() {
                     <Text style={styles.text2}>{isBalanceVisible ? `R$ ${usuario?.renda}` : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
                         <Feather name="arrow-up-right" size={16} color="#34D399" />
-                        <Text style={styles.saldoTrend}>R$ 1.250,00 entraram hoje</Text>
+                        <Text style={styles.saldoTrend}>R$ {entradasHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} entraram hoje</Text>
                     </View>
                 </View>
                 <View style={styles.linhaDegraficos}>
