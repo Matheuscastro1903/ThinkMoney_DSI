@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: Sa
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
-import InputDate from "@/src/components/inputdata";
+import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
 import InputRenda from "@/src/components/auth/inputrenda";
