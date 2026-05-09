@@ -1,19 +1,19 @@
 //import { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text} from 'react-native'
+import { View, TextInput, StyleSheet, Text} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
 interface campoInputRendaProps {
     label: string,
     placeholder: string,
-    atualizando: (texto: string) => void,
+    atualizando?: (texto: string) => void,
     icon?: any,
     iconVisibilidade?: any,
-    value:string,
+    value?: string,
     erro?: string | null 
 }
 
 
-export default function InputRenda({ label, placeholder, atualizando, value, erro}: campoInputRendaProps) {
+export default function InputValor({ label, placeholder, atualizando, value, erro}: campoInputRendaProps) {
 
     //const [protegido, setProtegido] = useState(true);
 
@@ -35,7 +35,7 @@ export default function InputRenda({ label, placeholder, atualizando, value, err
         if (typeof atualizando === 'function') {
             atualizando(formatado);
         } else {
-            console.warn('InputRenda: prop "atualizando" is not a function', atualizando);
+            console.warn('InputValor: prop "atualizando" is not a function', atualizando);
         }
     }
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#EDEEEF',
         borderRadius: 10,
         width: '100%',
-        height: 56,
+        height: 40,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 10,
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     color: '#e74c3c',
     fontSize: 11,
     marginTop: -4,
+    fontWeight: "bold"
     }
 
 });

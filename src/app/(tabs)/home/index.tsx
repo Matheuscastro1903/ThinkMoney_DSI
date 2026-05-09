@@ -111,10 +111,10 @@ export default function Home() {
                         </Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => console.log('clicou para registrar um novo gasto!')}>
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() =>   router.push('/(details)/detailshome/gastos/visualizar_gasto')}>
                     <Ionicons name="wallet-outline" size={22} color="#1D1252" />
                     <Text style={styles.text5}>
-                        Registrar novo gasto
+                        Visualizar gastos
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
