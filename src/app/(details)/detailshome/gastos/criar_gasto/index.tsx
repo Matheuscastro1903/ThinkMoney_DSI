@@ -43,13 +43,15 @@ export default function Criar() {
     return cep.length === 8;
   };
 
-  // Converte "1.234,56" -> 1234.56
+  
   const parseValor = (texto: string): number => {
     const limpo = texto.replace(/\./g, "").replace(",", ".").replace(/[^0-9.]/g, "");
     return parseFloat(limpo);
   };
 
   async function handleRegistrar() {
+
+    // validações para campos obrigatórios
 
     if (!title.trim()) {
     setErroTitle("Campo obrigatório");
@@ -91,13 +93,13 @@ export default function Criar() {
     try {
       setSalvando(true);
        
-
+      // Criação do gasto no Firestore
       await criarGasto(user.uid, {
         valor: valorNumerico,
         data: inputData,
         descricao: title,
         categoria: categoriaSelecionada,
-        fixo: fixo, // ajuste se adicionar a opção na UI
+        fixo: fixo, 
         endereco: {
           titulo: tituloEndereco,
           ...inputEndereco,
@@ -105,7 +107,7 @@ export default function Criar() {
       });
 
       Alert.alert("Sucesso", "Gasto registrado!");
-      // limpa o formulário
+      // Limpa os states apos o registro no firebase
       setTitle("");
       setTituloEndereco("");
       setInputValor("");
@@ -305,8 +307,8 @@ export default function Criar() {
             <InputTitle
               placeholder="ex: Barraquinha do seu zé"
               label="TÍTULO DO ENDEREÇO"
-              value={tituloEndereco}            // <-- corrigido
-              onChangeText={setTituloEndereco}  // <-- corrigido
+              value={tituloEndereco}           
+              onChangeText={setTituloEndereco}  
             />
 
             <InputEnderecoGasto
@@ -314,7 +316,7 @@ export default function Criar() {
                 erros={errosEndereco}                          
                 atualizando={(patch) => {
                   setInputEndereco((prev) => ({ ...prev, ...patch }));
-                  // Limpa o erro do campo assim que o usuário começa a digitar
+                 
                   setErrosEndereco((prev) => ({
                     ...prev,
                     ...Object.fromEntries(Object.keys(patch).map((k) => [k, ""])),
