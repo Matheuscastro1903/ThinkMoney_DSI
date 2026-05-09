@@ -27,14 +27,14 @@ import {
 } from "../../../../../services/gastosService";
 import { auth } from "../../../../../services/firebaseConfig";
 
-// ── Tipo ──────────────────────────────────────────────────────────────────────
+ 
 
 interface GastoCompleto {
   id: string;
   descricao: string;
   categoria: string;
   valor: number;
-  data: string; // ISO string vindo do JSON de params
+  data: string; 
   fixo: boolean;
   endereco?: {
     titulo?: string;
@@ -46,7 +46,7 @@ interface GastoCompleto {
   };
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 function parseValor(texto: string): number {
   const limpo = texto
@@ -63,12 +63,14 @@ function valorParaTexto(valor: number): string {
   });
 }
 
-// ── Componente ────────────────────────────────────────────────────────────────
+
 
 export default function EditarGasto() {
   const router = useRouter();
   const { gasto: gastoJson } = useLocalSearchParams<{ gasto: string }>();
 
+
+  // identificando e pegando todas as informações em JSON do gasto clicado pelo user
   const gastoOriginal = useMemo<GastoCompleto | null>(() => {
     if (!gastoJson) return null;
     try {
@@ -78,14 +80,18 @@ export default function EditarGasto() {
     }
   }, [gastoJson]);
 
-  // ── States inicializados com os dados existentes ──
+  // Série de verificacoes nos states para ver se cada campo de um gasto está existente e de acordo
   const [title, setTitle] = useState(gastoOriginal?.descricao ?? "");
   const [tituloEndereco, setTituloEndereco] = useState(
     gastoOriginal?.endereco?.titulo ?? "",
   );
+
+
   const [inputValor, setInputValor] = useState(
     gastoOriginal ? valorParaTexto(gastoOriginal.valor) : "",
   );
+
+
   const [inputEndereco, setInputEndereco] = useState<Endereco>({
     logradouro: gastoOriginal?.endereco?.logradouro ?? "",
     numero: gastoOriginal?.endereco?.numero ?? "",
@@ -93,16 +99,22 @@ export default function EditarGasto() {
     cidade: gastoOriginal?.endereco?.cidade ?? "",
     cep: gastoOriginal?.endereco?.cep ?? "",
   });
+
+
   const [inputData, setInputData] = useState<Date>(
     gastoOriginal ? new Date(gastoOriginal.data) : new Date(),
   );
+
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(
     gastoOriginal?.categoria,
   );
+
   const [fixo, setFixo] = useState<boolean>(gastoOriginal?.fixo ?? false);
   const [erroValor, setErroValor] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
+
+  // Se nao existir o gasto correspondente ele so mostra o headerback para voltar (tratamento de erro mesmo)
 
   if (!gastoOriginal) {
     return (
@@ -134,7 +146,7 @@ export default function EditarGasto() {
     );
   }
 
-  // ── Salvar ────────────────────────────────────────────────────────────────
+  // Salvar 
 
   async function handleSalvar() {
     if (!gastoOriginal) return;
@@ -154,7 +166,7 @@ export default function EditarGasto() {
       return;
     }
 
-    // Nada mudou — não faz chamada, avisa o usuário e sai
+    
     if (!houveMudanca()) {
       Alert.alert("Sem alterações", "Nenhum campo foi modificado.");
       return;
@@ -195,7 +207,7 @@ export default function EditarGasto() {
     }
   }
 
-  // ── Excluir ───────────────────────────────────────────────────────────────
+  // Excluir
 
   function handleExcluir() {
     if (!gastoOriginal) return;
@@ -230,7 +242,7 @@ export default function EditarGasto() {
     );
   }
 
-  // ── JSX ───────────────────────────────────────────────────────────────────
+ 
 
   return (
     <SafeAreaView style={styles.container}>
@@ -242,7 +254,7 @@ export default function EditarGasto() {
             Preencha os campos abaixo para editar seus gastos.
           </Text>
 
-          {/* Categorias */}
+         
           <View style={styles.categorias}>
             <Text>Categorias</Text>
             <View style={styles.categoriasBotoes}>
@@ -291,7 +303,7 @@ export default function EditarGasto() {
             </View>
           </View>
 
-          {/* Inputs */}
+          
           <View style={styles.inputs}>
             <InputTitle
               placeholder="ex: Hamburguer do Marquinhos"
@@ -337,7 +349,7 @@ export default function EditarGasto() {
             <Text style={styles.enderecoValidado}>Endereço validado</Text>
           )}
 
-          {/* Salvar */}
+          
           <TouchableOpacity
             style={[styles.register, salvando && { opacity: 0.6 }]}
             onPress={handleSalvar}
@@ -350,7 +362,7 @@ export default function EditarGasto() {
             )}
           </TouchableOpacity>
 
-          {/* Excluir */}
+         
           <TouchableOpacity
             style={[styles.excluir, excluindo && { opacity: 0.6 }]}
             onPress={handleExcluir}
@@ -368,7 +380,7 @@ export default function EditarGasto() {
   );
 }
 
-// ── Estilos (inalterados) ────────────────────────────────────────────────────
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1D1252" },
