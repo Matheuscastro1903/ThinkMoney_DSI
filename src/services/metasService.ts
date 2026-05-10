@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, increment, orderBy, query, Timestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, increment, orderBy, query, Timestamp, updateDoc, where } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
 export interface Meta {
@@ -32,6 +32,38 @@ class MetasService {
     await updateDoc(doc(db, 'usuarios', userId, 'metas', metaId), {
       valorPoupado: increment(valor)
     })
+
+    await addDoc(collection(db, 'usuarios', userId, 'contribuicoes'), {
+      valor,
+      metaId,
+      data: Timestamp.now()
+    })
+  }
+
+  async buscarContribuicoesDoDia(userId: string): Promise<number> {
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+
+    const amanha = new Date(hoje)
+    amanha.setDate(amanha.getDate() + 1)
+
+    const q = query(
+      collection(db, 'usuarios', userId, 'contribuicoes'),
+      where('data', '>=', Timestamp.fromDate(hoje)),
+      where('data', '<', Timestamp.fromDate(amanha))
+    )
+
+    const snapshot = await getDocs(q)
+    return snapshot.docs.reduce((acc, d) => acc + (d.data().valor || 0), 0)
+  }
+
+  async buscarContribuicoesDaMeta(userId: string, metaId: string): Promise<any[]> {
+    const q = query(
+      collection(db, 'usuarios', userId, 'contribuicoes'),
+      where('metaId', '==', metaId)
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
   }
 
   async atualizar(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>): Promise<void> {

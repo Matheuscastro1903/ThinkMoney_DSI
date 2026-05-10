@@ -1,36 +1,118 @@
-import { useState, useEffect } from "react"
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
 
 // Informacoes firebase
-import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/src/services/firebaseConfig';
+import { buscarGastos, Gasto } from '@/src/services/gastosService';
+import { metasService } from '@/src/services/metasService';
+import { doc, getDoc } from 'firebase/firestore';
+
+const icones: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
+    alimentacao: "basket",
+    transporte: "car",
+    lazer: "game-controller",
+    educacao: "school",
+    saude: "medkit",
+    eletronicos: "desktop",
+};
+
+function toDate(data: any): Date {
+    if (data instanceof Date) return data;
+    if (data && typeof data.toDate === "function") return data.toDate();
+    return new Date(data);
+}
+
+function formatarValor(valor: number) {
+    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function formatarData(data: any) {
+    return toDate(data).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+}
+
+function capitalizarCategoria(cat: string) {
+    if (!cat) return "";
+    return cat.charAt(0).toUpperCase() + cat.slice(1);
+}
 
 export default function Home() {
     const router = useRouter();
     const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
     const [usuario, setUsuario] = useState<any>(null);
+    const [entradasHoje, setEntradasHoje] = useState<number>(0);
+    const [gastos, setGastos] = useState<(Gasto & { id: string })[]>([]);
+    const [metas, setMetas] = useState<any[]>([]);
 
     useEffect(() => {
         async function carregarDados() {
-        const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+            const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
 
-        if (!uid) return;
+            if (!uid) return;
 
-        const docRef = doc(db, 'usuarios', uid);
-        const docSnap = await getDoc(docRef);
+            const docRef = doc(db, 'usuarios', uid);
+            const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            setUsuario(docSnap.data());
-        }
+            if (docSnap.exists()) {
+                setUsuario(docSnap.data());
+            }
+
+            const entradas = await metasService.buscarContribuicoesDoDia(uid);
+            setEntradasHoje(entradas);
+
+            try {
+                const listaGastos = await buscarGastos(uid);
+                setGastos(listaGastos);
+            } catch (error) {
+                console.error("Erro ao buscar gastos: ", error);
+            }
+
+            try {
+                const listaMetas = await metasService.buscarTodas(uid);
+                setMetas(listaMetas);
+            } catch (error) {
+                console.error("Erro ao buscar metas: ", error);
+            }
         }
 
         carregarDados();
     }, []);
+
+    const dataAtual = new Date();
+    const mesAtual = dataAtual.getMonth();
+    const anoAtual = dataAtual.getFullYear();
+
+    const gastoTotalMes = gastos
+        .filter(gasto => {
+            const dataGasto = toDate(gasto.data);
+            return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual;
+        })
+        .reduce((acc, gasto) => acc + gasto.valor, 0);
+
+    let limiteConsumidoPerc = 0;
+    let rendaVal = 0;
+    if (usuario && usuario.renda) {
+        const rendaString = String(usuario.renda).replace(/R\$\s?/, '').replace(/\./g, '').replace(',', '.');
+        rendaVal = parseFloat(rendaString);
+        if (rendaVal > 0) {
+            limiteConsumidoPerc = (gastoTotalMes / rendaVal) * 100;
+        }
+    }
+    const limiteFormatado = limiteConsumidoPerc.toFixed(1);
+    const limiteGrafico = Math.min(limiteConsumidoPerc, 100);
+
+    const saldoDisponivel = rendaVal - gastoTotalMes;
+
+    const reserva = metas.find(m => m.nomeMeta.toLowerCase().includes('reserva'));
+    const reservaPerc = reserva && reserva.valorTotal > 0 ? (reserva.valorPoupado / reserva.valorTotal) * 100 : 0;
 
     return (
         <View style={styles.container}>
@@ -46,56 +128,77 @@ export default function Home() {
                             <Ionicons name={isBalanceVisible ? "eye-outline" : "eye-off-outline"} size={20} color="#94A3B8" />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.text2}>{isBalanceVisible ? `R$ ${usuario?.renda}` : "R$ •••••"}</Text>
+                    <Text style={styles.text2}>{isBalanceVisible ? formatarValor(saldoDisponivel) : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
                         <Feather name="arrow-up-right" size={16} color="#34D399" />
-                        <Text style={styles.saldoTrend}>R$ 1.250,00 entraram hoje</Text>
+                        <Text style={styles.saldoTrend}>R$ {entradasHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} entraram hoje</Text>
                     </View>
                 </View>
                 <View style={styles.linhaDegraficos}>
                     <View style={styles.stackedCard}>
                         <View style={styles.stackedHeaderRow}>
                             <Text style={styles.stackedTitle}>RESERVA DE EMERGÊNCIA</Text>
-                            <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
-                        </View>
-                        <View style={styles.stackedValueRow}>
-                            <Text style={styles.stackedValue}>30.0%</Text>
-                        </View>
-
-                        <View style={styles.barChartContainer}>
-                            <View style={[styles.bar, { height: '30%', backgroundColor: 'rgba(139, 92, 246, 0.3)' }]} />
-                            <View style={[styles.bar, { height: '50%', backgroundColor: 'rgba(139, 92, 246, 0.5)' }]} />
-                            <View style={[styles.bar, { height: '25%', backgroundColor: 'rgba(139, 92, 246, 0.7)' }]} />
-                            <View style={[styles.bar, { height: '80%', backgroundColor: 'rgba(139, 92, 246, 0.85)' }]} />
-                            <View style={[styles.bar, { height: '100%', backgroundColor: 'rgba(139, 92, 246, 1.0)' }]} />
+                            <TouchableOpacity onPress={() => Alert.alert("Reserva de Emergência", "Este gráfico ilustra a jornada de crescimento da sua reserva. Fique de olho na porcentagem e mantenha a constância!")}>
+                                <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
+                            </TouchableOpacity>
                         </View>
 
-                        <Text style={styles.stackedFooterText}>Sua reserva cresceu <Text style={{ color: '#8B5CF6' }}>12%</Text> comparado ao mês anterior.</Text>
+                        {reserva ? (
+                            <>
+                                <View style={styles.stackedValueRow}>
+                                    <Text style={styles.stackedValue}>{reservaPerc.toFixed(1)}%</Text>
+                                </View>
+
+                                <View style={styles.barChartContainer}>
+                                    <View style={[styles.bar, { height: '30%', backgroundColor: 'rgba(139, 92, 246, 0.3)' }]} />
+                                    <View style={[styles.bar, { height: '50%', backgroundColor: 'rgba(139, 92, 246, 0.5)' }]} />
+                                    <View style={[styles.bar, { height: '25%', backgroundColor: 'rgba(139, 92, 246, 0.7)' }]} />
+                                    <View style={[styles.bar, { height: '80%', backgroundColor: 'rgba(139, 92, 246, 0.85)' }]} />
+                                    <View style={[styles.bar, { height: '100%', backgroundColor: 'rgba(139, 92, 246, 1.0)' }]} />
+                                </View>
+
+                                <Text style={styles.stackedFooterText}>Faltam <Text style={{ color: '#8B5CF6' }}>{Math.max(100 - reservaPerc, 0).toFixed(1)}%</Text> para atingir sua meta de proteção.</Text>
+                            </>
+                        ) : (
+                            <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
+                                <Ionicons name="shield-checkmark-outline" size={48} color="#8B5CF6" />
+                                <Text style={{ color: '#94A3B8', textAlign: 'center', marginTop: 10, fontSize: 13, paddingHorizontal: 10 }}>
+                                    Proteja seu futuro contra imprevistos.
+                                </Text>
+                                <TouchableOpacity
+                                    style={{ backgroundColor: '#8B5CF6', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, marginTop: 20, width: '100%' }}
+                                    onPress={() => router.push('/metas/addmeta')}
+                                >
+                                    <Text style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Criar Reserva</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
 
                     <View style={styles.stackedCard}>
                         <View style={styles.stackedHeaderRow}>
                             <Text style={styles.stackedTitle}>LIMITE CONSUMIDO</Text>
-                            <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
+                            <TouchableOpacity onPress={() => Alert.alert("Limite Consumido", "Este gráfico mostra a porcentagem da sua renda mensal que já foi gasta. Fique de olho para não ultrapassar os 100%!")}>
+                                <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.stackedValueRow}>
-                            <Text style={styles.stackedValue}>72.0%</Text>
-                            <Text style={styles.stackedTrend}>↗ +5.0%</Text>
+                            <Text style={styles.stackedValue}>{limiteFormatado}%</Text>
                         </View>
 
                         <View style={styles.stackedChartContainer}>
                             <CircularProgress
-                                value={72}
+                                value={limiteGrafico}
                                 showProgressValue={false}
                                 activeStrokeWidth={12}
                                 inActiveStrokeWidth={12}
                                 radius={55}
-                                activeStrokeColor={'#34D399'}
+                                activeStrokeColor={limiteConsumidoPerc > 90 ? '#EF4444' : '#34D399'}
                                 inActiveStrokeColor={'#1A1340'}
                                 inActiveStrokeOpacity={1}
                             />
                             <View style={styles.chartCenterTextContainer}>
-                                <Ionicons name="card-outline" size={32} color="#34D399" />
+                                <Ionicons name="card-outline" size={32} color={limiteConsumidoPerc > 90 ? '#EF4444' : '#34D399'} />
                             </View>
                         </View>
                     </View>
@@ -107,11 +210,11 @@ export default function Home() {
                             Seu gasto este mês foi de:
                         </Text>
                         <Text style={styles.text4}>
-                            R$ 1.234,56
+                            {formatarValor(gastoTotalMes)}
                         </Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() =>   router.push('/(details)/detailshome/gastos/visualizar_gasto')}>
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/gastos/visualizar_gasto')}>
                     <Ionicons name="wallet-outline" size={22} color="#1D1252" />
                     <Text style={styles.text5}>
                         Visualizar gastos
@@ -132,45 +235,25 @@ export default function Home() {
                 <View>
                     <Text style={styles.ultimosGastos}>ÚLTIMOS GASTOS</Text>
                 </View>
-                <View style={styles.gastosHistorico}>
-                    <View style={styles.iconeGastos}>
-                        <Ionicons name="cart-outline" size={20} color="#1D1252" />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text style={styles.textHistorico}>Assaí Atacadista</Text>
-                        <Text style={styles.textCategoria}>Alimentação</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.textValor}>R$ 452,10</Text>
-                        <Text style={styles.textCategoria}>19:00</Text>
-                    </View>
-                </View>
-                <View style={styles.gastosHistorico}>
-                    <View style={styles.iconeGastos}>
-                        <Ionicons name="car-outline" size={20} color="#1D1252" />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text style={styles.textHistorico}>Posto Shell Graal</Text>
-                        <Text style={styles.textCategoria}>Combustível</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.textValor}>R$ 200,00</Text>
-                        <Text style={styles.textCategoria}>14:32</Text>
-                    </View>
-                </View>
-                <View style={styles.gastosHistorico}>
-                    <View style={styles.iconeGastos}>
-                        <Ionicons name="restaurant-outline" size={20} color="#1D1252" />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text style={styles.textHistorico}>Coco Bambu</Text>
-                        <Text style={styles.textCategoria}>Alimentação</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.textValor}>R$ 140,00</Text>
-                        <Text style={styles.textCategoria}>22:00</Text>
-                    </View>
-                </View>
+                {gastos.length === 0 ? (
+                    <Text style={{ color: '#94A3B8', textAlign: 'center', marginTop: 10 }}>Nenhum gasto encontrado.</Text>
+                ) : (
+                    gastos.slice(0, 3).map((gasto) => (
+                        <View key={gasto.id} style={styles.gastosHistorico}>
+                            <View style={styles.iconeGastos}>
+                                <Ionicons name={icones[gasto.categoria?.toLowerCase()] ?? "cart-outline"} size={20} color="#1D1252" />
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 12 }}>
+                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.descricao}</Text>
+                                <Text style={styles.textCategoria}>{capitalizarCategoria(gasto.categoria)}</Text>
+                            </View>
+                            <View style={{ alignItems: 'flex-end' }}>
+                                <Text style={styles.textValor}>{formatarValor(gasto.valor)}</Text>
+                                <Text style={styles.textCategoria}>{formatarData(gasto.data)}</Text>
+                            </View>
+                        </View>
+                    ))
+                )}
             </ScrollView>
         </View>
     );
