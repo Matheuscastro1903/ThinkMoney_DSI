@@ -1,0 +1,120 @@
+import { View, TextInput, Text, StyleSheet } from "react-native";
+
+export interface Endereco {
+    logradouro: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    cep: string
+}
+
+interface InputEnderecoProps {
+    inputEndereco: Endereco;
+    atualizando: (patch: Partial<Endereco>) => void;
+    erros?: { logradouro?: string; numero?: string; bairro?: string; cidade?: string };
+}
+
+export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }: InputEnderecoProps){
+  return (
+    <View style={styles.container}>
+        <View style={styles.row}>
+            <View style={[styles.inputContainer, { flex: 2 }]}> 
+                <Text style={styles.label}>Logradouro</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholderTextColor="#ccc"
+                    placeholder={inputEndereco.logradouro ? inputEndereco.logradouro : "ex. rua das flores"}
+                    onChangeText={(value) => atualizando({logradouro: value})}
+                    
+                />
+                {erros?.logradouro ? <Text style={styles.erro}>{erros.logradouro}</Text> : null}
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Número</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholderTextColor="#ccc"
+                    placeholder={inputEndereco.numero ? inputEndereco.numero : "ex. 123"}
+                    onChangeText={(value) => atualizando({numero: value})}
+                />
+            
+                {erros?.numero ? <Text style={styles.erro}>{erros.numero}</Text> : null}
+            </View>
+        </View>
+
+        <View style={styles.row}>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Bairro</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={inputEndereco.bairro ? inputEndereco.bairro : "ex. bairro novo"}
+                    placeholderTextColor="#ccc"
+                    onChangeText={(value) => atualizando({bairro: value})}
+                />
+                {erros?.bairro ? <Text style={styles.erro}>{erros.bairro}</Text> : null}
+            </View>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Cidade</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={inputEndereco.cidade ? inputEndereco.cidade : "ex. São Paulo"}
+                    placeholderTextColor="#ccc"
+                    onChangeText={(value) => atualizando({cidade: value})}
+                />
+                {erros?.cidade ? <Text style={styles.erro}>{erros.cidade}</Text> : null}
+            </View>
+
+            <View style={styles.inputContainer}>
+                        <Text style={styles.label}>CEP</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholderTextColor="#ccc"
+                            placeholder={inputEndereco.cep ? inputEndereco.cep : "ex. 12345-678"}
+                            onChangeText={(value) => atualizando({cep: value})}
+                        />
+                    </View>
+        </View>
+
+        
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        gap: 25,
+        width: "100%",
+    },
+    
+    row: {
+        flexDirection: "row",
+    },
+    inputContainer: {
+    flex: 1,
+    gap: 5,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+},
+
+    label: { 
+        color: "#484550",
+        fontSize: 12,
+        fontWeight: "bold",
+    },
+
+    input: {
+        backgroundColor:'#EDEEEF',
+        width: "100%",
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        fontSize: 16,
+    },
+    erro: {
+    color: "red",
+    fontSize: 11,
+    marginTop: 2,
+    fontWeight: "bold"
+},
+});

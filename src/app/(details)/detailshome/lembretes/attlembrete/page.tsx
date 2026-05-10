@@ -18,7 +18,7 @@ import SelectField from "@/src/components/details/lembretes/campoescolha/page";
 import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
-import { atualizarLembrete, excluirLembrete } from "@/src/services/lembretesService";
+import { LembretesService } from "@/src/services/lembretesService";
 
 export default function TelaUpdateLembrete() {
   const router = useRouter();
@@ -47,7 +47,8 @@ export default function TelaUpdateLembrete() {
     const id = params.id as string;
     if (!user || !id) return;
 
-    await atualizarLembrete(user.uid, id, {
+    const service = new LembretesService(user.uid)
+    await service.atualizar(id, {
       nomeGasto: inputNomeGasto,
       categoria: escolhaGastos,
       valor: parseFloat(valorGasto.replace(",", ".")),
@@ -69,7 +70,7 @@ export default function TelaUpdateLembrete() {
         text: "Deletar",
         style: "destructive",
         onPress: async () => {
-          await excluirLembrete(user.uid, id);
+          await new LembretesService(user.uid).deletar(id);
           router.back();
         },
       },
