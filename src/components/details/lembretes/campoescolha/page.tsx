@@ -1,6 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Biblioteca padrão do Expo para selects
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+} from 'react-native';
 
 interface Option {
   value: string;
@@ -15,37 +21,44 @@ interface SelectFieldProps {
 }
 
 export default function SelectField({ label, options, value, onChange }: SelectFieldProps) {
+  const [open, setOpen] = useState(false);
+
+  const selected = options.find((o) => o.value === value);
+
   return (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
 
-      <View style={styles.input}>
-        {/*Picker é uma tag nativa do ReacNative para esoclhas */}
-        <Picker
-          selectedValue={value}
-          onValueChange={(itemValue) => onChange(itemValue)}
-          style={styles.picker}
-          dropdownIconColor="#484550"
-        >
-          {/*opção fantasma de placeholder pois o Picker não tem placegholder nativo*/}
-          <Picker.Item 
-            label="Selecione uma opção" 
-            value="" 
-            enabled={false} 
-            style={{ fontSize: 14, color: '#ccc' }} 
-          />
+      <TouchableOpacity style={styles.input} onPress={() => setOpen(true)} activeOpacity={0.8}>
+        <Text style={[styles.inputText, !selected && styles.placeholder]}>
+          {selected ? selected.label : 'Selecione uma opção'}
+        </Text>
+        <Text style={styles.arrow}>▾</Text>
+      </TouchableOpacity>
 
-          {/* Mapeamento das opções conforme seu componente original */}
-          {options.map((opt) => (
-            <Picker.Item 
-              key={opt.value} 
-              label={opt.label} 
-              value={opt.value} 
-              style={{ fontSize: 16 }}
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
+          <View style={styles.dropdown}>
+            <FlatList
+              data={options}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.option, item.value === value && styles.optionSelected]}
+                  onPress={() => {
+                    onChange(item.value);
+                    setOpen(false);
+                  }}
+                >
+                  <Text style={[styles.optionText, item.value === value && styles.optionTextSelected]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              )}
             />
-          ))}
-        </Picker>
-      </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -63,17 +76,55 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#EDEEEF', // Mantendo o padrão do seu inputLogin
+    backgroundColor: '#EDEEEF',
     borderRadius: 10,
     width: 300,
     height: 56,
-    justifyContent: 'center',
-    paddingHorizontal: 5, // Ajuste para o Picker não colar na borda
-    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    justifyContent: 'space-between',
   },
-  picker: {
-    width: '100%',
-    height: '100%',
+  inputText: {
+    fontSize: 14,
     color: '#484550',
+  },
+  placeholder: {
+    color: '#aaa',
+  },
+  arrow: {
+    fontSize: 16,
+    color: '#484550',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dropdown: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: 300,
+    maxHeight: 260,
+    overflow: 'hidden',
+    elevation: 5,
+  },
+  option: {
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  optionSelected: {
+    backgroundColor: '#ede8ff',
+  },
+  optionText: {
+    fontSize: 15,
+    color: '#333',
+  },
+  optionTextSelected: {
+    color: '#1D1252',
+    fontWeight: 'bold',
   },
 });

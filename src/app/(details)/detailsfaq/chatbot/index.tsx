@@ -1,23 +1,85 @@
+
+
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {KeyboardAvoidingView,Platform,ScrollView,StyleSheet,Text,TextInput,View,} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { HeaderBot } from "@/src/components/details/chatbot/headerbot/page";
+import { useState, useRef } from "react";
+import ButtonSendMensage from "@/src/components/details/chatbot/buttonsendmensage/page";
+import SuggestionButton from "@/src/components/details/chatbot/sugestionbutton/page";
+import { ControllerChatBot } from "@/src/hooks/ControllerChatbot";
+import ChatMessage from "@/src/components/details/chatbot/message/page";
+
+interface Mensagem {
+  id: string;
+  text: string;
+  sender: string; //user ou bot
+}
 
 export default function ChatBot() {
+  const scrollViewRef = useRef<ScrollView>(null); // Criando o "gancho"
+  
+  //guarda a última mensagem
+  const [mensagematual, setMensagemAtual] = useState('');
+  const [Isloading, setIsLoading] = useState(false);
+  //guarda todas as mensagens,enviadas e recebidas
+  //será um array de dicionarios
+  const [arrayMensagens, setArrayMensagens] = useState<Mensagem[]>([]);
+
+  //text?: não deixa a obrigatoriadade de passar prâemtro,fazendo com que consiga usar
+  //a mesam função para a mesnagem enviada e sugestão
+  async function ConexaoApi(text: string) {
+    let mensagemEnviada = text;
+    
+    if (text) {
+      //se for enviada pela sugestões
+      mensagemEnviada = text;
+    } else {
+      //se for enviada pelo botão de enviar
+      mensagemEnviada = mensagematual;
+    }
+    
+    //só passa da verificação se não estiver vazio
+    //.trim remove espaços em branco-->se tiver só espaço branco=false-->!false=true retorna nada
+    if (!mensagemEnviada.trim()) return;
+
+    setMensagemAtual('');
+
+    //Ativa o feedback visual de carregamento
+    setIsLoading(true);
+
+    //adicionando a mensagem da pessoa na lista
+    const idMensagemEnviada = Math.random().toString(36).slice(2, 9);
+    const dicionario_mensagem = {
+      "id": idMensagemEnviada,
+      "text": mensagemEnviada,
+      "sender": "user"
+    };
+    setArrayMensagens(prev => ([...prev, dicionario_mensagem]));
+    
+    try {
+      const apiresposta = await ControllerChatBot(mensagemEnviada);
+      setArrayMensagens(prev => ([...prev, apiresposta]));
+    } catch (error) {
+      console.log("erro na conexão com o controller");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* 
+        
+        - behavior: 'padding' no iOS faz a tela "encolher" por baixo, 'height' no Android redimensiona a janela.
+        - keyboardVerticalOffset: É a "folga" para o cabeçalho. 
+        
+      */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} 
       >
         <View style={{ width: "100%", marginBottom: 0, zIndex: 10 }}>
           <HeaderBack />
@@ -25,67 +87,43 @@ export default function ChatBot() {
 
         {/* MENSAGENS FLEXÍVEIS */}
         <ScrollView
+          ref={scrollViewRef}
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 24, paddingTop: 10 }}
+          /*flexGrow: 1 garante que o conteúdo ocupe a tela toda 
+             e responda corretamente ao empurrão do teclado sem sumir. */
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24, paddingTop: 10 }}
           keyboardShouldPersistTaps="handled"
+          //quando mudar,scrollaar automaticamente para o fim
+          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
         >
-          {/* CABEÇALHO DO ROBÔ */}
-          <View style={styles.int}>
-            <View style={styles.logo}>
-              <MaterialCommunityIcons
-                name="robot"
-                size={30}
-                color="white"
-                style={styles.icon}
-              />
-            </View>
-            <Text style={styles.title}>Olá, sou o Din$</Text>
-            <Text style={styles.subtitle}>
-              Sua inteligência artificial para gestão de patrimônio e
-              investimentos
-            </Text>
-          </View>
+          {/*CABEÇALHO DO ROBÔ*/}
+          <HeaderBot/>
 
+          {/**Mensagem padrão do robo(apenas escrito) */}
           <View style={styles.chat}>
             <View style={styles.ia}>
               <Text style={{ lineHeight: 20 }}>
-                Olá! Como posso ajudar você a otimizar sua vida financeira hoje?
-                Você pode me perguntar sobre seu saldo, novas oportunidades de
-                investimento ou análise de gastos.
+                Olá! Como posso ajudar sua vida financeira hoje?
+                Você pode me perguntar sobre qualquer assunto relacionado o âmbito financeiro
               </Text>
             </View>
-            <Text style={styles.time1}>10:24 AM</Text>
 
-            <View style={styles.user}>
-              <Text style={{ color: "white", lineHeight: 20 }}>
-                Gostaria de ver um resumo dos meus investimentos este mês
-              </Text>
-            </View>
-            <Text style={styles.time2}>10:24 AM</Text>
-
-            <View style={styles.ia}>
-              <Text style={{ lineHeight: 20 }}>
-                Com certeza. Seu portfólio teve uma valorização de{" "}
-                <Text style={styles.dado}>+4.2%</Text> nos últimos 30 dias. Veja
-                o Destaque:
-              </Text>
-            </View>
-            <Text style={styles.time1}>10:24 AM</Text>
+            {/**Mensagens enviadas e recebidas pela (chat real) */}
+            {arrayMensagens.map((item) => (
+              <ChatMessage
+                key={item.id} //id servirá para controlar quem já ta aparecendo e que mfalta aparecer
+                text={item.text}
+                isChatbot={item.sender === "chatbot"}
+              />
+            ))}
           </View>
         </ScrollView>
 
+        
         <View style={styles.sugestao}>
-          <TouchableOpacity style={styles.buttonSugestions}>
-            <Text style={styles.textSugestions}>Como investir?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonSugestions}>
-            <Text style={styles.textSugestions}>Ver saldo total</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonSugestions}>
-            <Text style={styles.textSugestions}>Onde gastei mais?</Text>
-          </TouchableOpacity>
+          <SuggestionButton text="Como investir?" onClick={ConexaoApi} />
+          <SuggestionButton text="O que é inflação?" onClick={ConexaoApi} />
+          <SuggestionButton text="Como calcular o juros?" onClick={ConexaoApi} />
         </View>
 
         {/* FOOTER FIXO NA BASE */}
@@ -96,12 +134,15 @@ export default function ChatBot() {
                 placeholder="Escreva sua mensagem..."
                 style={styles.input}
                 placeholderTextColor="#94A3B8"
+                onChangeText={setMensagemAtual}
+                value={mensagematual} //mostrar como está ficando a escrita
               />
-              <TouchableOpacity style={styles.sendButton} activeOpacity={0.7}>
-                <View style={styles.box}>
-                  <Ionicons name="send" size={16} color="white" />
-                </View>
-              </TouchableOpacity>
+
+              <ButtonSendMensage 
+                onClick={ConexaoApi} 
+                textoParaEnviar={mensagematual} 
+                isLoading={Isloading} 
+              />
             </View>
           </View>
         </View>
@@ -113,44 +154,10 @@ export default function ChatBot() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 0,
     backgroundColor: "#FFFFFF",
   },
-  int: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 24,
-    paddingBottom: 6,
-    marginTop: 0,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subtitle: {
-    textAlign: "center",
-    color: "#333",
-    lineHeight: 22,
-    paddingHorizontal: 8,
-    paddingBottom: 6,
-  },
-  chat: {},
-  logo: {
-    backgroundColor: "#e9e9e9",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 64,
-    height: 64,
-    marginBottom: 10,
-    marginTop: 4,
-  },
-  icon: {
-    color: "#1D1252",
+  chat: {
+    paddingBottom: 20,
   },
   ia: {
     marginTop: 32,
@@ -160,49 +167,12 @@ const styles = StyleSheet.create({
     marginRight: 100,
     padding: 20,
   },
-  time1: {
-    marginLeft: 50,
-    fontWeight: 200,
-    fontSize: 12,
-  },
-  user: {
-    marginTop: 32,
-    backgroundColor: "#1D1252",
-    borderRadius: 15,
-    marginLeft: 100,
-    marginRight: 30,
-    padding: 20,
-  },
-  time2: {
-    marginLeft: 300,
-    fontWeight: 200,
-    fontSize: 12,
-  },
-  dado: {
-    color: "green",
-  },
-  buttonSugestions: {
-    backgroundColor: "#e9e9e9",
-    borderRadius: 10,
-    padding: 4,
-    marginHorizontal: 5,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   sugestao: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 6,
-    marginBottom: 8,
+    paddingVertical: 8,
     paddingHorizontal: 16,
-  },
-  textSugestions: {
-    textAlign: "center",
-    color: "#1D1252",
-    fontWeight: "bold",
-    fontSize: 12,
-    paddingVertical: 1,
+    backgroundColor: "#FFFFFF", // Garante que as sugestões tenham fundo sólido ao subir
   },
   input: {
     flex: 1,
@@ -214,8 +184,7 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     paddingHorizontal: 16,
-    paddingBottom: -20,
-    marginTop: 0,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10, // 💡 Ajuste fino para não colar na base do iPhone
   },
   footer: {
     backgroundColor: "#e9e9e9",
@@ -223,19 +192,9 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     paddingHorizontal: 8,
-    marginBottom: -26,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-   
-  },
-  sendButton: {
-    padding: 6,
-  },
-  box: {
-    backgroundColor: "#1D1252",
-    padding: 8,
-    borderRadius: 20,
   },
 });

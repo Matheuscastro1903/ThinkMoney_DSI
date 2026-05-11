@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -13,6 +15,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
+import { metasService } from "../../services/metasService";
+import { auth } from "../../services/firebaseConfig";
 
 const CATEGORIAS = [
   { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -21,13 +25,140 @@ const CATEGORIAS = [
   { key: "reserva", label: "Reserva", icon: "wallet" },
 ];
 
-export default function AddMeta() {
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState<
-    string | null
-  >(null);
+export default function EditMeta() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const id = params.id as string;
+
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
+  const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
   const [data, setData] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [valorAporte, setValorAporte] = useState("");
+  const [valorPoupado, setValorPoupado] = useState(0);
+  const [valorTotalMeta, setValorTotalMeta] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAporteLoading, setIsAporteLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+
+  useEffect(() => {
+    async function loadMeta() {
+      const userId = auth.currentUser?.uid;
+      if (!userId || !id) {
+        setIsFetching(false);
+        return;
+      }
+      try {
+        const dataMetas = await metasService.buscarTodas(userId);
+        const meta = dataMetas.find((m) => m.id === id);
+        if (meta) {
+          setCategoriaSelecionada(meta.categoria);
+          setNomeMeta(meta.nomeMeta);
+          setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
+          setData(meta.dataLimite);
+          setValorPoupado(meta.valorPoupado);
+          setValorTotalMeta(meta.valorTotal);
+          if (meta.descricao) setDescricao(meta.descricao);
+        } else {
+          Alert.alert("Erro", "Meta não encontrada.");
+          router.back();
+        }
+      } catch (error) {
+        console.error("Erro ao carregar meta", error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+    loadMeta();
+  }, [id]);
+
+  const handleSalvar = async () => {
+    if (!categoriaSelecionada || !nomeMeta || !capital || !data) {
+      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const valorFormatado = parseFloat(capital.replace(/\./g, "").replace(",", "."));
+    
+    if (isNaN(valorFormatado) || valorFormatado <= 0) {
+      Alert.alert("Atenção", "Insira um valor numérico válido (ex: 1500,00).");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await metasService.atualizar(userId, id, {
+        nomeMeta,
+        categoria: categoriaSelecionada,
+        valorTotal: valorFormatado,
+        dataLimite: data,
+        descricao,
+      });
+      Alert.alert("Sucesso", "Meta atualizada com sucesso!");
+      router.back();
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao atualizar a meta.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleContribuir = async () => {
+    if (!valorAporte) return;
+
+    const valorFormatado = parseFloat(valorAporte.replace(/\./g, "").replace(",", "."));
+    
+    if (isNaN(valorFormatado) || valorFormatado <= 0) {
+      Alert.alert("Atenção", "Insira um valor numérico válido para o aporte.");
+      return;
+    }
+
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    setIsAporteLoading(true);
+
+    try {
+      await metasService.contribuir(userId, id, valorFormatado);
+      setValorPoupado((prev) => prev + valorFormatado);
+      setValorAporte("");
+      Alert.alert("Sucesso", "Dinheiro adicionado à meta!");
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao adicionar o valor.");
+    } finally {
+      setIsAporteLoading(false);
+    }
+  };
+
+  const handleExcluir = () => {
+    Alert.alert(
+      "Excluir Meta",
+      "Tem certeza que deseja excluir esta meta? Essa ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            const userId = auth.currentUser?.uid;
+            if (!userId) return;
+            try {
+              await metasService.excluir(userId, id);
+              Alert.alert("Sucesso", "Meta excluída.");
+              router.back();
+            } catch (error) {
+              Alert.alert("Erro", "Ocorreu um erro ao excluir a meta.");
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     
@@ -89,6 +220,18 @@ export default function AddMeta() {
                 })}
               </View>
 
+              {/* Nome da Meta */}
+              <Text style={styles.label}>NOME DA META</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.inputText}
+                  placeholder="Ex: Viagem para a Europa"
+                  placeholderTextColor="#BBBBBB"
+                  value={nomeMeta}
+                  onChangeText={setNomeMeta}
+                />
+              </View>
+
               {/* Capital Necessário */}
               <Text style={styles.label}>CAPITAL NECESSÁRIO</Text>
               <View style={styles.inputWrapper}>
@@ -135,14 +278,68 @@ export default function AddMeta() {
                 />
               </View>
 
+              <View style={styles.separator} />
+
+              <Text style={styles.labelSection}>GUARDAR DINHEIRO</Text>
+              
+              <Text style={styles.progressInfo}>
+                Você já guardou <Text style={styles.progressHighlight}>R$ {valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text> de R$ {valorTotalMeta.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </Text>
+
+              <View style={styles.inputWrapper}>
+                <Text style={styles.currencyPrefix}>R$</Text>
+                <TextInput
+                  style={styles.inputText}
+                  placeholder="0,00"
+                  placeholderTextColor="#BBBBBB"
+                  keyboardType="numeric"
+                  value={valorAporte}
+                  onChangeText={setValorAporte}
+                />
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.buttonAporte, isAporteLoading && { opacity: 0.7 }]} 
+                activeOpacity={0.85}
+                onPress={handleContribuir}
+                disabled={isAporteLoading || isFetching}
+              >
+                {isAporteLoading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <Text style={styles.buttonText}>Adicionar valor</Text>
+                    <Ionicons name="trending-up" size={20} color="white" />
+                  </>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.separator} />
+
               {/* Botão para editar */}
-              <TouchableOpacity style={styles.button} activeOpacity={0.85}>
-                <Text style={styles.buttonText}>Salvar alterações</Text>
-                <Ionicons name="pencil-outline" size={20} color="white" />
+              <TouchableOpacity 
+                style={[styles.button, isLoading && { opacity: 0.7 }]} 
+                activeOpacity={0.85}
+                onPress={handleSalvar}
+                disabled={isLoading || isFetching}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <Text style={styles.buttonText}>Salvar alterações</Text>
+                    <Ionicons name="pencil-outline" size={20} color="white" />
+                  </>
+                )}
               </TouchableOpacity>
 
               {/* Botão para excluir */}
-              <TouchableOpacity style={styles.button2} activeOpacity={0.85}>
+              <TouchableOpacity 
+                style={styles.button2} 
+                activeOpacity={0.85} 
+                onPress={handleExcluir}
+                disabled={isFetching}
+              >
                 <Text style={styles.buttonText}>Excluir Meta Pessoal</Text>
                 <Ionicons name="trash-outline" size={20} color="white" />
               </TouchableOpacity>
@@ -344,4 +541,29 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   textocancelar: {},
+  separator: {
+    height: 1,
+    backgroundColor: "#F0F0F5",
+    marginVertical: 20,
+    width: "100%",
+  },
+  progressInfo: {
+    fontSize: 12,
+    color: "#64748B",
+    marginBottom: 12,
+  },
+  progressHighlight: {
+    color: "#34D399",
+    fontWeight: "bold",
+  },
+  buttonAporte: {
+    backgroundColor: "#34D399",
+    borderRadius: 14,
+    paddingVertical: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
 });
