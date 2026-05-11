@@ -19,6 +19,7 @@ interface CadastroUsuario {
   bairro: string,
   cidade: string, 
   cep: string
+  avatar:number
 }
 
 export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
@@ -39,7 +40,8 @@ export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
     numero: dados.numero,
     bairro: dados.bairro,
     cidade: dados.cidade,
-    cep: dados.cep
+    cep: dados.cep,
+    avatar: dados.avatar
   })
 }
 

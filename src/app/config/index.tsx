@@ -15,6 +15,7 @@ import { useEffect, useState } from "react"
 // Informacoes firebase
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/src/services/firebaseConfig';
+import { avatares } from '@/src/components/auth/escolhaavantar'
 
 export default function App() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function App() {
         <View style={styles.safeArea}>
           <View style={styles.container2}>
             <Image
-              source={require("../../assets/images/onca.png")}
+              source={avatares[usuario?.avatar || 1]} 
               style={styles.avatar}
             />
             <Text style={styles.name}>{usuario?.nome}</Text>

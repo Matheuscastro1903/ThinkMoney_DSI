@@ -44,12 +44,11 @@ interface CadastroUsuario {
   bairro: string;
   cidade: string;
   cep: string;
+  avatar: number;
 }
 
 export default function Cadastro() {
-  const [avatarEscolhido, setAvatarEscolhido] = useState(
-    "../../assets/images/avatarcapivara.png",
-  );
+  const [avatarEscolhido, setAvatarEscolhido] = useState(1);
 
   const [inputNome, setInputNome] = useState("");
   const [inputUserName, setUserName] = useState("");
@@ -174,6 +173,7 @@ export default function Cadastro() {
         bairro: inputBairro,
         cidade: inputCidade,
         cep: inputCep,
+        avatar: avatarEscolhido
       };
       await cadastrarUsuario(dadosUsuario);
       router.replace("/(auth)/cadastro-sucesso");
