@@ -20,6 +20,7 @@ import InputEndereco, { Endereco } from "../../../components/InputEndereco";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
 
+import { avatares } from "@/src/components/auth/escolhaavantar";
 
 // Informacoes firebase
 import { auth, db } from "@/src/services/firebaseConfig";
@@ -152,6 +153,7 @@ export default function EditarConta() {
         bairro: inputEndereco.bairro,
         cidade: inputEndereco.cidade,
         cep: inputEndereco.cep,
+        avatar: avatarEscolhido
       });
 
       // ── Atualiza email no Auth ──
