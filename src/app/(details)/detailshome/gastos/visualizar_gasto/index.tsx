@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../../../../../services/firebaseConfig";
 import { buscarGastos } from "../../../../../services/gastosService";
-import { useRouter } from "expo-router";
+import { useRouter, Router } from "expo-router";
 
 interface Gasto {
   id: string;
@@ -32,8 +32,6 @@ const icones: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
   saude: "medkit",
   eletronicos: "desktop",
 };
-
-// Funcoes formatacoes dos valores
 
 function toDate(data: Gasto["data"]): Date {
   if (data instanceof Date) return data;
@@ -57,116 +55,140 @@ function capitalizarCategoria(cat: string) {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
 
-export default function ListaGastos() {
-  const [gastos, setGastos] = useState<Gasto[]>([]);
-  const [busca, setBusca] = useState("");
-  const [carregando, setCarregando] = useState(true);
+// Wrapper funcional para injetar o hook useRouter como prop
+export default function ListaGastosWrapper() {
   const router = useRouter();
+  return <ListaGastos router={router} />;
+}
 
-  // Busca dos gastos logo ao entrar na tela
-  useEffect(() => {
+interface Props {
+  router: Router;
+}
+
+interface State {
+  gastos: Gasto[];
+  busca: string;
+  carregando: boolean;
+}
+
+class ListaGastos extends Component<Props, State> {
+  state: State = {
+    gastos: [],
+    busca: "",
+    carregando: true,
+  };
+
+  async componentDidMount() {
     const user = auth.currentUser;
     if (!user) return;
 
-    buscarGastos(user.uid)
-      .then(setGastos)
-      .catch(console.error)
-      .finally(() => setCarregando(false));
-  }, []);
+    try {
+      const gastos = await buscarGastos(user.uid);
+      this.setState({ gastos });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.setState({ carregando: false });
+    }
+  }
 
-  const filtrados = gastos.filter(
-    (g) =>
-      g.descricao.toLowerCase().includes(busca.toLowerCase()) ||
-      g.categoria.toLowerCase().includes(busca.toLowerCase()),
-  );
+  render() {
+    const { busca, gastos, carregando } = this.state;
 
-  const totalMensal = filtrados.reduce((acc, g) => acc + g.valor, 0);
+    const filtrados = gastos.filter(
+      (g) =>
+        g.descricao.toLowerCase().includes(busca.toLowerCase()) ||
+        g.categoria.toLowerCase().includes(busca.toLowerCase()),
+    );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <HeaderBack />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <TouchableOpacity
-          style={styles.registrarNovoGasto}
-          onPress={() =>
-            router.push("/(details)/detailshome/gastos/criar_gasto")
-          }
-        >
-          <Ionicons name="wallet-outline" size={22} color="#1D1252" />
-          <Text style={styles.text5}>Criar novo gasto</Text>
-        </TouchableOpacity>
+    const totalMensal = filtrados.reduce((acc, g) => acc + g.valor, 0);
 
-        <View style={styles.searchBox}>
-          <Ionicons
-            name="search"
-            size={18}
-            color="#999"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Procurar transação..."
-            placeholderTextColor="#999"
-            value={busca}
-            onChangeText={setBusca}
-          />
-        </View>
+    return (
+      <SafeAreaView style={styles.container}>
+        <HeaderBack />
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <TouchableOpacity
+            style={styles.registrarNovoGasto}
+            onPress={() =>
+              this.props.router.push("/(details)/detailshome/gastos/criar_gasto")
+            }
+          >
+            <Ionicons name="wallet-outline" size={22} color="#1D1252" />
+            <Text style={styles.text5}>Criar novo gasto</Text>
+          </TouchableOpacity>
 
-        <View style={styles.card}>
-          <Text style={styles.visaoLabel}>VISÃO GERAL MENSAL</Text>
-          <Text style={styles.visaoValor}>{formatarValor(totalMensal)}</Text>
-        </View>
+          <View style={styles.searchBox}>
+            <Ionicons
+              name="search"
+              size={18}
+              color="#999"
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Procurar transação..."
+              placeholderTextColor="#999"
+              value={busca}
+              onChangeText={(v) => this.setState({ busca: v })}
+            />
+          </View>
 
-        {carregando ? (
-          <ActivityIndicator color="white" style={{ marginTop: 40 }} />
-        ) : filtrados.length === 0 ? (
-          <Text style={styles.vazio}>Nenhum gasto encontrado.</Text>
-        ) : (
-          filtrados.map((gasto) => (
-            <TouchableOpacity
-              key={gasto.id}
-              style={styles.gastoCard}
-              activeOpacity={0.8}
-              onPress={() =>
-                router.push({
-                  pathname: "/(details)/detailshome/gastos/editar_gasto",
-                  params: { gasto: JSON.stringify(gasto) },
-                })
-              }
-            >
-              <View style={styles.gastoIconBox}>
-                <Ionicons
-                  name={icones[gasto.categoria] ?? "cash"}
-                  size={22}
-                  color="#1D1252"
-                />
-              </View>
+          <View style={styles.card}>
+            <Text style={styles.visaoLabel}>VISÃO GERAL MENSAL</Text>
+            <Text style={styles.visaoValor}>{formatarValor(totalMensal)}</Text>
+          </View>
 
-              <View style={styles.gastoInfo}>
-                <Text
-                  style={styles.gastoTitulo}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {gasto.descricao}
-                </Text>
-                <Text style={styles.gastoCategoria}>
-                  {capitalizarCategoria(gasto.categoria)}
-                </Text>
-              </View>
+          {carregando ? (
+            <ActivityIndicator color="white" style={{ marginTop: 40 }} />
+          ) : filtrados.length === 0 ? (
+            <Text style={styles.vazio}>Nenhum gasto encontrado.</Text>
+          ) : (
+            filtrados.map((gasto) => (
+              <TouchableOpacity
+                key={gasto.id}
+                style={styles.gastoCard}
+                activeOpacity={0.8}
+                onPress={() =>
+                  this.props.router.push({
+                    pathname: "/(details)/detailshome/gastos/editar_gasto",
+                    params: { gasto: JSON.stringify(gasto) },
+                  })
+                }
+              >
+                <View style={styles.gastoIconBox}>
+                  <Ionicons
+                    name={icones[gasto.categoria] ?? "cash"}
+                    size={22}
+                    color="#1D1252"
+                  />
+                </View>
 
-              <View style={styles.gastoValorBox}>
-                <Text style={styles.gastoValor}>
-                  {formatarValor(gasto.valor)}
-                </Text>
-                <Text style={styles.gastoHora}>{formatarData(gasto.data)}</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  );
+                <View style={styles.gastoInfo}>
+                  <Text
+                    style={styles.gastoTitulo}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {gasto.descricao}
+                  </Text>
+                  <Text style={styles.gastoCategoria}>
+                    {capitalizarCategoria(gasto.categoria)}
+                  </Text>
+                </View>
+
+                <View style={styles.gastoValorBox}>
+                  <Text style={styles.gastoValor}>
+                    {formatarValor(gasto.valor)}
+                  </Text>
+                  <Text style={styles.gastoHora}>{formatarData(gasto.data)}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -179,7 +201,6 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     gap: 12,
   },
-
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -197,7 +218,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#1D1252",
   },
-
   card: {
     backgroundColor: "white",
     borderRadius: 16,
@@ -214,7 +234,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1D1252",
   },
-
   gastoCard: {
     backgroundColor: "white",
     borderRadius: 16,
@@ -257,7 +276,6 @@ const styles = StyleSheet.create({
     color: "#888",
     marginTop: 2,
   },
-
   vazio: {
     color: "white",
     textAlign: "center",

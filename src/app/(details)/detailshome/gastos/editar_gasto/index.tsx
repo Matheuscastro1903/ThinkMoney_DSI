@@ -7,8 +7,8 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useState, useMemo } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Component } from "react";
+import { useLocalSearchParams, useRouter, Router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,14 +27,12 @@ import {
 } from "../../../../../services/gastosService";
 import { auth } from "../../../../../services/firebaseConfig";
 
- 
-
 interface GastoCompleto {
   id: string;
   descricao: string;
   categoria: string;
   valor: number;
-  data: string; 
+  data: string;
   fixo: boolean;
   endereco?: {
     titulo?: string;
@@ -45,8 +43,6 @@ interface GastoCompleto {
     cep?: string;
   };
 }
-
-
 
 function parseValor(texto: string): number {
   const limpo = texto
@@ -63,93 +59,92 @@ function valorParaTexto(valor: number): string {
   });
 }
 
-
-
-export default function EditarGasto() {
+// Wrapper funcional para injetar os hooks useRouter e useLocalSearchParams como props
+export default function EditarGastoWrapper() {
   const router = useRouter();
-  const { gasto: gastoJson } = useLocalSearchParams<{ gasto: string }>();
+  const { gasto } = useLocalSearchParams<{ gasto: string }>();
+  return <EditarGasto router={router} gastoJson={gasto as string} />;
+}
 
+interface Props {
+  router: Router;
+  gastoJson: string;
+}
 
-  // identificando e pegando todas as informações em JSON do gasto clicado pelo user
-  const gastoOriginal = useMemo<GastoCompleto | null>(() => {
-    if (!gastoJson) return null;
+interface State {
+  title: string;
+  tituloEndereco: string;
+  inputValor: string;
+  inputEndereco: Endereco;
+  inputData: Date;
+  categoriaSelecionada: string | undefined;
+  fixo: boolean;
+  erroValor: string | null;
+  salvando: boolean;
+  excluindo: boolean;
+}
+
+class EditarGasto extends Component<Props, State> {
+  private gastoOriginal: GastoCompleto | null;
+
+  constructor(props: Props) {
+    super(props);
+
     try {
-      return JSON.parse(gastoJson as string);
+      this.gastoOriginal = JSON.parse(props.gastoJson);
     } catch {
-      return null;
+      this.gastoOriginal = null;
     }
-  }, [gastoJson]);
 
-  // Série de verificacoes nos states para ver se cada campo de um gasto está existente e de acordo
-  const [title, setTitle] = useState(gastoOriginal?.descricao ?? "");
-  const [tituloEndereco, setTituloEndereco] = useState(
-    gastoOriginal?.endereco?.titulo ?? "",
-  );
-
-
-  const [inputValor, setInputValor] = useState(
-    gastoOriginal ? valorParaTexto(gastoOriginal.valor) : "",
-  );
-
-
-  const [inputEndereco, setInputEndereco] = useState<Endereco>({
-    logradouro: gastoOriginal?.endereco?.logradouro ?? "",
-    numero: gastoOriginal?.endereco?.numero ?? "",
-    bairro: gastoOriginal?.endereco?.bairro ?? "",
-    cidade: gastoOriginal?.endereco?.cidade ?? "",
-    cep: gastoOriginal?.endereco?.cep ?? "",
-  });
-
-
-  const [inputData, setInputData] = useState<Date>(
-    gastoOriginal ? new Date(gastoOriginal.data) : new Date(),
-  );
-
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState(
-    gastoOriginal?.categoria,
-  );
-
-  const [fixo, setFixo] = useState<boolean>(gastoOriginal?.fixo ?? false);
-  const [erroValor, setErroValor] = useState<string | null>(null);
-  const [salvando, setSalvando] = useState(false);
-  const [excluindo, setExcluindo] = useState(false);
-
-  // Se nao existir o gasto correspondente ele so mostra o headerback para voltar (tratamento de erro mesmo)
-
-  if (!gastoOriginal) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <HeaderBack />
-      </SafeAreaView>
-    );
+    const g = this.gastoOriginal;
+    this.state = {
+      title: g?.descricao ?? "",
+      tituloEndereco: g?.endereco?.titulo ?? "",
+      inputValor: g ? valorParaTexto(g.valor) : "",
+      inputEndereco: {
+        logradouro: g?.endereco?.logradouro ?? "",
+        numero: g?.endereco?.numero ?? "",
+        bairro: g?.endereco?.bairro ?? "",
+        cidade: g?.endereco?.cidade ?? "",
+        cep: g?.endereco?.cep ?? "",
+      },
+      inputData: g ? new Date(g.data) : new Date(),
+      categoriaSelecionada: g?.categoria,
+      fixo: g?.fixo ?? false,
+      erroValor: null,
+      salvando: false,
+      excluindo: false,
+    };
   }
 
-  // Validações
+  validarCEP = () => this.state.inputEndereco.cep.replace(/\D/g, "").length === 8;
 
-  const validarCEP = () => inputEndereco.cep.replace(/\D/g, "").length === 8;
-
-  function houveMudanca(): boolean {
-    if (!gastoOriginal) return false;
+  houveMudanca = (): boolean => {
+    const g = this.gastoOriginal;
+    if (!g) return false;
+    const { title, tituloEndereco, inputValor, categoriaSelecionada, fixo, inputData, inputEndereco } = this.state;
     const valorNumerico = parseValor(inputValor);
     return (
-      title !== gastoOriginal.descricao ||
-      tituloEndereco !== (gastoOriginal.endereco?.titulo ?? "") ||
-      valorNumerico !== gastoOriginal.valor ||
-      categoriaSelecionada !== gastoOriginal.categoria ||
-      fixo !== gastoOriginal.fixo ||
-      inputData.getTime() !== new Date(gastoOriginal.data).getTime() ||
-      inputEndereco.logradouro !== (gastoOriginal.endereco?.logradouro ?? "") ||
-      inputEndereco.numero !== (gastoOriginal.endereco?.numero ?? "") ||
-      inputEndereco.bairro !== (gastoOriginal.endereco?.bairro ?? "") ||
-      inputEndereco.cidade !== (gastoOriginal.endereco?.cidade ?? "") ||
-      inputEndereco.cep !== (gastoOriginal.endereco?.cep ?? "")
+      title !== g.descricao ||
+      tituloEndereco !== (g.endereco?.titulo ?? "") ||
+      valorNumerico !== g.valor ||
+      categoriaSelecionada !== g.categoria ||
+      fixo !== g.fixo ||
+      inputData.getTime() !== new Date(g.data).getTime() ||
+      inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
+      inputEndereco.numero !== (g.endereco?.numero ?? "") ||
+      inputEndereco.bairro !== (g.endereco?.bairro ?? "") ||
+      inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
+      inputEndereco.cep !== (g.endereco?.cep ?? "")
     );
-  }
+  };
 
-  // Salvar 
+  handleSalvar = async () => {
+    const g = this.gastoOriginal;
+    if (!g) return;
 
-  async function handleSalvar() {
-    if (!gastoOriginal) return;
+    const { inputValor, categoriaSelecionada, inputData, title, tituloEndereco, fixo, inputEndereco } = this.state;
+
     if (!categoriaSelecionada) {
       Alert.alert("Atenção", "Selecione uma categoria.");
       return;
@@ -157,17 +152,16 @@ export default function EditarGasto() {
 
     const valorNumerico = parseValor(inputValor);
     if (isNaN(valorNumerico) || valorNumerico <= 0) {
-      setErroValor("Informe um valor válido");
+      this.setState({ erroValor: "Informe um valor válido" });
       return;
     }
 
-    if (!validarCEP()) {
+    if (!this.validarCEP()) {
       Alert.alert("Atenção", "CEP inválido. Informe um CEP com 8 dígitos.");
       return;
     }
 
-    
-    if (!houveMudanca()) {
+    if (!this.houveMudanca()) {
       Alert.alert("Sem alterações", "Nenhum campo foi modificado.");
       return;
     }
@@ -179,9 +173,9 @@ export default function EditarGasto() {
     }
 
     try {
-      setSalvando(true);
+      this.setState({ salvando: true });
 
-      await atualizarGasto(user.uid, gastoOriginal.id, {
+      await atualizarGasto(user.uid, g.id, {
         valor: valorNumerico,
         data: inputData,
         descricao: title,
@@ -194,23 +188,20 @@ export default function EditarGasto() {
       });
 
       Alert.alert("Sucesso", "Gasto atualizado!", [
-        { text: "OK", onPress: () => router.back() },
+        { text: "OK", onPress: () => this.props.router.back() },
       ]);
     } catch (error) {
       console.error(error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível atualizar o gasto. Tente novamente.",
-      );
+      Alert.alert("Erro", "Não foi possível atualizar o gasto. Tente novamente.");
     } finally {
-      setSalvando(false);
+      this.setState({ salvando: false });
     }
-  }
+  };
 
-  // Excluir
+  handleExcluir = () => {
+    const g = this.gastoOriginal;
+    if (!g) return;
 
-  function handleExcluir() {
-    if (!gastoOriginal) return;
     Alert.alert(
       "Excluir gasto",
       "Tem certeza que deseja excluir este gasto? Esta ação não pode ser desfeita.",
@@ -224,163 +215,164 @@ export default function EditarGasto() {
             if (!user) return;
 
             try {
-              setExcluindo(true);
-              await excluirGasto(user.uid, gastoOriginal?.id ?? "");
-              router.back();
+              this.setState({ excluindo: true });
+              await excluirGasto(user.uid, g.id);
+              this.props.router.back();
             } catch (error) {
               console.error(error);
-              Alert.alert(
-                "Erro",
-                "Não foi possível excluir o gasto. Tente novamente.",
-              );
+              Alert.alert("Erro", "Não foi possível excluir o gasto. Tente novamente.");
             } finally {
-              setExcluindo(false);
+              this.setState({ excluindo: false });
             }
           },
         },
       ],
     );
-  }
+  };
 
- 
+  render() {
+    if (!this.gastoOriginal) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <HeaderBack />
+        </SafeAreaView>
+      );
+    }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <HeaderBack />
-      <ScrollView>
-        <View style={styles.container2}>
-          <Text style={styles.title}>Edite seu gasto</Text>
-          <Text style={styles.subtitle}>
-            Preencha os campos abaixo para editar seus gastos.
-          </Text>
+    const {
+      title, inputValor, salvando, excluindo, erroValor,
+      fixo, inputEndereco, tituloEndereco, categoriaSelecionada,
+    } = this.state;
 
-         
-          <View style={styles.categorias}>
-            <Text>Categorias</Text>
-            <View style={styles.categoriasBotoes}>
-              {(
-                [
-                  {
-                    key: "alimentacao",
-                    icon: "restaurant",
-                    label: "Alimentação",
-                  },
-                  { key: "transporte", icon: "car", label: "Transporte" },
-                  { key: "lazer", icon: "game-controller", label: "Lazer" },
-                  { key: "educacao", icon: "school", label: "Educação" },
-                ] as const
-              ).map((cat) => (
-                <TouchableOpacity
-                  key={cat.key}
-                  onPress={() => setCategoriaSelecionada(cat.key)}
-                  style={[
-                    styles.categoriaBox,
-                    categoriaSelecionada === cat.key
-                      ? styles.categoriaAtiva
-                      : styles.categoriaInativa,
-                  ]}
-                >
-                  <Ionicons
-                    name={cat.icon}
-                    size={20}
-                    color={categoriaSelecionada === cat.key ? "white" : "black"}
-                    style={styles.categoriaIcon}
-                  />
-                  <Text
+    return (
+      <SafeAreaView style={styles.container}>
+        <HeaderBack />
+        <ScrollView>
+          <View style={styles.container2}>
+            <Text style={styles.title}>Edite seu gasto</Text>
+            <Text style={styles.subtitle}>
+              Preencha os campos abaixo para editar seus gastos.
+            </Text>
+
+            <View style={styles.categorias}>
+              <Text>Categorias</Text>
+              <View style={styles.categoriasBotoes}>
+                {(
+                  [
+                    { key: "alimentacao", icon: "restaurant", label: "Alimentação" },
+                    { key: "transporte", icon: "car", label: "Transporte" },
+                    { key: "lazer", icon: "game-controller", label: "Lazer" },
+                    { key: "educacao", icon: "school", label: "Educação" },
+                  ] as const
+                ).map((cat) => (
+                  <TouchableOpacity
+                    key={cat.key}
+                    onPress={() => this.setState({ categoriaSelecionada: cat.key })}
                     style={[
-                      styles.categoriaText,
+                      styles.categoriaBox,
                       categoriaSelecionada === cat.key
-                        ? styles.textoAtivo
-                        : styles.textoInativo,
+                        ? styles.categoriaAtiva
+                        : styles.categoriaInativa,
                     ]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
                   >
-                    {cat.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Ionicons
+                      name={cat.icon}
+                      size={20}
+                      color={categoriaSelecionada === cat.key ? "white" : "black"}
+                      style={styles.categoriaIcon}
+                    />
+                    <Text
+                      style={[
+                        styles.categoriaText,
+                        categoriaSelecionada === cat.key
+                          ? styles.textoAtivo
+                          : styles.textoInativo,
+                      ]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {cat.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
 
-          
-          <View style={styles.inputs}>
-            <InputTitle
-              placeholder="ex: Hamburguer do Marquinhos"
-              label="TÍTULO (OPCIONAL)"
-              value={title}
-              onChangeText={setTitle}
-            />
+            <View style={styles.inputs}>
+              <InputTitle
+                placeholder="ex: Hamburguer do Marquinhos"
+                label="TÍTULO (OPCIONAL)"
+                value={title}
+                onChangeText={(v) => this.setState({ title: v })}
+              />
 
-            <InputValor
-              label="VALOR"
-              placeholder="Ex: 50,00"
-              value={inputValor}
-              atualizando={(texto) => {
-                setInputValor(texto);
-                setErroValor(null);
-              }}
-              erro={erroValor}
-            />
+              <InputValor
+                label="VALOR"
+                placeholder="Ex: 50,00"
+                value={inputValor}
+                atualizando={(texto) => {
+                  this.setState({ inputValor: texto, erroValor: null });
+                }}
+                erro={erroValor}
+              />
 
-            <InputDate
-              label="DATA DO GASTO:"
-              onChange={(dataPronta) => setInputData(dataPronta)}
-            />
+              <InputDate
+                label="DATA DO GASTO:"
+                onChange={(dataPronta) => this.setState({ inputData: dataPronta })}
+              />
 
-            <InputFixo value={fixo} onChange={setFixo} />
+              <InputFixo value={fixo} onChange={(v) => this.setState({ fixo: v })} />
 
-            <InputTitle
-              placeholder="ex: Barraquinha do seu zé"
-              label="TÍTULO DO ENDEREÇO"
-              value={tituloEndereco}
-              onChangeText={setTituloEndereco}
-            />
+              <InputTitle
+                placeholder="ex: Barraquinha do seu zé"
+                label="TÍTULO DO ENDEREÇO"
+                value={tituloEndereco}
+                onChangeText={(v) => this.setState({ tituloEndereco: v })}
+              />
 
-            <InputEnderecoGasto
-              inputEndereco={inputEndereco}
-              atualizando={(patch) =>
-                setInputEndereco((prev) => ({ ...prev, ...patch }))
-              }
-            />
-          </View>
+              <InputEnderecoGasto
+                inputEndereco={inputEndereco}
+                atualizando={(patch) =>
+                  this.setState((prev) => ({
+                    inputEndereco: { ...prev.inputEndereco, ...patch },
+                  }))
+                }
+              />
+            </View>
 
-          {validarCEP() && (
-            <Text style={styles.enderecoValidado}>Endereço validado</Text>
-          )}
-
-          
-          <TouchableOpacity
-            style={[styles.register, salvando && { opacity: 0.6 }]}
-            onPress={handleSalvar}
-            disabled={salvando || excluindo}
-          >
-            {salvando ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.textRegister}>Salvar</Text>
+            {this.validarCEP() && (
+              <Text style={styles.enderecoValidado}>Endereço validado</Text>
             )}
-          </TouchableOpacity>
 
-         
-          <TouchableOpacity
-            style={[styles.excluir, excluindo && { opacity: 0.6 }]}
-            onPress={handleExcluir}
-            disabled={salvando || excluindo}
-          >
-            {excluindo ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.textRegister}>Excluir Gasto</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+            <TouchableOpacity
+              style={[styles.register, salvando && { opacity: 0.6 }]}
+              onPress={this.handleSalvar}
+              disabled={salvando || excluindo}
+            >
+              {salvando ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.textRegister}>Salvar</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.excluir, excluindo && { opacity: 0.6 }]}
+              onPress={this.handleExcluir}
+              disabled={salvando || excluindo}
+            >
+              {excluindo ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.textRegister}>Excluir Gasto</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 }
-
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1D1252" },

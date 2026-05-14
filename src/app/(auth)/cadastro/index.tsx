@@ -318,7 +318,7 @@ export default function Cadastro() {
 
               <InputSenha
                 label="Digite sua Senha"
-                placeholder="Ex:123456"
+                placeholder="Ex:12345678"
                 atualizando={(valor) => setInputSenha(valor)}
                 icon={require("../../../assets/icons/iconecadeado.svg")}
                 iconVisibilidade={require("../../../assets/icons/iconeolho.svg")}
