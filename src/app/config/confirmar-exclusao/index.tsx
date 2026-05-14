@@ -14,7 +14,7 @@ export default function ConfirmarExclusao() {
       // await api.deletarConta(); // excluir conta do firebase
       // await AsyncStorage.clear(); // excluir dados locais do usuário
 
-      router.replace('/');
+      router.replace('./conta-excluida'); // redirecionar para tela de conta excluída
     } catch (error) {
       console.error('Erro ao excluir conta:', error);
       setIsLoading(false);
