@@ -117,7 +117,9 @@ export default function App() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("./config/confirmar-exclusao")}
+          >
             <View style={styles.container5}>
               <Ionicons
                 name="trash-outline"
