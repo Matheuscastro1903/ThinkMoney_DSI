@@ -4,7 +4,7 @@ import { View, Image, TouchableOpacity, StyleSheet,Text } from "react-native"
 type AvatarID = 1 | 2 | 3 | 4 | 5;
 
 // caminho corrigido — subindo 2 níveis (auth → components → src)
-const avatares = {
+export const avatares = {
     1: require('../../assets/images/avatarcapivara.png'),
     2: require('../../assets/images/avataronca.png'),
     3: require('../../assets/images/avatarjacare.png'),
@@ -24,7 +24,7 @@ export default function EscolhaAvatar({ onChange }: EscolhaAvatarProps) {
     function changingAvatar(value: AvatarID) {
         const novoAvatar = avatares[value];
         setAvatar(novoAvatar);
-        onChange?.(novoAvatar); // avisa o pai qual avatar foi escolhido
+        onChange?.(value); // avisa o pai qual avatar foi escolhido
     }
 
     return (
