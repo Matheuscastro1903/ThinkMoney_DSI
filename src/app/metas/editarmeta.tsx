@@ -345,7 +345,7 @@ export default function EditMeta() {
               </TouchableOpacity>
 
               {/* Botão para cancelar */}
-              <Link href={"/metas"} asChild>
+              <Link href={"/"} asChild>
                 <TouchableOpacity style={styles.cancelar}>
                   <Text style={styles.textocancelar}>Cancelar</Text>
                 </TouchableOpacity>

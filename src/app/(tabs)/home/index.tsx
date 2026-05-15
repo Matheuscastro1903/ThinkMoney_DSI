@@ -255,7 +255,7 @@ export default function Home() {
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
-                    <Link href="/metas" asChild>
+                    <Link href="/(details)/detailshome/metas" asChild>
                         <TouchableOpacity style={styles.metasPessoais}>
                             <Ionicons name="rocket-outline" size={18} color="#1D1252" />
                             <Text style={styles.text6}>Metas</Text>
