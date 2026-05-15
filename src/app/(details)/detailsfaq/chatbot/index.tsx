@@ -1,8 +1,14 @@
-
-
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import {KeyboardAvoidingView,Platform,ScrollView,StyleSheet,Text,TextInput,View,} from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HeaderBot } from "@/src/components/details/chatbot/headerbot/page";
 import { useState, useRef } from "react";
@@ -19,9 +25,9 @@ interface Mensagem {
 
 export default function ChatBot() {
   const scrollViewRef = useRef<ScrollView>(null); // Criando o "gancho"
-  
+
   //guarda a última mensagem
-  const [mensagematual, setMensagemAtual] = useState('');
+  const [mensagematual, setMensagemAtual] = useState("");
   const [Isloading, setIsLoading] = useState(false);
   //guarda todas as mensagens,enviadas e recebidas
   //será um array de dicionarios
@@ -31,7 +37,7 @@ export default function ChatBot() {
   //a mesam função para a mesnagem enviada e sugestão
   async function ConexaoApi(text: string) {
     let mensagemEnviada = text;
-    
+
     if (text) {
       //se for enviada pela sugestões
       mensagemEnviada = text;
@@ -39,12 +45,12 @@ export default function ChatBot() {
       //se for enviada pelo botão de enviar
       mensagemEnviada = mensagematual;
     }
-    
+
     //só passa da verificação se não estiver vazio
     //.trim remove espaços em branco-->se tiver só espaço branco=false-->!false=true retorna nada
     if (!mensagemEnviada.trim()) return;
 
-    setMensagemAtual('');
+    setMensagemAtual("");
 
     //Ativa o feedback visual de carregamento
     setIsLoading(true);
@@ -52,15 +58,15 @@ export default function ChatBot() {
     //adicionando a mensagem da pessoa na lista
     const idMensagemEnviada = Math.random().toString(36).slice(2, 9);
     const dicionario_mensagem = {
-      "id": idMensagemEnviada,
-      "text": mensagemEnviada,
-      "sender": "user"
+      id: idMensagemEnviada,
+      text: mensagemEnviada,
+      sender: "user",
     };
-    setArrayMensagens(prev => ([...prev, dicionario_mensagem]));
-    
+    setArrayMensagens((prev) => [...prev, dicionario_mensagem]);
+
     try {
       const apiresposta = await ControllerChatBot(mensagemEnviada);
-      setArrayMensagens(prev => ([...prev, apiresposta]));
+      setArrayMensagens((prev) => [...prev, apiresposta]);
     } catch (error) {
       console.log("erro na conexão com o controller");
     } finally {
@@ -69,7 +75,7 @@ export default function ChatBot() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* 
         
         - behavior: 'padding' no iOS faz a tela "encolher" por baixo, 'height' no Android redimensiona a janela.
@@ -79,9 +85,9 @@ export default function ChatBot() {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0} 
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-        <View style={{ width: "100%", marginBottom: 0, zIndex: 10 }}>
+        <View style={{ width: "100%", zIndex: 10 }}>
           <HeaderBack />
         </View>
 
@@ -91,20 +97,27 @@ export default function ChatBot() {
           style={{ flex: 1 }}
           /*flexGrow: 1 garante que o conteúdo ocupe a tela toda 
              e responda corretamente ao empurrão do teclado sem sumir. */
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 24, paddingTop: 10 }}
+          contentContainerStyle={{
+            flexGrow: 0,
+            paddingBottom: 24,
+            paddingTop: 0,
+            justifyContent: "flex-start",
+          }}
           keyboardShouldPersistTaps="handled"
           //quando mudar,scrollaar automaticamente para o fim
-          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+          onContentSizeChange={() =>
+            scrollViewRef.current?.scrollToEnd({ animated: true })
+          }
         >
           {/*CABEÇALHO DO ROBÔ*/}
-          <HeaderBot/>
+          <HeaderBot />
 
           {/**Mensagem padrão do robo(apenas escrito) */}
           <View style={styles.chat}>
             <View style={styles.ia}>
               <Text style={{ lineHeight: 20 }}>
-                Olá! Como posso ajudar sua vida financeira hoje?
-                Você pode me perguntar sobre qualquer assunto relacionado o âmbito financeiro
+                Olá! Como posso ajudar sua vida financeira hoje? Você pode me
+                perguntar sobre qualquer assunto relacionado o âmbito financeiro
               </Text>
             </View>
 
@@ -119,12 +132,20 @@ export default function ChatBot() {
           </View>
         </ScrollView>
 
-        
-        <View style={styles.sugestao}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.sugestao}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <SuggestionButton text="Como investir?" onClick={ConexaoApi} />
           <SuggestionButton text="O que é inflação?" onClick={ConexaoApi} />
-          <SuggestionButton text="Como calcular o juros?" onClick={ConexaoApi} />
-        </View>
+          <SuggestionButton
+            text="Como calcular o juros?"
+            onClick={ConexaoApi}
+          />
+        </ScrollView>
 
         {/* FOOTER FIXO NA BASE */}
         <View style={styles.footerContainer}>
@@ -138,10 +159,10 @@ export default function ChatBot() {
                 value={mensagematual} //mostrar como está ficando a escrita
               />
 
-              <ButtonSendMensage 
-                onClick={ConexaoApi} 
-                textoParaEnviar={mensagematual} 
-                isLoading={Isloading} 
+              <ButtonSendMensage
+                onClick={ConexaoApi}
+                textoParaEnviar={mensagematual}
+                isLoading={Isloading}
               />
             </View>
           </View>
@@ -160,7 +181,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   ia: {
-    marginTop: 32,
+    marginTop: 12,
     backgroundColor: "#e9e9e9",
     borderRadius: 15,
     marginLeft: 30,
@@ -168,10 +189,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sugestao: {
-    flexDirection: "row",
-    justifyContent: "space-around",
     paddingVertical: 8,
-    paddingHorizontal: 16,
+
     backgroundColor: "#FFFFFF", // Garante que as sugestões tenham fundo sólido ao subir
   },
   input: {
@@ -184,7 +203,7 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10, // 💡 Ajuste fino para não colar na base do iPhone
+    paddingBottom: Platform.OS === "ios" ? 20 : 10, // 💡 Ajuste fino para não colar na base do iPhone
   },
   footer: {
     backgroundColor: "#e9e9e9",

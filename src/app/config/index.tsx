@@ -61,7 +61,7 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="at-circle" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Username</Text>
+                <Text style={styles.rowLabel}>Nome de Usuário</Text>
               </View>
               <Text style={styles.rowValue}>{usuario?.username}</Text>
             </View>
@@ -69,7 +69,7 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="calendar-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Birth Date</Text>
+                <Text style={styles.rowLabel}>Data de Nascimento</Text>
               </View>
               <Text style={styles.rowValue}>{data ? data.toLocaleDateString("pt-br") : ""}</Text>
             </View>
@@ -77,7 +77,7 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="briefcase-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Profile</Text>
+                <Text style={styles.rowLabel}>Profissão</Text>
               </View>
               <Text style={styles.rowValue}>{usuario?.profissao}</Text>
             </View>

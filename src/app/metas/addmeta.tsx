@@ -74,7 +74,7 @@ export default function AddMeta() {
 
   return (
 
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-    paddingTop: 10, // ADICIONADO: Um pequeno respiro entre o Header e o conteúdo inicial (Badge/Título)
+    paddingTop: 0, // ADICIONADO: Um pequeno respiro entre o Header e o conteúdo inicial (Badge/Título)
   },
   badge: {
     backgroundColor: "#D6D0F0",
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 12,
     alignSelf: "flex-start",
-    marginTop: 24,
+    marginTop: 8,
   },
   badgeText: {
     color: "#1D1252",

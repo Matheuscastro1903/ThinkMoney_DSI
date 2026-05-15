@@ -5,7 +5,7 @@ import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useRouter } from 'expo-router';
 import InputTitle from "@/src/components/details/gastos/inputtitle2/page";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
 import InputEnderecoGasto, {
@@ -32,7 +32,12 @@ interface State {
   fixo: boolean;
 }
 
-export default class Criar extends Component<{}, State> {
+export default function CriarWithRouter(props: any) {
+  const router = useRouter();
+  return <Criar {...props} router={router} />;
+}
+
+export class Criar extends Component<{ router?: any }, State> {
   state: State = {
     title: "",
     tituloEndereco: "",
@@ -45,8 +50,9 @@ export default class Criar extends Component<{}, State> {
     erroTitle: null,
     errosEndereco: { logradouro: "", numero: "", bairro: "", cidade: "" },
     fixo: false,
+    
   };
-
+  
   validarCEP = () => {
     const cep = this.state.inputEndereco.cep.replace(/\D/g, "");
     return cep.length === 8;
@@ -111,8 +117,23 @@ export default class Criar extends Component<{}, State> {
           ...inputEndereco,
         },
       });
-
-      Alert.alert("Sucesso", "Gasto registrado!");
+      
+      Alert.alert(
+        "Sucesso",
+        "Gasto registrado!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              if (this.props?.router && typeof this.props.router.back === 'function') {
+                this.props.router.back();
+              }
+            },
+          },
+        ],
+        { cancelable: false },
+      );
+      
       this.setState({
         title: "",
         tituloEndereco: "",

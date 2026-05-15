@@ -7,7 +7,9 @@ import {
     Text,
     TouchableOpacity,
     View,
+    Linking
 } from "react-native";
+
 
 const FAQ = [
   {
@@ -83,6 +85,14 @@ function CardFaq({
 }
 
 export default function Faq() {
+
+  function abrirEmail() {
+    const email = "contato@thinkmoney.com.br";
+    const assunto = "Suporte ThinkMoney";
+    const url = `mailto:${email}?subject=${encodeURIComponent(assunto)}`;
+    Linking.openURL(url);
+  }
+
   return (
     <ScrollView
       style={styles.fundo}
@@ -120,7 +130,8 @@ export default function Faq() {
         </Text>
         <Text style={styles.suporteSubtitulo}>Fale conosco</Text>
 
-        <TouchableOpacity style={styles.botaoSecundario} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.botaoSecundario} activeOpacity={0.85}
+        onPress={abrirEmail} >
           <Text style={styles.botaoSecundarioTexto}>E-mail</Text>
         </TouchableOpacity>
       </View>

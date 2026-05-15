@@ -194,7 +194,7 @@ export default function EditarConta() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}> 
        <HeaderBack />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     resizeMode: "contain",
-     marginTop: 8, 
+     marginTop: 0, 
   },
 
   main: {
