@@ -1,5 +1,5 @@
 import {
-  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator,
+  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator,KeyboardAvoidingView, Platform
 } from "react-native";
 import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -162,6 +162,11 @@ export class Criar extends Component<{ router?: any }, State> {
     return (
       <SafeAreaView style={styles.container}>
         <HeaderBack />
+
+        <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        >
         <ScrollView>
           <View style={styles.container2}>
             <Text style={styles.title}>Registre seu gasto</Text>
@@ -301,7 +306,7 @@ export class Criar extends Component<{ router?: any }, State> {
 
             <View style={styles.inputs}>
               <InputTitle
-                placeholder="ex: Hamburguer do Marquinhos"
+                placeholder="ex:Hamburguer"
                 label="TÍTULO"
                 value={title}
                 onChangeText={(v) => this.setState({ title: v })}
@@ -364,6 +369,7 @@ export class Criar extends Component<{ router?: any }, State> {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
