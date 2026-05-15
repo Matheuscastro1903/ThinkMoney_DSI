@@ -311,6 +311,7 @@ export class Criar extends Component<{ router?: any }, State> {
                 value={title}
                 onChangeText={(v) => this.setState({ title: v })}
                 erro={erroTitle}
+                maxLength={50}
               />
 
               <InputValor
@@ -331,14 +332,17 @@ export class Criar extends Component<{ router?: any }, State> {
               <InputFixo value={fixo} onChange={(v) => this.setState({ fixo: v })} />
 
               <InputTitle
-                placeholder="ex: Barraquinha do seu zé"
+                placeholder="ex:Vivências UFRPE"
                 label="TÍTULO DO ENDEREÇO"
                 value={tituloEndereco}
                 onChangeText={(v) => this.setState({ tituloEndereco: v })}
+                maxLength={50}
               />
 
               <InputEnderecoGasto
                 inputEndereco={inputEndereco}
+                maxLenght={50}
+                maxLengthCEP={8}
                 erros={errosEndereco}
                 atualizando={(patch) => {
                   this.setState((prev) => ({
