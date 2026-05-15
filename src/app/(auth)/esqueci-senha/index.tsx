@@ -59,7 +59,7 @@ export default function EsqueciSenha() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior="padding"
         style={{ flex: 1 }}
       >
         <ScrollView
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginTop: 100,
+    marginTop: 30,
   },
   main: {
     flexDirection: "column",
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 1,
     alignSelf: "center",
-    marginTop: 150,
+    marginTop: 40,
     marginBottom: 20,
     borderRadius: 25,
   },
