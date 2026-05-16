@@ -5,7 +5,7 @@ export interface Meta {
   nomeMeta: string
   valorTotal: number
   valorPoupado: number
-  dataLimite: string
+  dataLimite: Date
   categoria: string
   descricao?: string
 }

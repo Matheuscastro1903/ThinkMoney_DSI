@@ -18,7 +18,7 @@ import HeaderBack from "@/src/components/headerBack";
 import { useRouter } from "expo-router";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
-
+import InputDate from "@/src/components/details/metas/inputdata";
 
 const CATEGORIAS = [
   { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -32,7 +32,7 @@ export default function AddMeta() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
-  const [data, setData] = useState("");
+  const [data, setData] = useState<Date | null>(null);
   const [descricao, setDescricao] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -165,22 +165,14 @@ export default function AddMeta() {
             </View>
 
             {/* Data de Realização */}
-            <Text style={styles.label}>DATA DE REALIZAÇÃO</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons
-                name="calendar-outline"
-                size={18}
-                color="#BBBBBB"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.inputText}
-                placeholder="Selecione o prazo"
-                placeholderTextColor="#BBBBBB"
-                value={data}
-                onChangeText={setData}
-              />
-            </View>
+            
+              
+              <InputDate
+                              label="Data de realização:"
+                              
+                              onChange={(dataPronta) => setData(dataPronta)}
+                            ></InputDate>
+            
 
             {/* Descrição */}
             <Text style={styles.label}>DESCRIÇÃO (OPCIONAL)</Text>
