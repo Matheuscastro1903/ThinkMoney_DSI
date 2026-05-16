@@ -1,5 +1,5 @@
 import {
-  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator,
+  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator,KeyboardAvoidingView, Platform
 } from "react-native";
 import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -162,6 +162,11 @@ export class Criar extends Component<{ router?: any }, State> {
     return (
       <SafeAreaView style={styles.container}>
         <HeaderBack />
+
+        <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        >
         <ScrollView>
           <View style={styles.container2}>
             <Text style={styles.title}>Registre seu gasto</Text>
@@ -301,11 +306,12 @@ export class Criar extends Component<{ router?: any }, State> {
 
             <View style={styles.inputs}>
               <InputTitle
-                placeholder="ex: Hamburguer do Marquinhos"
+                placeholder="ex:Hamburguer"
                 label="TÍTULO"
                 value={title}
                 onChangeText={(v) => this.setState({ title: v })}
                 erro={erroTitle}
+                maxLength={50}
               />
 
               <InputValor
@@ -326,14 +332,17 @@ export class Criar extends Component<{ router?: any }, State> {
               <InputFixo value={fixo} onChange={(v) => this.setState({ fixo: v })} />
 
               <InputTitle
-                placeholder="ex: Barraquinha do seu zé"
+                placeholder="ex:Vivências UFRPE"
                 label="TÍTULO DO ENDEREÇO"
                 value={tituloEndereco}
                 onChangeText={(v) => this.setState({ tituloEndereco: v })}
+                maxLength={50}
               />
 
               <InputEnderecoGasto
                 inputEndereco={inputEndereco}
+                maxLenght={50}
+                maxLengthCEP={8}
                 erros={errosEndereco}
                 atualizando={(patch) => {
                   this.setState((prev) => ({
@@ -364,6 +373,7 @@ export class Criar extends Component<{ router?: any }, State> {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }

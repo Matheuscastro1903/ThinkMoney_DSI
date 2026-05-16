@@ -3,7 +3,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { THINK_MONEY_SYSTEM_PROMPT } from '../constants/prompt';
 
-const API_KEY = "AIzaSyDsX_Suampr7Uh_kcbTTi033oO5_KJSZB0"; 
+// ! força a não ser undifined
+export const API_KEY: string = process.env.EXPO_PUBLIC_API_KEY!;
+
 const iaInstancia = new GoogleGenerativeAI(API_KEY);
 
 export const modeloIA = iaInstancia.getGenerativeModel(

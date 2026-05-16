@@ -7,9 +7,10 @@ interface InputTitleProps {
   onChangeText?: (texto: string) => void
   atualizando?: (texto: string) => void
    erro?: string | null
+   maxLength?: number;
 }
 
-export default function InputTitle({ label, placeholder, value, onChangeText, erro }: InputTitleProps) {
+export default function InputTitle({ label, placeholder, value, onChangeText,maxLength, erro }: InputTitleProps) {
   return (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
@@ -21,6 +22,7 @@ export default function InputTitle({ label, placeholder, value, onChangeText, er
           value={value}
           onChangeText={onChangeText}
           autoCapitalize="sentences"
+          maxLength={maxLength}
         />
         {erro ? <Text style={styles.erro}>{erro}</Text> : null}
       </View>

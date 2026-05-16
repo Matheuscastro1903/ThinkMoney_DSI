@@ -6,15 +6,18 @@ export interface Endereco {
     bairro: string;
     cidade: string;
     cep: string
+    
 }
 
 interface InputEnderecoProps {
     inputEndereco: Endereco;
     atualizando: (patch: Partial<Endereco>) => void;
-    erros?: { logradouro?: string; numero?: string; bairro?: string; cidade?: string };
+    erros?: { logradouro?: string; numero?: string; bairro?: string; cidade?: string }
+    maxLengthCEP?:number,
+    maxLenght?:number;
 }
 
-export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }: InputEnderecoProps){
+export default function InputEnderecoGasto({ inputEndereco, atualizando, erros,maxLenght,maxLengthCEP }: InputEnderecoProps){
   return (
     <View style={styles.container}>
         <View style={styles.row}>
@@ -25,6 +28,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }
                     placeholderTextColor="#ccc"
                     placeholder={inputEndereco.logradouro ? inputEndereco.logradouro : "ex. rua das flores"}
                     onChangeText={(value) => atualizando({logradouro: value})}
+                    maxLength={maxLenght}
                     
                 />
                 {erros?.logradouro ? <Text style={styles.erro}>{erros.logradouro}</Text> : null}
@@ -37,6 +41,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }
                     placeholderTextColor="#ccc"
                     placeholder={inputEndereco.numero ? inputEndereco.numero : "ex. 123"}
                     onChangeText={(value) => atualizando({numero: value})}
+                    maxLength={maxLenght}
                 />
             
                 {erros?.numero ? <Text style={styles.erro}>{erros.numero}</Text> : null}
@@ -51,6 +56,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }
                     placeholder={inputEndereco.bairro ? inputEndereco.bairro : "ex. bairro novo"}
                     placeholderTextColor="#ccc"
                     onChangeText={(value) => atualizando({bairro: value})}
+                    maxLength={maxLenght}
                 />
                 {erros?.bairro ? <Text style={styles.erro}>{erros.bairro}</Text> : null}
             </View>
@@ -61,6 +67,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }
                     placeholder={inputEndereco.cidade ? inputEndereco.cidade : "ex. São Paulo"}
                     placeholderTextColor="#ccc"
                     onChangeText={(value) => atualizando({cidade: value})}
+                    maxLength={maxLenght}
                 />
                 {erros?.cidade ? <Text style={styles.erro}>{erros.cidade}</Text> : null}
             </View>
@@ -72,6 +79,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros }
                             placeholderTextColor="#ccc"
                             placeholder={inputEndereco.cep ? inputEndereco.cep : "ex. 12345-678"}
                             onChangeText={(value) => atualizando({cep: value})}
+                            maxLength={maxLengthCEP}
                         />
                     </View>
         </View>
