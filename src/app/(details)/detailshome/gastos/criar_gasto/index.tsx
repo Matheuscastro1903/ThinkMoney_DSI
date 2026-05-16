@@ -1,5 +1,5 @@
 import {
-  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator,KeyboardAvoidingView, Platform
+  Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, KeyboardAvoidingView
 } from "react-native";
 import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -137,11 +137,11 @@ export class Criar extends Component<{ router?: any }, State> {
       <SafeAreaView style={styles.container}>
         <HeaderBack />
 
-        <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        <KeyboardAvoidingView
+        behavior="padding"
         style={{ flex: 1 }}
         >
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="handled">
           <View style={styles.container2}>
             <Text style={styles.title}>Registre seu gasto</Text>
             <Text style={styles.subtitle}>
