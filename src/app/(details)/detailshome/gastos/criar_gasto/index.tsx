@@ -118,33 +118,7 @@ export class Criar extends Component<{ router?: any }, State> {
         },
       });
       
-      Alert.alert(
-        "Sucesso",
-        "Gasto registrado!",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              if (this.props?.router && typeof this.props.router.back === 'function') {
-                this.props.router.back();
-              }
-            },
-          },
-        ],
-        { cancelable: false },
-      );
-      
-      this.setState({
-        title: "",
-        tituloEndereco: "",
-        inputValor: "",
-        inputEndereco: { logradouro: "", numero: "", bairro: "", cidade: "", cep: "" },
-        categoriaSelecionada: "",
-        inputData: new Date(),
-        erroValor: null,
-        errosEndereco: { logradouro: "", numero: "", bairro: "", cidade: "" },
-        erroTitle: null,
-      });
+      this.props.router.back();
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível registrar o gasto. Tente novamente.");
