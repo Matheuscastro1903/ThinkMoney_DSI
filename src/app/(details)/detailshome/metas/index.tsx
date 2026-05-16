@@ -93,14 +93,8 @@ export default function Metas() {
               const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
 
               return (
-               <Link 
-  key={meta.id} 
-  href={{
-    pathname: "/(details)/detailshome/metas/updatemetas",
-    params: { id: meta.id }
-  }} 
-  asChild
->
+               <Link key={meta.id} href={{pathname: "/(details)/detailshome/metas/updatemetas",
+                params: { id: meta.id }}} asChild>
                   <TouchableOpacity style={{ width: "100%" }}>
                     <View style={styles.meta1}>
                       <View style={styles.iconMeta}>
