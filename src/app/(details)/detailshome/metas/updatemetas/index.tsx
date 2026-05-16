@@ -13,6 +13,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import MaskInput from "react-native-mask-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
@@ -256,12 +257,14 @@ export default function EditMeta() {
                   color="#BBBBBB"
                   style={styles.inputIcon}
                 />
-                <TextInput
+                <MaskInput
                   style={styles.inputText}
-                  placeholder="Selecione o prazo"
+                  placeholder="DD/MM/AAAA"
                   placeholderTextColor="#BBBBBB"
+                  keyboardType="numeric"
                   value={data}
-                  onChangeText={setData}
+                  onChangeText={(masked) => setData(masked)}
+                  mask={[/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
                 />
               </View>
 
