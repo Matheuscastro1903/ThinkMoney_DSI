@@ -49,7 +49,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros,m
         </View>
 
         <View style={styles.row}>
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, { flex: 1.5 }]}>
                 <Text style={styles.label}>Bairro</Text>
                 <TextInput
                     style={styles.input}
@@ -60,7 +60,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros,m
                 />
                 {erros?.bairro ? <Text style={styles.erro}>{erros.bairro}</Text> : null}
             </View>
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, { flex: 1.5 }]}>
                 <Text style={styles.label}>Cidade</Text>
                 <TextInput
                     style={styles.input}
@@ -71,17 +71,24 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros,m
                 />
                 {erros?.cidade ? <Text style={styles.erro}>{erros.cidade}</Text> : null}
             </View>
+        </View>
 
-            <View style={styles.inputContainer}>
-                        <Text style={styles.label}>CEP</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholderTextColor="#ccc"
-                            placeholder={inputEndereco.cep ? inputEndereco.cep : "ex. 12345-678"}
-                            onChangeText={(value) => atualizando({cep: value})}
-                            maxLength={maxLengthCEP}
-                        />
-                    </View>
+        <View style={styles.row}>
+            <View style={[styles.inputContainer, { flex: 1 }]}>
+                <Text style={styles.label}>CEP</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholderTextColor="#ccc"
+                    placeholder="ex. 12345-678"
+                    value={inputEndereco.cep}
+                    keyboardType="numeric"
+                    maxLength={9}
+                    onChangeText={(value) => {
+                        const d = value.replace(/\D/g, '').slice(0, 8);
+                        atualizando({ cep: d.length > 5 ? `${d.slice(0,5)}-${d.slice(5)}` : d });
+                    }}
+                />
+            </View>
         </View>
 
         
