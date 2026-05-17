@@ -20,6 +20,7 @@ import InputEndereco, { Endereco } from "../../../components/InputEndereco";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
 
+import { avatares } from "@/src/components/auth/escolhaavantar";
 
 // Informacoes firebase
 import { auth, db } from "@/src/services/firebaseConfig";
@@ -152,6 +153,7 @@ export default function EditarConta() {
         bairro: inputEndereco.bairro,
         cidade: inputEndereco.cidade,
         cep: inputEndereco.cep,
+        avatar: avatarEscolhido
       });
 
       // ── Atualiza email no Auth ──
@@ -192,7 +194,7 @@ export default function EditarConta() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}> 
        <HeaderBack />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -329,7 +331,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     resizeMode: "contain",
-     marginTop: 8, 
+     marginTop: 0, 
   },
 
   main: {

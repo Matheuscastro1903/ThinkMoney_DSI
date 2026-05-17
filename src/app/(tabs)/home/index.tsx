@@ -1,15 +1,16 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal, ActivityIndicator } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
+import InputRenda from '@/src/components/auth/inputrenda';
 
 
 // Informacoes firebase
 import { auth, db } from '@/src/services/firebaseConfig';
 import { buscarGastos, Gasto } from '@/src/services/gastosService';
 import { metasService } from '@/src/services/metasService';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const icones: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
     alimentacao: "basket",
@@ -47,6 +48,10 @@ export default function Home() {
     const router = useRouter();
     const [isBalanceVisible, setIsBalanceVisible] = useState(true);
 
+    const [modalVisible, setModalVisible] = useState(false);
+    const [novaRenda, setNovaRenda] = useState("");
+    const [salvandoRenda, setSalvandoRenda] = useState(false);
+
     const [usuario, setUsuario] = useState<any>(null);
     const [entradasHoje, setEntradasHoje] = useState<number>(0);
     const [gastos, setGastos] = useState<(Gasto & { id: string })[]>([]);
@@ -54,7 +59,7 @@ export default function Home() {
 
     useEffect(() => {
         async function carregarDados() {
-            const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+            const uid = auth.currentUser?.uid; 
 
             if (!uid) return;
 
@@ -85,6 +90,10 @@ export default function Home() {
 
         carregarDados();
     }, []);
+
+    useEffect(() => {
+        setNovaRenda(usuario?.renda ?? "");
+    }, [usuario]);
 
     const dataAtual = new Date();
     const mesAtual = dataAtual.getMonth();
@@ -133,47 +142,72 @@ export default function Home() {
                         <Feather name="arrow-up-right" size={16} color="#34D399" />
                         <Text style={styles.saldoTrend}>R$ {entradasHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} entraram hoje</Text>
                     </View>
+                    <TouchableOpacity style={styles.botaoAtualizarRenda} onPress={() => setModalVisible(true)}>
+                        <View style={styles.itensBotaoAtualizar}>
+                            <Ionicons name="refresh" size={20} color="#FFFFFF" />
+                            <Text style={{fontWeight: "bold", fontSize: 12, color: "white", textAlign: "center", marginTop: 4}}>Atualizar Renda Disponível</Text>
+                        </View>
+                        
+                    </TouchableOpacity>
+                    <Modal
+                        visible={modalVisible}
+                        animationType="slide"
+                        transparent
+                        onRequestClose={() => setModalVisible(false)}
+                    >
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Atualizar Renda</Text>
+                                <Text style={styles.modalSubtitle}>Digite o novo valor da sua renda média</Text>
+                                <View style={{ width: '100%', marginTop: 12 }}>
+                                    
+                                    <View style={{ marginBottom: 8 }}>
+                                        <Text style={{ fontWeight: 'bold', marginBottom: 6 }}>Renda</Text>
+                                        <Text style={{ color: '#666', marginBottom: 6 }}>Formato: 1.234,56</Text>
+                                        <InputRenda
+                                            label=""
+                                            placeholder="Ex: 2.500,00"
+                                            atualizando={(v) => setNovaRenda(v)}
+                                            value={novaRenda}
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={styles.modalButtons}>
+                                    <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#ccc' }]} onPress={() => setModalVisible(false)}>
+                                        <Text style={styles.modalButtonText}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.modalButton, { backgroundColor: '#1D1252' }]}
+                                        onPress={async () => {
+                                            const uid = auth.currentUser?.uid;
+                                            if (!uid) {
+                                                Alert.alert('Erro', 'Usuário não autenticado.');
+                                                return;
+                                            }
+                                            try {
+                                                setSalvandoRenda(true);
+                                                await updateDoc(doc(db, 'usuarios', uid), { renda: novaRenda });
+                                                setUsuario((prev: any) => ({ ...(prev ?? {}), renda: novaRenda }));
+                                                Alert.alert('Sucesso', 'Renda atualizada!');
+                                                setModalVisible(false);
+                                            } catch (e) {
+                                                console.error(e);
+                                                Alert.alert('Erro', 'Não foi possível atualizar a renda. Tente novamente.');
+                                            } finally {
+                                                setSalvandoRenda(false);
+                                            }
+                                        }}
+                                    >
+                                        {salvandoRenda ? <ActivityIndicator color="white" /> : <Text style={[styles.modalButtonText, { color: 'white' }]}>Salvar</Text>}
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
                 <View style={styles.linhaDegraficos}>
-                    <View style={styles.stackedCard}>
-                        <View style={styles.stackedHeaderRow}>
-                            <Text style={styles.stackedTitle}>RESERVA DE EMERGÊNCIA</Text>
-                            <TouchableOpacity onPress={() => Alert.alert("Reserva de Emergência", "Este gráfico ilustra a jornada de crescimento da sua reserva. Fique de olho na porcentagem e mantenha a constância!")}>
-                                <Ionicons name="information-circle-outline" size={20} color="#94A3B8" />
-                            </TouchableOpacity>
-                        </View>
-
-                        {reserva ? (
-                            <>
-                                <View style={styles.stackedValueRow}>
-                                    <Text style={styles.stackedValue}>{reservaPerc.toFixed(1)}%</Text>
-                                </View>
-
-                                <View style={styles.barChartContainer}>
-                                    <View style={[styles.bar, { height: '30%', backgroundColor: 'rgba(139, 92, 246, 0.3)' }]} />
-                                    <View style={[styles.bar, { height: '50%', backgroundColor: 'rgba(139, 92, 246, 0.5)' }]} />
-                                    <View style={[styles.bar, { height: '25%', backgroundColor: 'rgba(139, 92, 246, 0.7)' }]} />
-                                    <View style={[styles.bar, { height: '80%', backgroundColor: 'rgba(139, 92, 246, 0.85)' }]} />
-                                    <View style={[styles.bar, { height: '100%', backgroundColor: 'rgba(139, 92, 246, 1.0)' }]} />
-                                </View>
-
-                                <Text style={styles.stackedFooterText}>Faltam <Text style={{ color: '#8B5CF6' }}>{Math.max(100 - reservaPerc, 0).toFixed(1)}%</Text> para atingir sua meta de proteção.</Text>
-                            </>
-                        ) : (
-                            <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
-                                <Ionicons name="shield-checkmark-outline" size={48} color="#8B5CF6" />
-                                <Text style={{ color: '#94A3B8', textAlign: 'center', marginTop: 10, fontSize: 13, paddingHorizontal: 10 }}>
-                                    Proteja seu futuro contra imprevistos.
-                                </Text>
-                                <TouchableOpacity
-                                    style={{ backgroundColor: '#8B5CF6', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, marginTop: 20, width: '100%' }}
-                                    onPress={() => router.push('/metas/addmeta')}
-                                >
-                                    <Text style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Criar Reserva</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
+                    
 
                     <View style={styles.stackedCard}>
                         <View style={styles.stackedHeaderRow}>
@@ -221,7 +255,7 @@ export default function Home() {
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
-                    <Link href="/metas" asChild>
+                    <Link href="/(details)/detailshome/metas" asChild>
                         <TouchableOpacity style={styles.metasPessoais}>
                             <Ionicons name="rocket-outline" size={18} color="#1D1252" />
                             <Text style={styles.text6}>Metas</Text>
@@ -255,6 +289,7 @@ export default function Home() {
                     ))
                 )}
             </ScrollView>
+                
         </View>
     );
 }
@@ -528,5 +563,59 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    botaoAtualizarRenda:{
+        backgroundColor: "#1D1252",
+        borderRadius: 20,
+        padding: 6,
+        marginTop: 12
+    }
+
+    ,modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalContent: {
+        width: '100%',
+        maxWidth: 480,
+        backgroundColor: 'white',
+        borderRadius: 12,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1D1252'
+    },
+    modalSubtitle: {
+        fontSize: 13,
+        color: '#6B7280',
+        marginTop: 6,
+        textAlign: 'center'
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'space-between',
+        marginTop: 12,
+        gap: 8,
+    },
+    modalButton: {
+        flex: 1,
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        fontWeight: 'bold'
+    },
+    itensBotaoAtualizar: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 8
+    }
 
 })

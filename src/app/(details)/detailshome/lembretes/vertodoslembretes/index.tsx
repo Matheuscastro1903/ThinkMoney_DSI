@@ -4,15 +4,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { auth } from "@/src/services/firebaseConfig";
 import { LembretesService } from "@/src/services/lembretesService";
@@ -23,7 +23,7 @@ type Lembrete = {
   categoria: string;
   vencimento: string;
   valor: number;
-  status: 'PENDENTE' | 'PAGO';
+  status: "PENDENTE" | "PAGO";
 };
 
 export default function VerTodosLembretes() {
@@ -42,7 +42,7 @@ export default function VerTodosLembretes() {
         setLembretes(dados as Lembrete[]);
         setCarregando(false);
       });
-    }, [])
+    }, []),
   );
 
   const lembretesFiltrados = lembretes.filter((item) => {
@@ -50,25 +50,54 @@ export default function VerTodosLembretes() {
       filtro === "Todos" ||
       (filtro === "Pendentes" && item.status === "PENDENTE") ||
       (filtro === "Pagos" && item.status === "PAGO");
-    const bateBusca = item.nomeGasto.toLowerCase().includes(busca.toLowerCase());
+    const bateBusca = item.nomeGasto
+      .toLowerCase()
+      .includes(busca.toLowerCase());
     return bateFiltro && bateBusca;
   });
 
   const handleEditar = (item: Lembrete) => {
     router.push({
       pathname: "/detailshome/lembretes/attlembrete/page" as any,
-      params: { id: item.id, titulo: item.nomeGasto, categoria: item.categoria, valor: item.valor.toString() },
+      params: {
+        id: item.id,
+        titulo: item.nomeGasto,
+        categoria: item.categoria,
+        valor: item.valor.toString(),
+      },
     });
   };
 
+  async function handleAlterarStatus(item: Lembrete) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const novoStatus = item.status === "PAGO" ? "PENDENTE" : "PAGO";
+    await new LembretesService(user.uid).atualizar(item.id, {
+      status: novoStatus,
+    });
+
+    setLembretes((prev) =>
+      prev.map((l) => (l.id === item.id ? { ...l, status: novoStatus } : l)),
+    );
+  }
+
   return (
     <LayoutNavBar>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
         <HeaderBack />
-        <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.main}>
             <Text style={styles.text1}>Todos os Lembretes</Text>
-            <Text style={styles.text2}>Gerencie suas obrigações financeiras mensais.</Text>
+            <Text style={styles.text2}>
+              Gerencie suas obrigações financeiras mensais.
+            </Text>
           </View>
 
           <View style={styles.buscaContainer}>
@@ -86,36 +115,82 @@ export default function VerTodosLembretes() {
             {["Todos", "Pendentes", "Pagos"].map((opcao) => (
               <TouchableOpacity
                 key={opcao}
-                style={filtro === opcao ? styles.filtroAtivo : styles.filtroInativo}
+                style={
+                  filtro === opcao ? styles.filtroAtivo : styles.filtroInativo
+                }
                 onPress={() => setFiltro(opcao)}
               >
-                <Text style={filtro === opcao ? styles.textoFiltroAtivo : styles.textoFiltroInativo}>{opcao}</Text>
+                <Text
+                  style={
+                    filtro === opcao
+                      ? styles.textoFiltroAtivo
+                      : styles.textoFiltroInativo
+                  }
+                >
+                  {opcao}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           {carregando ? (
             <ActivityIndicator color="#FFFFFF" style={{ marginTop: 40 }} />
-          ) : lembretesFiltrados.map((item) => (
-            <View key={item.id} style={styles.containerLembretes}>
-              <View style={styles.lembreteIcone}>
-                <Ionicons name="notifications-outline" size={20} color="#1D1252" />
-              </View>
-              <View style={styles.lembreteInfo}>
-                <Text style={styles.lembreteTitulo}>{item.nomeGasto}</Text>
-                <Text style={styles.lembreteSubtitulo}>{item.categoria} • VENCE {item.vencimento}</Text>
-              </View>
-              <View style={styles.lembreteDireita}>
-                <Text style={styles.lembreteMoeda}>R$ <Text style={styles.lembreteValor}>{item.valor.toFixed(2).replace('.', ',')}</Text></Text>
-                <View style={item.status === 'PAGO' ? styles.badgePago : styles.badgePendente}>
-                  <Text style={item.status === 'PAGO' ? styles.badgeTextPago : styles.badgeTextPendente}>{item.status}</Text>
+          ) : (
+            lembretesFiltrados.map((item) => (
+              <View key={item.id} style={styles.containerLembretes}>
+                <View style={styles.lembreteIcone}>
+                  <Ionicons
+                    name="notifications-outline"
+                    size={20}
+                    color="#1D1252"
+                  />
                 </View>
+                <View style={styles.lembreteInfo}>
+                  <Text style={styles.lembreteTitulo}>{item.nomeGasto}</Text>
+                  <Text style={styles.lembreteSubtitulo}>
+                    {item.categoria} • VENCE {item.vencimento}
+                  </Text>
+                </View>
+                <View style={styles.lembreteDireita}>
+                  <Text style={styles.lembreteMoeda}>
+                    R${" "}
+                    <Text style={styles.lembreteValor}>
+                      {item.valor.toFixed(2).replace(".", ",")}
+                    </Text>
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => handleAlterarStatus(item)}
+                    style={
+                      item.status === "PAGO"
+                        ? styles.badgePago
+                        : styles.badgePendente
+                    }
+                  >
+                    <Text
+                      style={
+                        item.status === "PAGO"
+                          ? styles.badgeTextPago
+                          : styles.badgeTextPendente
+                      }
+                    >
+                      {item.status}
+                    </Text>
+                    <Ionicons
+                      name="refresh-outline"
+                      size={10}
+                      color={item.status === "PAGO" ? "#ffffff" : "#ffff"}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => handleEditar(item)}
+                >
+                  <Ionicons name="pencil-outline" size={16} color="#94A3B8" />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.editButton} onPress={() => handleEditar(item)}>
-                <Ionicons name="pencil-outline" size={16} color="#94A3B8" />
-              </TouchableOpacity>
-            </View>
-          ))}
+            ))
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </LayoutNavBar>
@@ -125,29 +200,128 @@ export default function VerTodosLembretes() {
 const styles = StyleSheet.create({
   main: { flexDirection: "column", paddingLeft: 20, marginTop: 15 },
   text1: { color: "#FFFFFF", fontSize: 35, fontWeight: "bold" },
-  text2: { color: "#A8A7D5", fontSize: 14, textAlign: "left", paddingTop: 5, paddingLeft: 5, height: 52, width: 290, letterSpacing: 0.6 },
-  buscaContainer: { width: "90%", height: 50, backgroundColor: "#FFFFFF", borderRadius: 25, paddingHorizontal: 20, alignItems: "center", alignSelf: "center", marginTop: 20, flexDirection: "row" },
-  inputDeBusca: { flex: 1, height: "100%", fontSize: 16, color: "#000000", marginLeft: 10 },
-  filtrosContainer: { alignSelf: "center", flexDirection: "row", justifyContent: "center", gap: 12, marginTop: 24, marginBottom: 12 },
-  filtroAtivo: { backgroundColor: "#000000", paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20 },
+  text2: {
+    color: "#A8A7D5",
+    fontSize: 14,
+    textAlign: "left",
+    paddingTop: 5,
+    paddingLeft: 5,
+    height: 52,
+    width: 290,
+    letterSpacing: 0.6,
+  },
+  buscaContainer: {
+    width: "90%",
+    height: 50,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 20,
+    flexDirection: "row",
+  },
+  inputDeBusca: {
+    flex: 1,
+    height: "100%",
+    fontSize: 16,
+    color: "#000000",
+    marginLeft: 10,
+  },
+  filtrosContainer: {
+    alignSelf: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  filtroAtivo: {
+    backgroundColor: "#000000",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
   textoFiltroAtivo: { color: "#FFFFFF", fontWeight: "bold", fontSize: 13 },
-  filtroInativo: { backgroundColor: "#F3F4F6", paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20 },
+  filtroInativo: {
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
   textoFiltroInativo: { color: "#6B7280", fontWeight: "bold", fontSize: 13 },
   containerLembretes: {
-    height: 72, width: "90%", backgroundColor: "#FFFFFF", borderRadius: 8, alignSelf: "center",
-    alignItems: "center", marginTop: 8, flexDirection: "row", justifyContent: "space-between",
-    marginBottom: 8, paddingHorizontal: 16, gap: 12,
+    width: "90%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    alignSelf: "center",
+    alignItems: "center",
+    marginTop: 8,
+    flexDirection: "row",
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
   },
-  lembreteIcone: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#F1F5F9", justifyContent: "center", alignItems: "center" },
-  lembreteInfo: { flex: 1, marginLeft: 12 },
-  lembreteTitulo: { fontSize: 16, color: "#1D1252", fontWeight: "bold" },
+  lembreteIcone: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  lembreteInfo: { flex: 1, marginLeft: 4, minWidth: 0 },
+  lembreteTitulo: { fontSize: 14, color: "#1D1252", fontWeight: "bold" },
   lembreteSubtitulo: { fontSize: 10, color: "#94A3B8", marginTop: 4 },
-  lembreteDireita: { alignItems: "flex-end" },
+  lembreteDireita: { alignItems: "flex-end", flexShrink: 0, minWidth: 90 },
   lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "bold" },
   lembreteValor: { fontSize: 18 },
-  badgePendente: { backgroundColor: "#FEE2E2", paddingVertical: 3, paddingHorizontal: 8, borderRadius: 12, marginTop: 5 },
-  badgeTextPendente: { color: "#B91C1C", fontSize: 9, fontWeight: "bold" },
-  badgePago: { backgroundColor: "#E2E8F0", paddingVertical: 3, paddingHorizontal: 8, borderRadius: 12, marginTop: 5 },
-  badgeTextPago: { color: "#475569", fontSize: 9, fontWeight: "bold" },
-  editButton: { width: 32, height: 32, borderRadius: 8, backgroundColor: "#F1F5F9", justifyContent: "center", alignItems: "center", marginLeft: 8 },
+  badgePendente: {
+    backgroundColor: "#c03333",
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    marginTop: 10,
+    width: 80,           
+    alignItems: "center"
+  },
+  badgeTextPendente: { color: "#000000", fontSize: 9, fontWeight: "bold" },
+  badgePago: {
+    backgroundColor: "#67cb4c",
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    marginTop: 10,
+    color: "white",
+    width: 80,           
+    alignItems: "center"
+  },
+  badgeTextPago: { color: "#000000", fontSize: 9, fontWeight: "bold" },
+  editButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  statusButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginLeft: 6,
+  },
+  statusPendente: {
+    backgroundColor: "#DCFCE7",
+  },
+  statusPago: {
+    backgroundColor: "#eafee2",
+  },
+  statusButtonText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#1D1252",
+  },
 });

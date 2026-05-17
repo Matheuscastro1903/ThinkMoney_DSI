@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
 import { useEffect, useState } from "react"
 
+
 // Informacoes firebase
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/src/services/firebaseConfig';
@@ -39,8 +40,8 @@ export default function App() {
       }, []);
   
 
-
-
+  const avatarKey = (usuario?.avatar || 1) as keyof typeof avatares;
+  const data = usuario?.datanascimento?.toDate?.(); // garantir que não haja erro de TimeStamp pelo firestore
   return (
     <SafeAreaView style={styles.container}>
       <HeaderBack />
@@ -48,7 +49,7 @@ export default function App() {
         <View style={styles.safeArea}>
           <View style={styles.container2}>
             <Image
-              source={avatares[usuario?.avatar || 1]} 
+              source={avatares[avatarKey]} 
               style={styles.avatar}
             />
             <Text style={styles.name}>{usuario?.nome}</Text>
@@ -60,7 +61,7 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="at-circle" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Username</Text>
+                <Text style={styles.rowLabel}>Nome de Usuário</Text>
               </View>
               <Text style={styles.rowValue}>{usuario?.username}</Text>
             </View>
@@ -68,15 +69,15 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="calendar-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Birth Date</Text>
+                <Text style={styles.rowLabel}>Data de Nascimento</Text>
               </View>
-              <Text style={styles.rowValue}>{usuario?.datanascimento}</Text>
+              <Text style={styles.rowValue}>{data ? data.toLocaleDateString("pt-br") : ""}</Text>
             </View>
 
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="briefcase-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Profile</Text>
+                <Text style={styles.rowLabel}>Profissão</Text>
               </View>
               <Text style={styles.rowValue}>{usuario?.profissao}</Text>
             </View>
@@ -117,7 +118,9 @@ export default function App() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("./config/confirmar-exclusao")}
+          >
             <View style={styles.container5}>
               <Ionicons
                 name="trash-outline"
