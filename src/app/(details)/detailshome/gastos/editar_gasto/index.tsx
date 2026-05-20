@@ -25,6 +25,7 @@ import {
   atualizarGasto,
   excluirGasto,
 } from "../../../../../services/gastosService";
+import { geocodificarEndereco } from "../../../../../services/geocodingService";
 import { auth } from "../../../../../services/firebaseConfig";
 
 interface GastoCompleto {
@@ -175,6 +176,22 @@ class EditarGasto extends Component<Props, State> {
     try {
       this.setState({ salvando: true });
 
+      const enderecoMudou =
+        inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
+        inputEndereco.numero !== (g.endereco?.numero ?? "") ||
+        inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
+        inputEndereco.cep !== (g.endereco?.cep ?? "");
+
+      const coordenadas = enderecoMudou
+        ? await geocodificarEndereco(
+            inputEndereco.logradouro,
+            inputEndereco.numero,
+            inputEndereco.bairro,
+            inputEndereco.cidade,
+            inputEndereco.cep,
+          )
+        : null;
+
       await atualizarGasto(user.uid, g.id, {
         valor: valorNumerico,
         data: inputData,
@@ -184,6 +201,8 @@ class EditarGasto extends Component<Props, State> {
         endereco: {
           titulo: tituloEndereco,
           ...inputEndereco,
+          latitude: coordenadas?.latitude ?? (g.endereco as any)?.latitude,
+          longitude: coordenadas?.longitude ?? (g.endereco as any)?.longitude,
         },
       });
 
