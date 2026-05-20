@@ -16,6 +16,7 @@ import InputDate from "@/src/components/auth/inputdata";
 import InputFixo from "@/src/components/details/gastos/inputfixo/page";
 
 import { criarGasto } from "../../../../../services/gastosService";
+import { geocodificarEndereco } from "../../../../../services/geocodingService";
 import { auth } from "../../../../../services/firebaseConfig";
 
 interface State {
@@ -106,6 +107,14 @@ export class Criar extends Component<{ router?: any }, State> {
     try {
       this.setState({ salvando: true });
 
+      const coordenadas = await geocodificarEndereco(
+        inputEndereco.logradouro,
+        inputEndereco.numero,
+        inputEndereco.bairro,
+        inputEndereco.cidade,
+        inputEndereco.cep,
+      );
+
       await criarGasto(user.uid, {
         valor: valorNumerico,
         data: inputData,
@@ -115,6 +124,7 @@ export class Criar extends Component<{ router?: any }, State> {
         endereco: {
           titulo: tituloEndereco,
           ...inputEndereco,
+          ...(coordenadas ?? {}),
         },
       });
       

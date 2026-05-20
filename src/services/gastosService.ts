@@ -19,6 +19,8 @@ export interface EnderecoGasto {
   bairro: string;
   cidade: string;
   cep: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Gasto {
