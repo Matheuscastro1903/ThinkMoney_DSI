@@ -16,6 +16,7 @@ import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import InputSenha from "@/src/components/auth/inputsenha";
 import { loginUsuario, buscarDadosUsuario } from "@/src/services/authService";
 import { Link, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import InputLogin from "../../../components/auth/inputlogin";
 
 
@@ -70,6 +71,13 @@ export default function Login() {
       // ✅ Busca os dados do usuário no Firestore
       const dadosUsuario = await buscarDadosUsuario(user.uid);
       console.log("Renda do usuário:", dadosUsuario?.renda);
+
+      // Salva a preferência de manter conectado
+      if (manterConectado) {
+        await AsyncStorage.setItem("manter_logado", "true");
+      } else {
+        await AsyncStorage.setItem("manter_logado", "false");
+      }
 
       router.push("/(tabs)/home");
 

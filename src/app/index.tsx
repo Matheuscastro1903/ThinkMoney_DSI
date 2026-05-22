@@ -1,12 +1,39 @@
+import { useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../services/firebaseConfig";
 
 //importando biblioteca de icons
 import { Ionicons } from '@expo/vector-icons';
 
 
 export default function telaInical(){  
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            const manterLogado = await AsyncStorage.getItem("manter_logado");
+            
+            const unsubscribe = onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    if (manterLogado === "true") {
+                        // Se deseja manter logado, vai para a home automaticamente
+                        router.replace("/(tabs)/home");
+                    } else {
+                        // Se não deseja, desloga o usuário por segurança
+                        await signOut(auth);
+                    }
+                }
+            });
+
+            return unsubscribe;
+        };
+
+        checkLoginStatus();
+    }, []);
+
     return(
         <View style={styles.main}>
 
