@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
+import InputDate from "@/src/components/details/metas/inputdata";
 
 
 const CATEGORIAS = [
@@ -35,7 +36,7 @@ export default function EditMeta() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
-  const [data, setData] = useState("");
+  const [data, setData] = useState<Date | null>(null);;
   const [descricao, setDescricao] = useState("");
   const [valorAporte, setValorAporte] = useState("");
   const [valorPoupado, setValorPoupado] = useState(0);
@@ -58,7 +59,10 @@ export default function EditMeta() {
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
           setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
-          setData(meta.dataLimite);
+          //programaão segura,garantir que vai vir o dataLimite
+          if (meta.dataLimite) {
+            setData((meta.dataLimite as any).toDate());
+            }
           setValorPoupado(meta.valorPoupado);
           setValorTotalMeta(meta.valorTotal);
           if (meta.descricao) setDescricao(meta.descricao);
@@ -248,25 +252,14 @@ export default function EditMeta() {
                 />
               </View>
 
-              {/* Data de Realização */}
-              <Text style={styles.label}>DATA DE REALIZAÇÃO</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color="#BBBBBB"
-                  style={styles.inputIcon}
-                />
-                <MaskInput
-                  style={styles.inputText}
-                  placeholder="DD/MM/AAAA"
-                  placeholderTextColor="#BBBBBB"
-                  keyboardType="numeric"
-                  value={data}
-                  onChangeText={(masked) => setData(masked)}
-                  mask={[/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
-                />
-              </View>
+              
+
+              <InputDate
+                      label="Data de realização:"
+                      onChange={(dataNova)=>setData(dataNova)}
+                      valorInicial={data}              ></InputDate>
+                
+             
 
               {/* Descrição */}
               <Text style={styles.label}>DESCRIÇÃO (OPCIONAL)</Text>

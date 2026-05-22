@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MaskInput from "react-native-mask-input";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,10 +8,24 @@ interface InputDateProps {
   icon?: any;                         
   iconComponent?: React.ReactNode;    
   onChange?: (data: Date) => void;
+  valorInicial?: Date | null //só será usado na parte de atualizar meta
 }
 
-export default function InputDate({ label, icon, iconComponent, onChange }: InputDateProps) {
-  const [textoExibido, setTextoExibido] = useState("");
+export default function InputDate({ label, icon, iconComponent, onChange,valorInicial }: InputDateProps) {
+  //caso o valor inciial não exista,irá retornar null
+  const [textoExibido, setTextoExibido] = useState(formatarData(valorInicial));
+  //apenas formatando a data que está no firebase para mostrar na tela
+  function formatarData(data?: Date | null) {
+  if (!data) return "";
+  
+  const dia = String(data.getDate()).padStart(2, "0");
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const ano = data.getFullYear();
+  
+  return `${dia}/${mes}/${ano}`;
+}
+
+
 
   function aoDigitar(masked: string, unmasked: string) {
     setTextoExibido(masked);
@@ -31,12 +45,19 @@ export default function InputDate({ label, icon, iconComponent, onChange }: Inpu
     }
   }
 
+
+  useEffect(() => {
+    if (valorInicial) {
+      setTextoExibido(formatarData(valorInicial));
+    }
+  }, [valorInicial]);
+
   return (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.input}>
 
-        {/* ✅ Prioriza iconComponent, depois icon antigo, depois ícone padrão */}
+        
         {iconComponent
           ? iconComponent
           : <Ionicons name="calendar-outline" size={20} color="#888" />
@@ -85,3 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
+
+
