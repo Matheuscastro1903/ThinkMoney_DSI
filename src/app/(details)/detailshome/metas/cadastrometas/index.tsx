@@ -12,6 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import * as ImagePicker from 'expo-image-picker';
+import InputImagem from "@/src/components/details/metas/inputimagem";
+import * as Crypto from 'expo-crypto';
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 
 import HeaderBack from "@/src/components/headerBack";
@@ -19,6 +23,12 @@ import { useRouter } from "expo-router";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
 import InputDate from "@/src/components/details/metas/inputdata";
+
+import { pegarFotoDaGaleria } from "@/src/scripts/getImage";
+import { tirarFotoCamera } from "@/src/scripts/getImage";
+
+import { prepararImagemParaUpload } from "@/src/scripts/prepararImagemUpload";
+import { StorageService } from "@/src/services/storageService";
 
 const CATEGORIAS = [
   { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -35,6 +45,35 @@ export default function AddMeta() {
   const [data, setData] = useState<Date | null>(null);
   const [descricao, setDescricao] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  
+  const [uriImagem,setUriImagem]=useState<string | null>(null);
+
+
+  async function choosePhoto(){
+    const fotoEscolhida= await pegarFotoDaGaleria()
+    setUriImagem(fotoEscolhida)
+    
+
+  }
+
+  async function takePhoto(){
+    const fotoEscolhida= await tirarFotoCamera()
+    setUriImagem(fotoEscolhida)
+    
+  }
+  
+  function abrirMenuDeOpcoes(){
+    Alert.alert(
+      "Adicionar Foto",
+      "Escolha a origem da imagem:",
+      [
+        { text: "Abrir Galeria", onPress: choosePhoto },
+        { text: "Tirar Foto", onPress: takePhoto },
+        { text: "Cancelar", style: "cancel" } // O botão de cancelar fecha o menu sozinho
+      ]
+    );
+  };
 
   const handleSalvarMeta = async () => {
     if (!categoriaSelecionada || !nomeMeta || !capital || !data) {
@@ -56,23 +95,52 @@ export default function AddMeta() {
     }
 
     setIsLoading(true);
-
+    
     try {
+      let idImagemGerado: string | null = null;
+      if (uriImagem) {
+        idImagemGerado = Crypto.randomUUID();
+        
+        //convertendo imagem para formato para ser lido no uri
+        const preparo = await prepararImagemParaUpload(uriImagem);
+        
+        if (!preparo.sucesso || !preparo.arquivoConvertido) {
+          Alert.alert("Erro", "Não foi possível processar a imagem da galeria.");
+          setIsLoading(false);
+          return;
+        }
+
+        //função de salvar no Supabase
+        const upload = await StorageService(idImagemGerado, preparo.arquivoConvertido);
+
+        //tratando caso de erro na requisição de upload
+        if (!upload.sucesso) {
+          console.log("DETALHES DO ERRO SUPABASE:", JSON.stringify(upload.erro, null, 2));
+          Alert.alert("Erro", "Não foi possível enviar a foto para a nuvem.");
+          setIsLoading(false);
+          return; 
+        }
+      }
+
+      //salva na firebase
       await metasService.criar(userId, {
         nomeMeta,
         categoria: categoriaSelecionada,
         valorTotal: valorFormatado,
         dataLimite: data,
         descricao,
+        id_imagem: idImagemGerado //se não tiver foto será retornado null
       });
+
       Alert.alert("Sucesso", "Sua meta foi criada!");
       router.back();
+
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao salvar sua meta.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
 
@@ -137,6 +205,11 @@ export default function AddMeta() {
                 );
               })}
             </View>
+
+            <InputImagem
+            onPress={abrirMenuDeOpcoes}
+            imagemUri={uriImagem}
+            ></InputImagem>
 
             {/* Nome da Meta */}
             <Text style={styles.label}>NOME DA META</Text>

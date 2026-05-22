@@ -8,6 +8,7 @@ export interface Meta {
   dataLimite: Date
   categoria: string
   descricao?: string
+  id_imagem?: string | null
 }
 
 class MetasService {

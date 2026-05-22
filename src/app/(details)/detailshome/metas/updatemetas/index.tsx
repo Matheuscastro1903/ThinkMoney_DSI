@@ -170,7 +170,7 @@ export default function EditMeta() {
         style={{ flex: 1 }}
       >
         {/* Header */}
-        <HeaderBack />
+        <HeaderBack/>
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
