@@ -8,11 +8,17 @@ export async function deletarImagemSupabase(idImagem: string): Promise<void> {
   try {
     if (!idImagem) return;
 
-    //remoção no bucket
-    await supabase.storage.from('metas_fotos').remove([idImagem]);
+    
+    const nomeArquivoComExtensao = `${idImagem}.jpg`;
+
+    
+    await supabase.storage
+      .from('metas_fotos')
+      .remove([nomeArquivoComExtensao]);
+      
+    console.log(`[Sucesso Técnico] Imagem ${nomeArquivoComExtensao} deletada do Storage.`);
     
   } catch (error) {
-    
     console.warn(`[Aviso Técnico] Não foi possível deletar a imagem antiga ${idImagem}:`, error);
   }
 }
