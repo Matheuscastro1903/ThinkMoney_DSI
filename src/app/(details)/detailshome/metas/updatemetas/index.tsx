@@ -18,7 +18,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
-
+import InputDate from "@/src/components/details/metas/inputdata";
+import { buscarUrlDaImagem } from "@/src/services/searchStorage";
+import InputImagem from "@/src/components/details/metas/inputimagem";
+import { pegarFotoDaGaleria} from "@/src/scripts/getImage";
+import { tirarFotoCamera } from "@/src/scripts/getImage";
+import * as Crypto from 'expo-crypto';
+import { prepararImagemParaUpload } from "@/src/scripts/prepararImagemUpload";
+import { atualizarImagemSupabase } from "@/src/services/atualizarStorage";
+import { deletarImagemSupabase } from "@/src/services/deletarStorage";
 
 const CATEGORIAS = [
   { key: "viagem", label: "Viagem", icon: "airplane" },
@@ -35,7 +43,7 @@ export default function EditMeta() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
-  const [data, setData] = useState("");
+  const [data, setData] = useState<Date | null>(null);
   const [descricao, setDescricao] = useState("");
   const [valorAporte, setValorAporte] = useState("");
   const [valorPoupado, setValorPoupado] = useState(0);
@@ -43,6 +51,10 @@ export default function EditMeta() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAporteLoading, setIsAporteLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+
+  const [idImagemAntiga, setIdImagemAntiga] = useState<string | null>(null);
+  const [imagemUrl, setImagemUrl] = useState<string | null>(null);
+  const [uriImagem, setUriImagem] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadMeta() {
@@ -58,10 +70,21 @@ export default function EditMeta() {
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
           setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
-          setData(meta.dataLimite);
+          
+          if (meta.dataLimite) {
+            setData((meta.dataLimite as any).toDate());
+          }
+          
           setValorPoupado(meta.valorPoupado);
           setValorTotalMeta(meta.valorTotal);
           if (meta.descricao) setDescricao(meta.descricao);
+          
+          if (meta.id_imagem) {
+            const url = await buscarUrlDaImagem(meta.id_imagem);
+            console.log("URL GERADA PELO SUPABASE:", url)
+            setIdImagemAntiga(meta.id_imagem);
+            setImagemUrl(url);
+          }
         } else {
           Alert.alert("Erro", "Meta não encontrada.");
           router.back();
@@ -75,6 +98,28 @@ export default function EditMeta() {
     loadMeta();
   }, [id]);
 
+  async function choosePhoto() {
+    const fotoEscolhida = await pegarFotoDaGaleria();
+    setUriImagem(fotoEscolhida);
+  }
+
+  async function takePhoto() {
+    const fotoEscolhida = await tirarFotoCamera();
+    setUriImagem(fotoEscolhida);
+  }
+
+  function abrirMenuDeOpcoes() {
+    Alert.alert(
+      "Adicionar Foto",
+      "Escolha a origem da imagem:",
+      [
+        { text: "Abrir Galeria", onPress: choosePhoto },
+        { text: "Tirar Foto", onPress: takePhoto },
+        { text: "Cancelar", style: "cancel" }
+      ]
+    );
+  }
+
   const handleSalvar = async () => {
     if (!categoriaSelecionada || !nomeMeta || !capital || !data) {
       Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios.");
@@ -85,36 +130,65 @@ export default function EditMeta() {
     if (!userId) return;
 
     const valorFormatado = parseFloat(capital.replace(/\./g, "").replace(",", "."));
-    
+
     if (isNaN(valorFormatado) || valorFormatado <= 0) {
       Alert.alert("Atenção", "Insira um valor numérico válido (ex: 1500,00).");
       return;
     }
 
     setIsLoading(true);
-
     try {
+      let idImagemGerado: string | null = null;
+
+      if (uriImagem) {
+        idImagemGerado = Crypto.randomUUID();
+
+        const preparo = await prepararImagemParaUpload(uriImagem);
+
+        if (!preparo.sucesso || !preparo.arquivoConvertido) {
+          Alert.alert("Erro", "Não foi possível processar a imagem da galeria.");
+          setIsLoading(false);
+          return;
+        }
+
+        const upload = await atualizarImagemSupabase(idImagemGerado, preparo.arquivoConvertido);
+
+        if (!upload.sucesso) {
+          Alert.alert("Erro", "Não foi possível enviar a foto para a nuvem.");
+          setIsLoading(false);
+          return;
+        }
+
+        if (idImagemAntiga) {
+          deletarImagemSupabase(idImagemAntiga);
+        }
+      }
+
       await metasService.atualizar(userId, id, {
         nomeMeta,
         categoria: categoriaSelecionada,
         valorTotal: valorFormatado,
         dataLimite: data,
         descricao,
+        id_imagem: idImagemGerado || idImagemAntiga,
       });
+
       Alert.alert("Sucesso", "Meta atualizada com sucesso!");
       router.back();
+
     } catch (error) {
+      console.error("Erro ao atualizar meta:", error);
       Alert.alert("Erro", "Ocorreu um erro ao atualizar a meta.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }; 
 
   const handleContribuir = async () => {
     if (!valorAporte) return;
 
     const valorFormatado = parseFloat(valorAporte.replace(/\./g, "").replace(",", "."));
-    
+
     if (isNaN(valorFormatado) || valorFormatado <= 0) {
       Alert.alert("Atenção", "Insira um valor numérico válido para o aporte.");
       return;
@@ -124,7 +198,6 @@ export default function EditMeta() {
     if (!userId) return;
 
     setIsAporteLoading(true);
-
     try {
       await metasService.contribuir(userId, id, valorFormatado);
       setValorPoupado((prev) => prev + valorFormatado);
@@ -162,6 +235,15 @@ export default function EditMeta() {
     );
   };
 
+  // Se estiver buscando os dados iniciais do Firebase, evita renderizar a árvore quebrada
+  if (isFetching) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#1D1252" />
+      </View>
+    );
+  }
+
   return (
     
     <SafeAreaView style={styles.safeArea}> 
@@ -170,7 +252,7 @@ export default function EditMeta() {
         style={{ flex: 1 }}
       >
         {/* Header */}
-        <HeaderBack />
+        <HeaderBack/>
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -222,6 +304,11 @@ export default function EditMeta() {
                 })}
               </View>
 
+              <InputImagem 
+              imagemUri={uriImagem || imagemUrl} 
+              onPress={abrirMenuDeOpcoes} 
+                />
+
               {/* Nome da Meta */}
               <Text style={styles.label}>NOME DA META</Text>
               <View style={styles.inputWrapper}>
@@ -248,25 +335,14 @@ export default function EditMeta() {
                 />
               </View>
 
-              {/* Data de Realização */}
-              <Text style={styles.label}>DATA DE REALIZAÇÃO</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color="#BBBBBB"
-                  style={styles.inputIcon}
-                />
-                <MaskInput
-                  style={styles.inputText}
-                  placeholder="DD/MM/AAAA"
-                  placeholderTextColor="#BBBBBB"
-                  keyboardType="numeric"
-                  value={data}
-                  onChangeText={(masked) => setData(masked)}
-                  mask={[/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
-                />
-              </View>
+              
+
+              <InputDate
+                      label="Data de realização:"
+                      onChange={(dataNova)=>setData(dataNova)}
+                      valorInicial={data}              ></InputDate>
+                
+             
 
               {/* Descrição */}
               <Text style={styles.label}>DESCRIÇÃO (OPCIONAL)</Text>

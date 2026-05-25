@@ -4,7 +4,7 @@ import { getAuth } from 'firebase/auth'
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYqMprbd-f-ygk901LuVyuvkkTLZe4FWI",
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: "thinkmoney-teste.firebaseapp.com",
   projectId: "thinkmoney-teste",
   storageBucket: "thinkmoney-teste.firebasestorage.app",

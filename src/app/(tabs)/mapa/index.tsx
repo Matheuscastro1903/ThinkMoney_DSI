@@ -1,70 +1,168 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { buscarGastos, atualizarGasto, Gasto } from "../../../services/gastosService";
+import { geocodificarEndereco } from "../../../services/geocodingService";
+import { auth } from "../../../services/firebaseConfig";
+
+type GastoComId = Gasto & { id: string };
+
+const REGIAO_PADRAO = {
+  latitude: -23.55052,
+  longitude: -46.633308,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
+};
+
+function formatarValor(valor: number) {
+  return valor.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function formatarData(data: any): string {
+  try {
+    const d = data?.toDate ? data.toDate() : new Date(data);
+    return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+}
 
 export default function Mapa() {
   const router = useRouter();
+  const mapRef = useRef<MapView>(null);
+  const [gastos, setGastos] = useState<GastoComId[]>([]);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      setCarregando(false);
+      return;
+    }
+
+    const uid = user.uid;
+
+    buscarGastos(uid)
+      .then(async (dados) => {
+        // Exibe a lista imediatamente enquanto geocodifica
+        setGastos(dados);
+        setCarregando(false);
+
+        // Geocodifica sequencialmente (1 req/s — limite do Nominatim)
+        const lista: GastoComId[] = [...dados];
+
+        for (let i = 0; i < lista.length; i++) {
+          const g = lista[i];
+
+          const jaTemCoords = g.endereco?.latitude != null && g.endereco?.longitude != null;
+          const semEndereco = !g.endereco?.logradouro || !g.endereco?.cidade;
+          if (jaTemCoords || semEndereco) continue;
+
+          // Respeita o rate limit do Nominatim (1 req/s)
+          if (i > 0) await new Promise((r) => setTimeout(r, 1100));
+
+          const coords = await geocodificarEndereco(
+            g.endereco!.logradouro,
+            g.endereco!.numero,
+            g.endereco!.bairro,
+            g.endereco!.cidade,
+            g.endereco!.cep,
+          );
+
+          if (!coords) continue;
+
+          const gastoAtualizado = { ...g, endereco: { ...g.endereco!, ...coords } };
+          lista[i] = gastoAtualizado;
+
+          // Atualiza os marcadores progressivamente
+          setGastos([...lista]);
+
+          // Persiste no Firebase para não geocodificar novamente
+          atualizarGasto(uid, g.id, { endereco: gastoAtualizado.endereco }).catch(console.error);
+        }
+
+        // Centraliza o mapa para englobar todos os pins
+        const comCoordenadas = lista.filter(
+          (g) => g.endereco?.latitude != null && g.endereco?.longitude != null,
+        );
+
+        if (comCoordenadas.length > 0) {
+          const lats = comCoordenadas.map((g) => g.endereco!.latitude!);
+          const lons = comCoordenadas.map((g) => g.endereco!.longitude!);
+          const padding = 0.02;
+
+          mapRef.current?.animateToRegion(
+            {
+              latitude: (Math.min(...lats) + Math.max(...lats)) / 2,
+              longitude: (Math.min(...lons) + Math.max(...lons)) / 2,
+              latitudeDelta: Math.max(Math.max(...lats) - Math.min(...lats) + padding, 0.04),
+              longitudeDelta: Math.max(Math.max(...lons) - Math.min(...lons) + padding, 0.02),
+            },
+            800,
+          );
+        }
+      })
+      .catch(console.error)
+      .finally(() => setCarregando(false));
+  }, []);
+
+  const gastosComCoordenadas = gastos.filter(
+    (g) => g.endereco?.latitude != null && g.endereco?.longitude != null,
+  );
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.title}>Mapa de gastos</Text>
 
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: -23.55052,
-            longitude: -46.633308,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        >
-          <Marker coordinate={{ latitude: -23.561, longitude: -46.655 }} />
-          <Marker coordinate={{ latitude: -23.557, longitude: -46.661 }} />
-          <Marker coordinate={{ latitude: -23.564, longitude: -46.648 }} />
-          <Marker coordinate={{ latitude: -23.558, longitude: -46.643 }} />
+        <MapView ref={mapRef} style={styles.map} initialRegion={REGIAO_PADRAO}>
+          {gastosComCoordenadas.map((g) => (
+            <Marker
+              key={g.id}
+              coordinate={{
+                latitude: g.endereco!.latitude!,
+                longitude: g.endereco!.longitude!,
+              }}
+              title={g.endereco?.titulo || g.descricao}
+              description={`${formatarValor(g.valor)} • ${g.categoria}`}
+            />
+          ))}
         </MapView>
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Registro de Transações</Text>
-
-          <TouchableOpacity onPress={() => router.push('/(details)/detailsmapa/visualizar-gastos')}>
+          <TouchableOpacity onPress={() => router.push("/(details)/detailsmapa/visualizar-gastos")}>
             <Text style={styles.seeAll}>Ver tudo</Text>
           </TouchableOpacity>
         </View>
 
-        <TransactionItem
-          name="Posto Ipiranga Premium"
-          info="São Paulo • 14:20"
-          amount="- R$ 342,50"
-          card="DÉBITO MASTER"
-          light
-        />
-        <TransactionItem
-          name="D.O.M Restaurante"
-          info="São Paulo • 21:05"
-          amount="- R$ 1.850,00"
-          card="CRÉDITO BLACK"
-        />
-        <TransactionItem
-          name="Uber Black Travel"
-          info="São Paulo • 10:15"
-          amount="- R$ 82,40"
-          card="CRÉDITO BLACK"
-        />
-        <TransactionItem
-          name="Pão de Açúcar Gourmet"
-          info="São Paulo • 18:45"
-          amount="- R$ 612,18"
-          card="DÉBITO MASTER"
-        />
+        {carregando ? (
+          <ActivityIndicator color="#fff" style={{ marginTop: 20 }} />
+        ) : gastos.length === 0 ? (
+          <Text style={styles.vazio}>Nenhum gasto registrado ainda.</Text>
+        ) : (
+          gastos.slice(0, 5).map((g, i) => (
+            <TransactionItem
+              key={g.id}
+              name={g.descricao}
+              info={`${g.endereco?.cidade || "—"} • ${formatarData(g.data)}`}
+              amount={`- ${formatarValor(g.valor)}`}
+              card={g.categoria}
+              light={i % 2 === 0}
+            />
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -86,9 +184,7 @@ function TransactionItem({ name, info, amount, card, light }: Props) {
         <Text style={styles.itemInfo}>{info}</Text>
       </View>
       <View style={styles.itemRight}>
-        <Text style={[styles.itemAmount, light && styles.textDark]}>
-          {amount}
-        </Text>
+        <Text style={[styles.itemAmount, light && styles.textDark]}>{amount}</Text>
         <Text style={styles.itemCard}>{card}</Text>
       </View>
     </View>
@@ -171,8 +267,15 @@ const styles = StyleSheet.create({
     color: "#64748B",
     marginTop: 2,
     letterSpacing: 0.5,
+    textTransform: "capitalize",
   },
   textDark: {
     color: "#000",
+  },
+  vazio: {
+    color: "#94A3B8",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 14,
   },
 });
