@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 
-import * as ImagePicker from 'expo-image-picker';
+
 import InputImagem from "@/src/components/details/metas/inputimagem";
 import * as Crypto from 'expo-crypto';
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
