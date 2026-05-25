@@ -1,11 +1,11 @@
-import { cadastrarUsuario, loginUsuario } from "./authService";
+import authService from "./authService";
 import { criarGasto } from './gastosService'
 import { criarMeta } from './metasService'
 import { criarLembrete } from './lembretesService'
 
 export async function testarFirebase() {
   try {
-    await cadastrarUsuario({
+    await authService.cadastrarUsuario({
       nome: "User teste",
       email: "teste123@gmail.com",
       senha: "123456",
@@ -15,7 +15,7 @@ export async function testarFirebase() {
     console.log("✅ Usuário cadastrado!");
 
     console.log('🔐 Fazendo login...')
-    const user = await loginUsuario({
+    const user = await authService.loginUsuario({
       email: 'teste123@gmail.com',
       senha: '123456'
     })

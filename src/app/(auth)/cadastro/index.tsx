@@ -1,4 +1,4 @@
-import { cadastrarUsuario } from "@/src/services/authService";
+import authService from "@/src/services/authService";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -28,24 +28,7 @@ import InputNumero from "@/src/components/auth/inputnumero";
 import InputBairro from "@/src/components/auth/inputbairro";
 import InputCidade from "@/src/components/auth/inputcidade";
 import InputCep from "@/src/components/auth/inputcep";
-import { Ionicons } from "@expo/vector-icons";
-
-interface CadastroUsuario {
-  nome: string;
-  email: string;
-  senha: string;
-  datanascimento: string;
-  username: string; // formato "YYYY-MM-DD"
-  renda: string;
-  telefone: string;
-  profissao: string;
-  logradouro: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  cep: string;
-  avatar: number;
-}
+import { UsuarioProps } from "@/src/types/usuario";
 
 export default function Cadastro() {
   const [avatarEscolhido, setAvatarEscolhido] = useState(1);
@@ -159,7 +142,7 @@ export default function Cadastro() {
 
     setIsLoading(true);
     try {
-      const dadosUsuario: CadastroUsuario = {
+      const dadosUsuario: UsuarioProps = {
         nome,
         email,
         senha,
@@ -175,7 +158,7 @@ export default function Cadastro() {
         cep: inputCep,
         avatar: avatarEscolhido
       };
-      await cadastrarUsuario(dadosUsuario);
+      await authService.cadastrarUsuario(dadosUsuario);
       router.replace("/(auth)/cadastro-sucesso");
     } catch (error: any) {
       // traduz os erros mais comuns do firebase
