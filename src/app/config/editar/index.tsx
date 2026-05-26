@@ -194,12 +194,14 @@ export default function EditarConta() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["bottom"]}> 
-       <HeaderBack />
+    <SafeAreaView style={styles.safeArea} > 
+      <HeaderBack />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
+        
+        
        
         <ScrollView
           contentContainerStyle={styles.fundo}
@@ -324,7 +326,10 @@ const styles = StyleSheet.create({
     width: "100%",
     gap: 0,
     paddingBottom: 40,
-    paddingTop: 0,
+    paddingTop:0,
+  
+    paddingHorizontal: 20,
+    
   },
 
   logo: {
