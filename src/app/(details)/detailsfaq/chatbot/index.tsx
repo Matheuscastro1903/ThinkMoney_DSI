@@ -1,5 +1,10 @@
+import ButtonSendMensage from "@/src/components/details/chatbot/buttonsendmensage/page";
+import { HeaderBot } from "@/src/components/details/chatbot/headerbot/page";
+import ChatMessage from "@/src/components/details/chatbot/message/page";
+import SuggestionButton from "@/src/components/details/chatbot/sugestionbutton/page";
 import HeaderBack from "@/src/components/headerBack";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { ControllerChatBot } from "@/src/hooks/ControllerChatbot";
+import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,12 +15,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HeaderBot } from "@/src/components/details/chatbot/headerbot/page";
-import { useState, useRef } from "react";
-import ButtonSendMensage from "@/src/components/details/chatbot/buttonsendmensage/page";
-import SuggestionButton from "@/src/components/details/chatbot/sugestionbutton/page";
-import { ControllerChatBot } from "@/src/hooks/ControllerChatbot";
-import ChatMessage from "@/src/components/details/chatbot/message/page";
 
 interface Mensagem {
   id: string;
@@ -75,7 +74,7 @@ export default function ChatBot() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom"]}>
+    <SafeAreaView style={styles.container} edges={["bottom", "top"]}>
       {/* 
         
         - behavior: 'padding' no iOS faz a tela "encolher" por baixo, 'height' no Android redimensiona a janela.
@@ -190,8 +189,8 @@ const styles = StyleSheet.create({
   },
   sugestao: {
     paddingVertical: 8,
-
     backgroundColor: "#FFFFFF", // Garante que as sugestões tenham fundo sólido ao subir
+    flexGrow: 0,
   },
   input: {
     flex: 1,
