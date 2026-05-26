@@ -15,7 +15,7 @@ import InputDateLembretes from "@/src/components/details/lembretes/inputDataLemb
 import ButtonDeletarLembretes from "@/src/components/details/lembretes/buttondell/page";
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
-import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
+import InputTexto from "@/src/components/details/lembretes/campoinput/page";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
 import { LembretesService } from "@/src/services/lembretesService";

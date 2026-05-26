@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
-import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
+import InputTexto from "@/src/components/details/lembretes/campoinput/page";
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
