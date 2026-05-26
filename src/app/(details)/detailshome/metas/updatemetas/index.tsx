@@ -35,6 +35,16 @@ const CATEGORIAS = [
   { key: "reserva", label: "Reserva", icon: "wallet" },
 ];
 
+const formatarMoeda = (valor: string) => {
+  const apenasNumeros = valor.replace(/\D/g, "");
+  if (apenasNumeros === "") return "";
+  const valorDecimal = parseFloat(apenasNumeros) / 100;
+  return valorDecimal.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 export default function EditMeta() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -334,7 +344,7 @@ export default function EditMeta() {
                   placeholderTextColor="#BBBBBB"
                   keyboardType="numeric"
                   value={capital}
-                  onChangeText={setCapital}
+                  onChangeText={(texto) => setCapital(formatarMoeda(texto))}
                 />
               </View>
 
@@ -377,7 +387,7 @@ export default function EditMeta() {
                   placeholderTextColor="#BBBBBB"
                   keyboardType="numeric"
                   value={valorAporte}
-                  onChangeText={setValorAporte}
+                  onChangeText={(texto) => setValorAporte(formatarMoeda(texto))}
                 />
               </View>
 
