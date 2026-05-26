@@ -14,7 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: Sa
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
 import InputSenha from "@/src/components/auth/inputsenha";
-import { loginUsuario, buscarDadosUsuario } from "@/src/services/authService";
+import authService from "@/src/services/authService";
+import usuarioService from "@/src/services/usuarioService";
 import { Link, useRouter } from "expo-router";
 import InputLogin from "../../../components/auth/inputlogin";
 
@@ -57,7 +58,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       console.log("Chamando firebase...");
-      const user = await loginUsuario({
+      const user = await authService.loginUsuario({
         email: email,
         senha: inputSenha,
       });
@@ -68,10 +69,8 @@ export default function Login() {
       console.log("📧 Email Firebase:", user.email);
 
       // ✅ Busca os dados do usuário no Firestore
-      const dadosUsuario = await buscarDadosUsuario(user.uid);
+      const dadosUsuario = await usuarioService.buscarDadosUsuario(user.uid);
       console.log("Renda do usuário:", dadosUsuario?.renda);
-
-      router.push("/(tabs)/home");
 
       router.push("/(tabs)/home");
     } catch (error: any) {

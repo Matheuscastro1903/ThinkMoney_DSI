@@ -1,12 +1,8 @@
 import {
-  collection, doc, addDoc, setDoc, updateDoc,
-  getDocs, query, where, increment, Timestamp
+  collection, doc, addDoc, updateDoc, increment, Timestamp, arrayUnion, getDoc, deleteDoc
 } from 'firebase/firestore'
-import { db } from './firebaseConfig'
-import { auth } from './firebaseConfig'
-import { arrayUnion } from 'firebase/firestore'
-import { getDoc, deleteDoc } from 'firebase/firestore'
-import { loginUsuario } from "./authService"
+import { db, auth } from './firebaseConfig'
+import authService from "./authService"
 // ─────────────────────────────────────────
 // TIPOS
 // ─────────────────────────────────────
@@ -249,7 +245,7 @@ export async function testarFamilias(): Promise<void> {
 
   try {
 
-    await loginUsuario({
+    await authService.loginUsuario({
         email: 'teste123@gmail.com',
         senha: '123456'
     })
@@ -292,7 +288,7 @@ export async function testarNovasFuncoes(): Promise<void> {
 
   try {
     // 1. Login (Usando seu serviço existente)
-    await loginUsuario({ email: 'teste123@gmail.com', senha: '123456' });
+    await authService.loginUsuario({ email: 'teste123@gmail.com', senha: '123456' });
     const user = auth.currentUser;
     if (!user) throw new Error('Falha no login.');
 

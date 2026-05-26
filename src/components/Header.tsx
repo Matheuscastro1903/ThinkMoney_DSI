@@ -1,4 +1,4 @@
-import { buscarDadosUsuario } from "@/src/services/authService";
+import usuarioService from "@/src/services/usuarioService";
 import { auth } from "@/src/services/firebaseConfig";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -18,7 +18,7 @@ export default function Header() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
-    buscarDadosUsuario(user.uid).then((dados) => {
+    usuarioService.buscarDadosUsuario(user.uid).then((dados) => {
       if (dados?.avatar) {
         setAvatarId(dados.avatar);
       }

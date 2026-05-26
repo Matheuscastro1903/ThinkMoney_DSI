@@ -1,7 +1,7 @@
 // arquivo que sera responsavel pela tela de recuperação de senha
 
 import HeaderBack from "@/src/components/headerBack";
-import { recuperarSenha } from "@/src/services/authService";
+import authService from "@/src/services/authService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
@@ -35,7 +35,7 @@ export default function EsqueciSenha() {
 
     setCarregando(true);
     try {
-      await recuperarSenha(emailLimpo);
+      await authService.recuperarSenha(emailLimpo);
       router.push("/(auth)/link-enviado");
     } catch (error: any) {
       if (error.code === "auth/invalid-email") {

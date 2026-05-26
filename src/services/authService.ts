@@ -1,84 +1,30 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth'
-import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore'
-import { auth, db } from './firebaseConfig'
+import { auth } from './firebaseConfig'
+import { UsuarioProps } from '../types/usuario'
+import usuarioService from './usuarioService'
 
+class AuthService {
+  async cadastrarUsuario(dados: UsuarioProps): Promise<void> {
+    // 1. Cria o usuário no Firebase Auth (gerencia a senha com segurança)
+    const { user } = await createUserWithEmailAndPassword(auth, dados.email, dados.senha)
 
-// == CADASTRO ==
-
-interface CadastroUsuario {
-  nome: string
-  email: string
-  senha: string
-  datanascimento: string,
-  username: string,  // formato "YYYY-MM-DD"
-  renda: string,
-  telefone: string,
-  profissao: string,
-  logradouro: string,
-  numero: string,
-  bairro: string,
-  cidade: string, 
-  cep: string
-  avatar:number
-}
-
-export async function cadastrarUsuario(dados: CadastroUsuario): Promise<void> {
-  // 1. Cria o usuário no Firebase Auth (gerencia a senha com segurança)
-  const { user } = await createUserWithEmailAndPassword(auth, dados.email, dados.senha)
-
-  // 2. Cria o documento do usuário no Firestore (SEM a senha)
-  await setDoc(doc(db, 'usuarios', user.uid), {
-    nome: dados.nome,
-    email: dados.email,
-    datanascimento: dados.datanascimento,
-    username: dados.username,
-    renda: dados.renda,
-    criadoEm: Timestamp.now(),
-    telefone: dados.telefone,
-    profissao: dados.profissao,
-    logradouro: dados.logradouro,
-    numero: dados.numero,
-    bairro: dados.bairro,
-    cidade: dados.cidade,
-    cep: dados.cep,
-    avatar: dados.avatar
-  })
-}
-
-// == LOGIN ===
-
-
-export async function loginUsuario(dados: {email: string, senha: string}) {
-  const { user } = await signInWithEmailAndPassword(auth, dados.email, dados.senha)
-  return user
-}
-
-
-// == Logout ==
-
-export async function logoutUsuario(): Promise<void> {
-  await signOut(auth)
-}
-
-// == BUSCAR DADOS DO USUÁRIO ==
-
-export async function buscarDadosUsuario(uid: string) {
-  const docRef = doc(db, 'usuarios', uid)
-  const docSnap = await getDoc(docRef)
-  
-  if (docSnap.exists()) {
-    return docSnap.data()
-  } else {
-    console.log("Usuário não encontrado")
-    return null
+    // 2. Persiste o perfil do usuário no Firestore (SEM a senha)
+    await usuarioService.salvarUsuario(user.uid, dados)
   }
-}
 
+  async loginUsuario(dados: {email: string, senha: string}) {
+    const { user } = await signInWithEmailAndPassword(auth, dados.email, dados.senha)
+    return user
+  }
 
-// Recuperar Senha
+  async logoutUsuario(): Promise<void> {
+    await signOut(auth)
+  }
 
-export async function recuperarSenha(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email)
-}
+  async recuperarSenha(email: string): Promise<void> {
+    await sendPasswordResetEmail(auth, email)
+  }
+};
 
-
+const authService = new AuthService()
+export default authService
