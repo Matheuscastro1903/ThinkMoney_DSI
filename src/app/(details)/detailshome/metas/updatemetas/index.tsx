@@ -246,13 +246,16 @@ export default function EditMeta() {
 
   return (
     
-    <SafeAreaView style={styles.safeArea}> 
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}> 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         {/* Header */}
-        <HeaderBack/>
+        <View style={{ marginBottom: -10}}>
+          <HeaderBack/>
+        </View>
+        
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -445,7 +448,8 @@ export default function EditMeta() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#ffffff",
+    paddingTop: 10 
   },
   container: {
     flex: 1,
@@ -472,7 +476,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-    paddingTop: 10, //pequeno respiro entre o Header e o Título
+    paddingTop: 0, //pequeno respiro entre o Header e o Título
   },
   badge: {
     backgroundColor: "#D6D0F0",
@@ -492,7 +496,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "800",
     color: "#1D1252",
-    marginTop: 20,
+    marginTop: 8,
     lineHeight: 36,
   },
   subtitle: {
