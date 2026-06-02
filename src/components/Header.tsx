@@ -40,7 +40,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 87,
+    height: 37,
     backgroundColor: "#000000",
     width: "100%",
     flexDirection: "row",
@@ -50,10 +50,11 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
   logo: {
-    width: 68,
-    height: 59,
+    width: 50,
+    height: 50,
     resizeMode: "contain",
     transform: [{ scale: 3 }],
+    marginBottom: 60
   },
   avatar: {
     width: 50,
@@ -61,5 +62,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 2,
     borderColor: "#4ADE80",
+    marginBottom: 60
   },
 });

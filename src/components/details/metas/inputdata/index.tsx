@@ -8,10 +8,11 @@ interface InputDateProps {
   icon?: any;                         
   iconComponent?: React.ReactNode;    
   onChange?: (data: Date) => void;
+  style?: object;
   valorInicial?: Date | null //só será usado na parte de atualizar meta
 }
 
-export default function InputDate({ label, icon, iconComponent, onChange,valorInicial }: InputDateProps) {
+export default function InputDate({ label, icon, iconComponent, onChange,valorInicial, style }: InputDateProps) {
   //caso o valor inciial não exista,irá retornar null
   const [textoExibido, setTextoExibido] = useState(formatarData(valorInicial));
   //apenas formatando a data que está no firebase para mostrar na tela
@@ -53,9 +54,9 @@ export default function InputDate({ label, icon, iconComponent, onChange,valorIn
   }, [valorInicial]);
 
   return (
-    <View style={styles.containerText}>
+    <View style={[styles.containerText, style]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.input}>
+      <View style={[styles.input, style]}>
 
         
         {iconComponent
