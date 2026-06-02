@@ -159,7 +159,7 @@ export default function Metas() {
                       const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
         
                       return (
-                       <Link key={meta.id} href={{pathname: "/",
+                       <Link key={meta.id} href={{pathname: "/(tabs)/familia/metas/editar_meta",
                         params: { id: meta.id }}} asChild>
                           <TouchableOpacity style={{ width: "100%" }}>
                             <View style={styles.meta1}>
