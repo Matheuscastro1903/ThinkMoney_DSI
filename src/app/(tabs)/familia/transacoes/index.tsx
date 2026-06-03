@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 12,
+        height: 90,
     },
     txIconContainer: {
         width: 48,
@@ -216,12 +217,12 @@ const styles = StyleSheet.create({
     txSubtitleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        flexWrap: 'wrap',
+        gap: 8,
     },
     txSubtitle: {
         fontSize: 12,
         color: '#94A3B8',
-        marginRight: 8,
+        flexShrink: 1,
     },
     memberPill: {
         flexDirection: 'row',
