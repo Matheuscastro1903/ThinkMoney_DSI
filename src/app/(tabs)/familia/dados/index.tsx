@@ -60,7 +60,13 @@ export default function Dados() {
 
                 <View style={styles.navMenu}>
                     {MOCK_TABS.map((tab) => (
-                        <TouchableOpacity key={tab.id} style={[styles.navPill, tab.active && styles.navPillActive]}>
+                        <TouchableOpacity 
+                            key={tab.id} 
+                            style={[styles.navPill, tab.active && styles.navPillActive]}
+                            onPress={() => {
+                                if (tab.name === 'Metas') router.push('/(tabs)/familia/metas' as any);
+                            }}
+                        >
                             {tab.family === 'Ionicons' ? (
                                 <Ionicons name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
                             ) : (

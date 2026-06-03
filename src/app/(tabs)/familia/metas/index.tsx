@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useFocusEffect } from "expo-router";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 
 type Meta = {
     id: string,
@@ -28,6 +28,7 @@ const metasMock: (Meta & { id: string }) [] = [
 ]
 
 export default function Metas() {
+  const router = useRouter();
   const [membro, setMembro] = useState("");
   const [metas, setMetas] = useState<(Meta & { id: string })[]>(metasMock);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +108,7 @@ export default function Metas() {
             <Text style={{ color: "white", fontWeight: "bold" }}>Metas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.option4}>
+          <TouchableOpacity style={styles.option4} onPress={() => router.push('/(tabs)/familia/dados' as any)}>
             <Ionicons
               name="stats-chart"
               size={15}
@@ -159,7 +160,7 @@ export default function Metas() {
                       const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
         
                       return (
-                       <Link key={meta.id} href={{pathname: "/(tabs)/familia/metas/editar_meta",
+                       <Link key={meta.id} href={{pathname: "/(tabs)/familia/metas/editar_meta" as any,
                         params: { id: meta.id }}} asChild>
                           <TouchableOpacity style={{ width: "100%" }}>
                             <View style={styles.meta1}>
