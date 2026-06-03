@@ -32,7 +32,7 @@ export default function Header() {
       />
 
       <TouchableOpacity onPress={() => router.push("/config")}>
-        <Image source={avatares[avatarId]} style={styles.avatar} />
+        <Image source={avatares[avatarId as keyof typeof avatares]} style={styles.avatar} />
       </TouchableOpacity>
     </View>
   );
@@ -40,7 +40,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   header: {
-    height: 37,
+    height: 87,
     backgroundColor: "#000000",
     width: "100%",
     flexDirection: "row",
@@ -50,11 +50,10 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 68,
+    height: 59,
     resizeMode: "contain",
     transform: [{ scale: 3 }],
-    marginBottom: 60
   },
   avatar: {
     width: 50,
@@ -62,6 +61,5 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 2,
     borderColor: "#4ADE80",
-    marginBottom: 60
   },
 });

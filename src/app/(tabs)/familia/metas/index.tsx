@@ -1,33 +1,42 @@
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useFocusEffect } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Meta = {
-    id: string,
-    nomeMeta: string,
-    categoria: string,
-    valorPoupado: number,
-    valorTotal: number,
-    criador: string
+  id: string,
+  nomeMeta: string,
+  categoria: string,
+  valorPoupado: number,
+  valorTotal: number,
+  criador: string
 }
 
-const metasMock: (Meta & { id: string }) [] = [
+const MOCK_TABS = [
+  { id: '1', name: 'Família', icon: 'people-outline', family: 'Ionicons', active: false },
+  { id: '2', name: 'Editar', icon: 'edit-2', family: 'Feather', active: false },
+  { id: '3', name: 'Metas', icon: 'flag', family: 'Feather', active: true },
+  { id: '4', name: 'Dados', icon: 'grid-outline', family: 'Ionicons', active: false },
+];
+
+const metasMock: (Meta & { id: string })[] = [
   { id: "1", nomeMeta: "Viagem para Europa", categoria: "viagem", valorPoupado: 8000, valorTotal: 20000, criador: "João" },
   { id: "2", nomeMeta: "Casa própria", categoria: "casa", valorPoupado: 45000, valorTotal: 200000, criador: "Matheus" },
   { id: "3", nomeMeta: "Carro novo", categoria: "carro", valorPoupado: 12000, valorTotal: 35000, criador: "Leo" },
 ]
 
 export default function Metas() {
+  const router = useRouter();
   const [membro, setMembro] = useState("");
   const [metas, setMetas] = useState<(Meta & { id: string })[]>(metasMock);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,79 +52,48 @@ export default function Metas() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
       <View>
-        <Text style={styles.nome_familia}>Família Silva</Text>
+        <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+          <Text style={styles.title}>Família Silva</Text>
 
-        <View style={styles.container2}>
-          <View style={styles.badge1}>
-            <Ionicons
-              name="people"
-              size={20}
-              color="#1D1252"
-              style={{ marginRight: 8 }}
-            />
-            <View style={styles.badgeContent}>
-              <Text style={styles.badgeNumber}>03</Text>
-              <Text style={styles.badgeLabel}>MEMBROS</Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statCard}>
+              <Feather name="smile" size={20} color="#000" />
+              <View style={styles.statTextGroup}>
+                <Text style={styles.statNumber}>03</Text>
+                <Text style={styles.statLabel}>MEMBROS</Text>
+              </View>
+            </View>
+
+            <View style={styles.statCard}>
+              <Feather name="target" size={20} color="#000" />
+              <View style={styles.statTextGroup}>
+                <Text style={styles.statNumber}>05</Text>
+                <Text style={styles.statLabel}>METAS</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.badge2}>
-            <Ionicons
-              name="trophy"
-              size={20}
-              color="#1D1252"
-              style={{ marginRight: 8 }}
-            />
-            <View style={styles.badgeContent}>
-              <Text style={styles.badgeNumber}>05</Text>
-              <Text style={styles.badgeLabel}>METAS</Text>
-            </View>
+
+          <View style={styles.navMenu}>
+            {MOCK_TABS.map((tab) => (
+              <TouchableOpacity
+                key={tab.id}
+                style={[styles.navPill, tab.active && styles.navPillActive]}
+                onPress={() => {
+                  if (tab.name === 'Dados') router.push('/(tabs)/familia/dados' as any);
+                }}
+              >
+                {tab.family === 'Ionicons' ? (
+                  <Ionicons name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
+                ) : (
+                  <Feather name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
+                )}
+                <Text style={[styles.navPillText, tab.active && styles.navPillTextActive]}>{tab.name}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        </View>
-
-        <View style={styles.container3}>
-          <TouchableOpacity style={styles.option1}>
-            <Ionicons
-              name="people"
-              size={15}
-              color="#1D1252"
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "#1D1252", fontWeight: "bold" }}>
-              Família
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.option2}>
-            <Ionicons
-              name="pencil"
-              size={15}
-              color="#1D1252"
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "#1D1252", fontWeight: "bold" }}>Editar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.option3}>
-            <Ionicons
-              name="flag"
-              size={15}
-              color="white"
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "white", fontWeight: "bold" }}>Metas</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.option4}>
-            <Ionicons
-              name="stats-chart"
-              size={15}
-              color="#1D1252"
-              style={{ marginRight: 8 }}
-            />
-            <Text style={{ color: "#1D1252", fontWeight: "bold" }}>Dados</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.containerPicker}>
@@ -148,189 +126,163 @@ export default function Metas() {
         </View>
 
         <View style={styles.listaMetas}>
-                  <Text style={styles.suasMetas}>Suas Metas</Text>
-        
-                  {isLoading ? (
-                    <ActivityIndicator size="large" color="white" style={{ marginTop: 20 }} />
-                  ) : metas.length === 0 ? (
-                    <Text style={{ color: "white", marginTop: 20 }}>Nenhuma meta encontrada.</Text>
-                  ) : (
-                    metas.map((meta) => {
-                      const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
-        
-                      return (
-                       <Link key={meta.id} href={{pathname: "/(tabs)/familia/metas/editar_meta",
-                        params: { id: meta.id }}} asChild>
-                          <TouchableOpacity style={{ width: "100%" }}>
-                            <View style={styles.meta1}>
-                              <View style={styles.iconMeta}>
-                                <Ionicons name={getIconeCategoria(meta.categoria) as any} size={28} color="#1D1252" />
-                              </View>
-                              <View style={styles.textMeta}>
-                                <Text style={styles.tituloMeta} numberOfLines={1} ellipsizeMode="tail">
-                                  {meta.nomeMeta}
-                                </Text>
+          <Text style={styles.suasMetas}>Suas Metas</Text>
 
-                                <Text style={{color: "#aaa", fontSize: 12}} numberOfLines={1} ellipsizeMode="tail">
-                                    Criado por: {meta.criador}
-                                </Text>
-        
-                                {/* Valores */}
-                                <View style={styles.progressValues}>
-                                  <Text style={styles.progressValueStart}>
-                                    R$ {meta.valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </Text>
-                                  <Text style={styles.progressValueEnd}>
-                                    de R$ {meta.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                  </Text>
-                                </View>
-        
-                                {/* Barra de Progresso */}
-                                <View style={styles.progressBarContainer}>
-                                  <View
-                                    style={[
-                                      styles.progressBar,
-                                      { width: `${Math.min(progresso * 100, 100)}%` },
-                                    ]}
-                                  />
-                                </View>
-                              </View>
-        
-                              {/* Porcentagem no canto superior direito */}
-                              <View style={styles.percentageContainer}>
-                                <Text style={styles.percentageText}>
-                                  {Math.round(progresso * 100)}%
-                                </Text>
-                              </View>
-                            </View>
-                          </TouchableOpacity>
-                        </Link>
-                      );
-                    })
-                  )}
-        
-                  <LinearGradient
-                    colors={['transparent', '#3E346B', 'transparent']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.linhaSeparadora}>
-                  </LinearGradient>
-        
-                  <Link href="/" asChild>
-                    <TouchableOpacity style={styles.addMetaButton}>
-                      <Ionicons name="add-outline" size={20} color="#1D1252" />
-                      <Text style={styles.addMetaText}>Nova Meta Familiar</Text>
-                    </TouchableOpacity>
-                  </Link> 
-                </View>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="white" style={{ marginTop: 20 }} />
+          ) : metas.length === 0 ? (
+            <Text style={{ color: "white", marginTop: 20 }}>Nenhuma meta encontrada.</Text>
+          ) : (
+            metas.map((meta) => {
+              const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
+
+              return (
+                <Link key={meta.id} href={{
+                  pathname: "/(tabs)/familia/metas/editar_meta" as any,
+                  params: { id: meta.id }
+                }} asChild>
+                  <TouchableOpacity style={{ width: "100%" }}>
+                    <View style={styles.meta1}>
+                      <View style={styles.iconMeta}>
+                        <Ionicons name={getIconeCategoria(meta.categoria) as any} size={28} color="#1D1252" />
+                      </View>
+                      <View style={styles.textMeta}>
+                        <Text style={styles.tituloMeta} numberOfLines={1} ellipsizeMode="tail">
+                          {meta.nomeMeta}
+                        </Text>
+
+                        <Text style={{ color: "#aaa", fontSize: 12 }} numberOfLines={1} ellipsizeMode="tail">
+                          Criado por: {meta.criador}
+                        </Text>
+
+                        {/* Valores */}
+                        <View style={styles.progressValues}>
+                          <Text style={styles.progressValueStart}>
+                            R$ {meta.valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                          <Text style={styles.progressValueEnd}>
+                            de R$ {meta.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                        </View>
+
+                        {/* Barra de Progresso */}
+                        <View style={styles.progressBarContainer}>
+                          <View
+                            style={[
+                              styles.progressBar,
+                              { width: `${Math.min(progresso * 100, 100)}%` },
+                            ]}
+                          />
+                        </View>
+                      </View>
+
+                      {/* Porcentagem no canto superior direito */}
+                      <View style={styles.percentageContainer}>
+                        <Text style={styles.percentageText}>
+                          {Math.round(progresso * 100)}%
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </Link>
+              );
+            })
+          )}
+
+          <LinearGradient
+            colors={['transparent', '#3E346B', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.linhaSeparadora}>
+          </LinearGradient>
+
+          <Link href="/" asChild>
+            <TouchableOpacity style={styles.addMetaButton}>
+              <Ionicons name="add-outline" size={20} color="#1D1252" />
+              <Text style={styles.addMetaText}>Nova Meta Familiar</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
 
 
       </View>
     </ScrollView>
+   </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1D1252',
+  },
   container: {
     flex: 1,
     backgroundColor: "#1D1252",
     marginTop: -10,
   },
-  nome_familia: {
-    color: "white",
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 20,
-    marginBottom: 20
+  title: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 30,
   },
-  badge1: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    width: 140,
-    height: 50,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 10,
-    marginBottom: 15
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    gap: 12,
   },
-  badge2: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    width: 140,
-    height: 50,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 10,
+  statCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
   },
-  badgeContent: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
+  statTextGroup: {
+    alignItems: 'center',
   },
-  badgeNumber: {
-    fontWeight: "bold",
-    color: "#1D1252",
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
   },
-  badgeLabel: {
+  statLabel: {
+    fontSize: 10,
+    color: '#000',
+    letterSpacing: 1,
+  },
+  navMenu: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+    gap: 8,
+  },
+  navPill: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  navPillActive: {
+    backgroundColor: '#000000',
+  },
+  navPillText: {
+    color: '#1D1252',
     fontSize: 12,
-    color: "#1D1252",
+    fontWeight: 'bold',
   },
-  container2: {
-    flexDirection: "row",
-    gap: 20,
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  container3: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-    gap: 15,
-  },
-  option1: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    width: "21%",
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 5,
-  },
-  option2: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    width: "21%",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 5,
-    height: 40,
-  },
-  option3: {
-    backgroundColor: "black",
-    borderRadius: 10,
-    width: "21%",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 5,
-    height: 40,
-  },
-  option4: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    width: "21%",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 5,
-    height: 40,
+  navPillTextActive: {
+    color: '#FFFFFF',
   },
   containerPicker: {
     backgroundColor: "#9E9E9E",
@@ -478,7 +430,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  addMetaButton:{
+  addMetaButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
