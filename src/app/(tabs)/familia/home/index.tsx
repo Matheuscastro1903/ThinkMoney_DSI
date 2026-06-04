@@ -16,10 +16,8 @@ const members = [
   { id: 3, name: 'Lucas Cavalcante', role: 'Membro', avatarId: 4 as keyof typeof avatares },
 ];
 
-type Tab = 'familia' | 'editar' | 'metas' | 'dados';
-
 export default function FamiliaHome() {
-  const [activeTab, setActiveTab] = useState<Tab>('familia');
+  const [activeTab, setActiveTab] = useState<'familia' | 'editar' | 'metas' | 'dados'>('familia');
 
   function copiarCodigo() {
     Alert.alert('Código copiado!', `${familyData.code} foi copiado para a área de transferência.`);
