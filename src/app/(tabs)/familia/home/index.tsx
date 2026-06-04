@@ -2,6 +2,7 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { avatares } from '@/src/components/auth/escolhaavantar';
+import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 
 const familyData = {
   name: 'Família Silva',
@@ -29,90 +30,32 @@ export default function FamiliaHome() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.familyName}>{familyData.name}</Text>
-
-        <View style={styles.quickStats}>
-          <View style={styles.statCard}>
-            <Ionicons name="people" size={18} color="#1D1252" />
-            <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>
-                {String(familyData.membersCount).padStart(2, '0')}
-              </Text>
-              <Text style={styles.statLabel}>MEMBROS</Text>
-            </View>
-          </View>
-          <View style={styles.statCard}>
-            <Ionicons name="flag-outline" size={18} color="#1D1252" />
-            <View style={styles.statInfo}>
-              <Text style={styles.statNumber}>
-                {String(familyData.goalsCount).padStart(2, '0')}
-              </Text>
-              <Text style={styles.statLabel}>METAS</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.actionTabs}>
-          <TouchableOpacity
-            style={[styles.actionButton, activeTab === 'familia' && styles.actionButtonActive]}
-            onPress={() => setActiveTab('familia')}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="people"
-              size={14}
-              color={activeTab === 'familia' ? '#ffffff' : '#1D1252'}
-            />
-            <Text style={[styles.actionButtonText, activeTab === 'familia' && styles.actionButtonTextActive]}>
-              Família
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, activeTab === 'editar' && styles.actionButtonActive]}
-            onPress={() => setActiveTab('editar')}
-            activeOpacity={0.7}
-          >
-            <Feather
-              name="edit-2"
-              size={13}
-              color={activeTab === 'editar' ? '#ffffff' : '#1D1252'}
-            />
-            <Text style={[styles.actionButtonText, activeTab === 'editar' && styles.actionButtonTextActive]}>
-              Editar
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, activeTab === 'metas' && styles.actionButtonActive]}
-            onPress={() => setActiveTab('metas')}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="flag-outline"
-              size={13}
-              color={activeTab === 'metas' ? '#ffffff' : '#1D1252'}
-            />
-            <Text style={[styles.actionButtonText, activeTab === 'metas' && styles.actionButtonTextActive]}>
-              Metas
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, activeTab === 'dados' && styles.actionButtonActive]}
-            onPress={() => setActiveTab('dados')}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="bar-chart-outline"
-              size={13}
-              color={activeTab === 'dados' ? '#ffffff' : '#1D1252'}
-            />
-            <Text style={[styles.actionButtonText, activeTab === 'dados' && styles.actionButtonTextActive]}>
-              Dados
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.headerContainer}>
+                  <Text style={styles.familyName}>Família Silva</Text>
+        
+                  <View style={styles.quickStats}>
+                    <View style={styles.statCard}>
+                      <Ionicons name="people" size={18} color="#1D1252" />
+                      <View style={styles.statInfo}>
+                        <Text style={styles.statNumber}>
+                          3
+                        </Text>
+                        <Text style={styles.statLabel}>MEMBROS</Text>
+                      </View>
+                    </View>
+                    <View style={styles.statCard}>
+                      <Ionicons name="flag-outline" size={18} color="#1D1252" />
+                      <View style={styles.statInfo}>
+                        <Text style={styles.statNumber}>
+                          5
+                        </Text>
+                        <Text style={styles.statLabel}>METAS</Text>
+                      </View>
+                    </View>
+                  </View>
+        
+                  <NavBarFamilia></NavBarFamilia>
+                </View>
 
         <View style={styles.membersSection}>
           {members.map((member) => (
@@ -165,9 +108,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
     textAlign: 'center',
   },
+  headerContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 24,
+  },
   quickStats: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 12,
     paddingHorizontal: 40,
     width: '100%',
     justifyContent: 'center',

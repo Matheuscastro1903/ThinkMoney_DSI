@@ -75,6 +75,7 @@ export default function Metas() {
                 <Text style={styles.statLabel}>METAS</Text>
               </View>
             </View>
+
           </View>
 
           <NavBarFamilia></NavBarFamilia>
