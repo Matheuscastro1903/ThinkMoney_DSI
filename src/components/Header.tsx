@@ -32,7 +32,7 @@ export default function Header() {
       />
 
       <TouchableOpacity onPress={() => router.push("/config")}>
-        <Image source={avatares[avatarId]} style={styles.avatar} />
+        <Image source={avatares[avatarId as keyof typeof avatares]} style={styles.avatar} />
       </TouchableOpacity>
     </View>
   );
