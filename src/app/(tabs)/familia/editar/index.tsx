@@ -1,5 +1,6 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 
 const membros = [
   { id: 1, nome: 'Henrique', role: 'RESPONSÁVEL', inicial: 'H' },
@@ -14,46 +15,32 @@ export default function FamiliaEditar() {
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.familyName}>Família Silva</Text>
+      <View style={styles.headerContainer}>
+          <Text style={styles.familyName}>Família Silva</Text>
 
-      <View style={styles.quickStats}>
-        <View style={styles.statCard}>
-          <Ionicons name="people" size={18} color="#1D1252" />
-          <View style={styles.statInfo}>
-            <Text style={styles.statNumber}>03</Text>
-            <Text style={styles.statLabel}>MEMBROS</Text>
+          <View style={styles.quickStats}>
+            <View style={styles.statCard}>
+              <Ionicons name="people" size={18} color="#1D1252" />
+              <View style={styles.statInfo}>
+                <Text style={styles.statNumber}>
+                  3
+                </Text>
+                <Text style={styles.statLabel}>MEMBROS</Text>
+              </View>
+            </View>
+            <View style={styles.statCard}>
+              <Ionicons name="flag-outline" size={18} color="#1D1252" />
+              <View style={styles.statInfo}>
+                <Text style={styles.statNumber}>
+                  5
+                </Text>
+                <Text style={styles.statLabel}>METAS</Text>
+              </View>
+            </View>
           </View>
+
+          <NavBarFamilia></NavBarFamilia>
         </View>
-        <View style={styles.statCard}>
-          <Ionicons name="flag-outline" size={18} color="#1D1252" />
-          <View style={styles.statInfo}>
-            <Text style={styles.statNumber}>05</Text>
-            <Text style={styles.statLabel}>METAS</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.actionTabs}>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
-          <Ionicons name="people" size={14} color="#1D1252" />
-          <Text style={styles.actionButtonText}>Família</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.actionButton, styles.actionButtonActive]} activeOpacity={0.7}>
-          <Feather name="edit-2" size={13} color="#ffffff" />
-          <Text style={[styles.actionButtonText, styles.actionButtonTextActive]}>Editar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
-          <Ionicons name="flag-outline" size={13} color="#1D1252" />
-          <Text style={styles.actionButtonText}>Metas</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
-          <Ionicons name="bar-chart-outline" size={13} color="#1D1252" />
-          <Text style={styles.actionButtonText}>Dados</Text>
-        </TouchableOpacity>
-      </View>
 
       <View style={styles.membrosSection}>
         <Text style={styles.sectionLabel}>MEMBROS</Text>
@@ -115,6 +102,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.9,
     marginTop: 16,
     textAlign: 'center',
+  },
+  headerContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 24,
   },
   quickStats: {
     flexDirection: 'row',

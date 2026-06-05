@@ -2,6 +2,8 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
+
 
 // TODO: Dados fictícios (mocks) criados para montagem da tela. Substituir por dados da API futuramente.
 const MOCK_TABS = [
@@ -58,24 +60,7 @@ export default function Dados() {
                     </View>
                 </View>
 
-                <View style={styles.navMenu}>
-                    {MOCK_TABS.map((tab) => (
-                        <TouchableOpacity 
-                            key={tab.id} 
-                            style={[styles.navPill, tab.active && styles.navPillActive]}
-                            onPress={() => {
-                                if (tab.name === 'Metas') router.push('/(tabs)/familia/metas' as any);
-                            }}
-                        >
-                            {tab.family === 'Ionicons' ? (
-                                <Ionicons name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
-                            ) : (
-                                <Feather name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
-                            )}
-                            <Text style={[styles.navPillText, tab.active && styles.navPillTextActive]}>{tab.name}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <NavBarFamilia></NavBarFamilia>
 
                 <View style={styles.mainCard}>
                     <Text style={styles.cardHeaderTitle}>GASTO MENSAL DA FAMÍLIA</Text>

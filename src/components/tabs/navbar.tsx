@@ -87,7 +87,7 @@ export default function NavBar() {
             </Link>
 
             {/* botão Família */}
-            <Link href="/familia/dados" asChild>
+            <Link href="/familia/home" asChild>
                 <TouchableOpacity style={caminho.startsWith('/familia')
                     ? styles.botaoAtivo
                     : styles.botaoDesativado}>

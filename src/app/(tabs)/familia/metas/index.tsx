@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import NavBarFamilia from "@/src/components/tabs/familia/navbar/page";
 
 type Meta = {
   id: string,
@@ -74,26 +75,11 @@ export default function Metas() {
                 <Text style={styles.statLabel}>METAS</Text>
               </View>
             </View>
+
           </View>
 
-          <View style={styles.navMenu}>
-            {MOCK_TABS.map((tab) => (
-              <TouchableOpacity
-                key={tab.id}
-                style={[styles.navPill, tab.active && styles.navPillActive]}
-                onPress={() => {
-                  if (tab.name === 'Dados') router.push('/(tabs)/familia/dados' as any);
-                }}
-              >
-                {tab.family === 'Ionicons' ? (
-                  <Ionicons name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
-                ) : (
-                  <Feather name={tab.icon as any} size={16} color={tab.active ? "#FFF" : "#1D1252"} />
-                )}
-                <Text style={[styles.navPillText, tab.active && styles.navPillTextActive]}>{tab.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <NavBarFamilia></NavBarFamilia>
+          
         </View>
 
         <View style={styles.containerPicker}>
