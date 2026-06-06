@@ -3,15 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
-
-
-// TODO: Dados fictícios (mocks) criados para montagem da tela. Substituir por dados da API futuramente.
-const MOCK_TABS = [
-    { id: '1', name: 'Família', icon: 'people-outline', family: 'Ionicons', active: false },
-    { id: '2', name: 'Editar', icon: 'edit-2', family: 'Feather', active: false },
-    { id: '3', name: 'Metas', icon: 'flag', family: 'Feather', active: false },
-    { id: '4', name: 'Dados', icon: 'grid-outline', family: 'Ionicons', active: true },
-];
+import InfoCards from '@/src/components/tabs/familia/info-cards';
 
 const MOCK_MEMBERS = [
     { id: '1', name: 'Henrique', value: 'R$ 8.240,00', percent: '60%', color: '#1D1252' },
@@ -40,27 +32,13 @@ export default function Dados() {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                 
-                <Text style={styles.title}>Família Silva</Text>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.title}>Família Silva</Text>
 
-                <View style={styles.statsContainer}>
-                    <View style={styles.statCard}>
-                        <Feather name="smile" size={20} color="#000" />
-                        <View style={styles.statTextGroup}>
-                            <Text style={styles.statNumber}>03</Text>
-                            <Text style={styles.statLabel}>MEMBROS</Text>
-                        </View>
-                    </View>
+                    <InfoCards/>
 
-                    <View style={styles.statCard}>
-                        <Feather name="target" size={20} color="#000" />
-                        <View style={styles.statTextGroup}>
-                            <Text style={styles.statNumber}>05</Text>
-                            <Text style={styles.statLabel}>METAS</Text>
-                        </View>
-                    </View>
+                    <NavBarFamilia></NavBarFamilia>
                 </View>
-
-                <NavBarFamilia></NavBarFamilia>
 
                 <View style={styles.mainCard}>
                     <Text style={styles.cardHeaderTitle}>GASTO MENSAL DA FAMÍLIA</Text>
@@ -152,6 +130,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1D1252',
+    },
+        headerContainer: {
+        width: '100%',
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        gap: 24,
     },
     contentContainer: {
         paddingHorizontal: 20,

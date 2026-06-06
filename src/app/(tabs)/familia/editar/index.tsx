@@ -1,6 +1,7 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
+import InfoCards from '@/src/components/tabs/familia/info-cards';
 
 const membros = [
   { id: 1, nome: 'Henrique', role: 'RESPONSÁVEL', inicial: 'H' },
@@ -16,31 +17,12 @@ export default function FamiliaEditar() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.headerContainer}>
-          <Text style={styles.familyName}>Família Silva</Text>
+        <Text style={styles.familyName}>Família Silva</Text>
 
-          <View style={styles.quickStats}>
-            <View style={styles.statCard}>
-              <Ionicons name="people" size={18} color="#1D1252" />
-              <View style={styles.statInfo}>
-                <Text style={styles.statNumber}>
-                  3
-                </Text>
-                <Text style={styles.statLabel}>MEMBROS</Text>
-              </View>
-            </View>
-            <View style={styles.statCard}>
-              <Ionicons name="flag-outline" size={18} color="#1D1252" />
-              <View style={styles.statInfo}>
-                <Text style={styles.statNumber}>
-                  5
-                </Text>
-                <Text style={styles.statLabel}>METAS</Text>
-              </View>
-            </View>
-          </View>
+        <InfoCards/>
 
-          <NavBarFamilia></NavBarFamilia>
-        </View>
+        <NavBarFamilia></NavBarFamilia>
+      </View>
 
       <View style={styles.membrosSection}>
         <Text style={styles.sectionLabel}>MEMBROS</Text>
@@ -108,39 +90,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
     gap: 24,
-  },
-  quickStats: {
-    flexDirection: 'row',
-    gap: 20,
-    paddingHorizontal: 40,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  statInfo: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#000000',
-    letterSpacing: 1,
-    textAlign: 'center',
   },
   actionTabs: {
     flexDirection: 'row',

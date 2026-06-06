@@ -1,4 +1,4 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NavBarFamilia from "@/src/components/tabs/familia/navbar/page";
+import InfoCards from "@/src/components/tabs/familia/info-cards";
 
 type Meta = {
   id: string,
@@ -22,13 +23,6 @@ type Meta = {
   valorTotal: number,
   criador: string
 }
-
-const MOCK_TABS = [
-  { id: '1', name: 'Família', icon: 'people-outline', family: 'Ionicons', active: false },
-  { id: '2', name: 'Editar', icon: 'edit-2', family: 'Feather', active: false },
-  { id: '3', name: 'Metas', icon: 'flag', family: 'Feather', active: true },
-  { id: '4', name: 'Dados', icon: 'grid-outline', family: 'Ionicons', active: false },
-];
 
 const metasMock: (Meta & { id: string })[] = [
   { id: "1", nomeMeta: "Viagem para Europa", categoria: "viagem", valorPoupado: 8000, valorTotal: 20000, criador: "João" },
@@ -56,27 +50,10 @@ export default function Metas() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
       <View>
-        <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+        <View style={styles.headerContainer}>
           <Text style={styles.title}>Família Silva</Text>
 
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Feather name="smile" size={20} color="#000" />
-              <View style={styles.statTextGroup}>
-                <Text style={styles.statNumber}>03</Text>
-                <Text style={styles.statLabel}>MEMBROS</Text>
-              </View>
-            </View>
-
-            <View style={styles.statCard}>
-              <Feather name="target" size={20} color="#000" />
-              <View style={styles.statTextGroup}>
-                <Text style={styles.statNumber}>05</Text>
-                <Text style={styles.statLabel}>METAS</Text>
-              </View>
-            </View>
-
-          </View>
+          <InfoCards/>
 
           <NavBarFamilia></NavBarFamilia>
           
@@ -214,61 +191,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 30,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  statTextGroup: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#000',
-    letterSpacing: 1,
-  },
-  navMenu: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-    gap: 8,
-  },
-  navPill: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  navPillActive: {
-    backgroundColor: '#000000',
-  },
-  navPillText: {
-    color: '#1D1252',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  navPillTextActive: {
-    color: '#FFFFFF',
+  headerContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    gap: 24,
   },
   containerPicker: {
     backgroundColor: "#9E9E9E",
