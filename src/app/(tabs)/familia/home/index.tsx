@@ -1,8 +1,8 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { avatares } from '@/src/components/auth/escolhaavantar';
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
+import InfoCards from '@/src/components/tabs/familia/info-cards';
 
 const familyData = {
   name: 'Família Silva',
@@ -18,8 +18,6 @@ const members = [
 ];
 
 export default function FamiliaHome() {
-  const [activeTab, setActiveTab] = useState<'familia' | 'editar' | 'metas' | 'dados'>('familia');
-
   function copiarCodigo() {
     Alert.alert('Código copiado!', `${familyData.code} foi copiado para a área de transferência.`);
   }
@@ -31,31 +29,12 @@ export default function FamiliaHome() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerContainer}>
-                  <Text style={styles.familyName}>Família Silva</Text>
-        
-                  <View style={styles.quickStats}>
-                    <View style={styles.statCard}>
-                      <Ionicons name="people" size={18} color="#1D1252" />
-                      <View style={styles.statInfo}>
-                        <Text style={styles.statNumber}>
-                          3
-                        </Text>
-                        <Text style={styles.statLabel}>MEMBROS</Text>
-                      </View>
-                    </View>
-                    <View style={styles.statCard}>
-                      <Ionicons name="flag-outline" size={18} color="#1D1252" />
-                      <View style={styles.statInfo}>
-                        <Text style={styles.statNumber}>
-                          5
-                        </Text>
-                        <Text style={styles.statLabel}>METAS</Text>
-                      </View>
-                    </View>
-                  </View>
-        
-                  <NavBarFamilia></NavBarFamilia>
-                </View>
+          <Text style={styles.familyName}>Família Silva</Text>
+
+          <InfoCards/>
+
+          <NavBarFamilia></NavBarFamilia>
+        </View>
 
         <View style={styles.membersSection}>
           {members.map((member) => (
