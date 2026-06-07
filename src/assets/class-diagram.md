@@ -6,8 +6,9 @@
             -username: String
             -data_nascimento: Date
             -renda: Number
-            -telefone: Telefone
+            -telefone: string
             -profissao: String
+            -endereco: Endereco
             -lembretes: Lembrete[]
             -metas: Meta[]
             -gastos: Gasto[]
@@ -22,7 +23,12 @@
             +verGastos()
         }
         class Endereco {
-            
+            -rua: String
+            -numero: String
+            -bairro: String
+            -cidade: String
+            -estado: String
+            -cep: String    
         }
         class Lembrete {
             -categoria: String
@@ -53,9 +59,9 @@
             -data: Date
             -fixo: Boolean
             -valor: Number
-            -endereco: Endereco
             -descricao: String
             -categoria: String
+            -endereco: Endereco
             +criarGasto()
             +editarGasto()
             +verGasto()
@@ -100,7 +106,7 @@
         }
         Usuario "1" --> "*" Lembrete : possui
         Usuario "1" --> "*" Meta : possui
-        Usuario "1" --> "*" Gastos : possui
+        Usuario "1" --> "*" Gasto : possui
         Usuario "1" --> "*" ListaCompras : possui
         ListaCompras "1" --> "*" ItemListaCompras: possui
         Usuario "1" --> "1" Familia : possui
@@ -108,3 +114,4 @@
         Familia "1" --> "*" Meta : possui
         Familia "1" --> "*" Gasto : possui
         Familia "1" --> "*" Usuario: possui
+```
