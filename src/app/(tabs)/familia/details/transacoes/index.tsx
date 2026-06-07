@@ -1,11 +1,11 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HeaderBack from '../../../../components/headerBack';
+import HeaderBack from '../../../../../components/headerBack';
 
-const AVATAR_1 = require('../../../../assets/images/avatarcapivara.png');
-const AVATAR_2 = require('../../../../assets/images/avatarjacare.png');
-const AVATAR_3 = require('../../../../assets/images/avatarleao.png');
+const AVATAR_1 = require('../../../../../assets/images/avatarcapivara.png');
+const AVATAR_2 = require('../../../../../assets/images/avatarjacare.png');
+const AVATAR_3 = require('../../../../../assets/images/avatarleao.png');
 
 // Mocks simulando o agrupamento de transações por data
 const MOCK_TRANSACTIONS = [

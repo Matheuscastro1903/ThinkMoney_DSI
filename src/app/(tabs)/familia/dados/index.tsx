@@ -130,7 +130,7 @@ export default function Dados() {
                     </View>
                 </View>
 
-                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/transacoes' as any)}>
+                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/details/transacoes' as any)}>
                     <Text style={styles.verTodosLabel}>VER TODOS</Text>
                 </TouchableOpacity>
 
