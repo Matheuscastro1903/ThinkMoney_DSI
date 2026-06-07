@@ -147,8 +147,10 @@ export default function Home() {
                             <Ionicons name="refresh" size={20} color="#FFFFFF" />
                             <Text style={{fontWeight: "bold", fontSize: 12, color: "white", textAlign: "center", marginTop: 4}}>Atualizar Renda Disponível</Text>
                         </View>
-                        
+                      
                     </TouchableOpacity>
+
+                    
                     <Modal
                         visible={modalVisible}
                         animationType="slide"
@@ -205,7 +207,10 @@ export default function Home() {
                             </View>
                         </View>
                     </Modal>
-                </View>
+                </View>  
+                
+               
+
                 <View style={styles.linhaDegraficos}>
                     
 
@@ -301,6 +306,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1D1252',
+        alignItems:'center'
     },
     saldo: {
         width: '90%',
