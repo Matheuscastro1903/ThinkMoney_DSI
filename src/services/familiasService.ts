@@ -15,7 +15,8 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 
-import { UsuarioProps } from "@/src/types/usuario";
+import { UsuarioProps, UsuarioFirestore } from "@/src/types/usuario";
+import { Usuario } from "@/src/models/usuario";
 import { FamiliaPayloadProps, FamiliaProps } from "@/src/types/familia";
 
 export class FamiliaService {
@@ -36,16 +37,16 @@ export class FamiliaService {
       throw error
     }
   }
-
-  async criarFamilia(nome: string, admin: UsuarioProps): Promise<string> {
+  
+  async criarFamilia(nome: string, admin: Usuario): Promise<string> {
     try {
       const codigo_convite = await this.gerarCodigo()
 
       const novaFamilia: FamiliaPayloadProps = {
         nome,
         codigo_convite,
-        admin,
-        membros: [admin],
+        admin: admin.toFirestore(),
+        membros: [admin.toFirestore()],
         lembretes: [],
         metas: [],
         gastos: []
@@ -81,11 +82,11 @@ export class FamiliaService {
     }
   }
 
-  async adicionarMembro(familiaId: string, membro: UsuarioProps): Promise<void> {
+  async adicionarMembro(familiaId: string, membro: Usuario): Promise<void> {
     try {
       const docRef = doc(db, 'familias', familiaId)
       await updateDoc(docRef, {
-        membros: arrayUnion(membro),
+        membros: arrayUnion(membro.toFirestore()),
       })
     } catch (error) {
       console.error('Erro ao adicionar membro:', error)
@@ -93,11 +94,24 @@ export class FamiliaService {
     }
   }
 
-  async removerMembro(familiaId: string, membro: UsuarioProps): Promise<void> {
+  async removerMembro(familiaId: string, membro: Usuario): Promise<void> {
     try {
       const docRef = doc(db, 'familias', familiaId)
+
+      const docSnap = await getDoc(docRef)
+      if (!docSnap.exists()) {
+        throw new Error("Família não encontrada.")
+      }
+
+      const dadosFamilia = docSnap.data() as FamiliaProps
+      const membrosAtuais = dadosFamilia.membros || []
+
+      const membrosAtualizados = membrosAtuais.filter(
+        (m) => m.email !== membro.email
+      )
+
       await updateDoc(docRef, {
-        membros: arrayRemove(membro),
+        membros: membrosAtualizados,
       })
     } catch (error) {
       console.error('Erro ao remover membro:', error)

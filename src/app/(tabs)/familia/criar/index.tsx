@@ -1,5 +1,5 @@
-// arquivo destinado a guardar a "primeira tela da família"
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
@@ -8,31 +8,33 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-
 import { useState } from "react";
-
 import { useRouter } from "expo-router";
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFamiliaAcoes } from "@/src/hooks/familia/useFamiliaAcoes";
 
-export default function Familia() {
+export default function CriarFamilia() {
   const router = useRouter();
+  const { criarFamilia, isLoading } = useFamiliaAcoes()
   const [familyName, setFamilyName] = useState("");
+  // codigoGerado é preenchido após criação bem-sucedida; null = família ainda não criada.
+  const [codigoGerado, setCodigoGerado] = useState<string | null>(null);
 
-  function gerarCodigo() {
-    return;
+  async function handleGerarCodigo() {
+    if (!familyName.trim()) return
+    const novoId = await criarFamilia(familyName)
+    if (!novoId) return // erro já tratado dentro do hook (Alert)
+
+    // Armazena o código localmente para exibir na UI.
+    // O familiaId real já foi gravado no perfil do usuário pelo hook.
+    setCodigoGerado(novoId)
   }
 
-  function copiarCodigo() {
-    return;
-  }
-
-  function entrarEmFamilia() {
-    // Deve haver antes uma verificação se o código foi gerado corretamente e se a família foi criada no banco de dados do Firebase, mas como isso ainda não foi implementado, a função apenas redireciona para a tela inicial da família.
-    // Esse futuro método pode herdar o método de entrar em família do objeto da classe Usuário (Implementação futura)
-    router.push("./home");
-    return;
+  function handlePronto() {
+    // Navegação liberada somente após criação bem-sucedida
+    if (!codigoGerado) return
+    router.replace('/(tabs)/familia/home')
   }
 
   return (
@@ -57,16 +59,22 @@ export default function Familia() {
             keyboardType="default"
             value={familyName}
             onChangeText={setFamilyName}
+            editable={!codigoGerado} // bloqueia edição após criação
           />
 
           <TouchableOpacity
-            style={styles.gerarCodigoButton}
+            style={[styles.gerarCodigoButton, (isLoading || !!codigoGerado) && styles.buttonDisabled]}
             activeOpacity={0.7}
-            onPress={gerarCodigo}
+            onPress={handleGerarCodigo}
+            disabled={isLoading || !!codigoGerado}
           >
-            <Text style={styles.textGerarCodigoButton}>
-              Gerar código de família
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.textGerarCodigoButton}>
+                {codigoGerado ? 'Família criada!' : 'Gerar código de família'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -74,7 +82,9 @@ export default function Familia() {
           <View style={styles.codeContentContainer}>
             <Text style={styles.codeTitle}>Código de Acesso da Família</Text>
 
-            <Text style={styles.codeText}>THKM-X7R2-89</Text>
+            <Text style={styles.codeText}>
+              {codigoGerado ?? '— — — — — —'}
+            </Text>
 
             <View style={styles.infoCodeContainer}>
               <MaterialIcons name="info-outline" size={18} color="#1D1252" />
@@ -83,20 +93,13 @@ export default function Familia() {
               </Text>
             </View>
           </View>
-
-          <TouchableOpacity
-            style={styles.copiarCodigoFamiliaButton}
-            activeOpacity={0.7}
-            onPress={copiarCodigo}
-          >
-            <MaterialIcons name="content-copy" size={20} color="#ffffff" />
-          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          style={styles.prontoButton}
+          style={[styles.prontoButton, !codigoGerado && styles.buttonDisabled]}
           activeOpacity={0.7}
-          onPress={entrarEmFamilia}
+          onPress={handlePronto}
+          disabled={!codigoGerado}
         >
           <Text style={styles.textProntoButton}>Pronto</Text>
         </TouchableOpacity>
@@ -116,7 +119,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     justifyContent: "center",
     alignItems: "center",
-    color: "white",
     marginBottom: 10,
   },
 
@@ -160,7 +162,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "100%",
     alignItems: "center",
-    color: "white",
+  },
+
+  buttonDisabled: {
+    opacity: 0.5,
   },
 
   textGerarCodigoButton: {
@@ -186,7 +191,6 @@ const styles = StyleSheet.create({
   },
 
   codeTitle: {
-    fontWeight: "regular",
     textTransform: "uppercase",
     fontSize: 12,
   },
@@ -194,6 +198,8 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "#1D1252",
+    letterSpacing: 2,
   },
 
   infoCodeContainer: {
@@ -206,14 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     flex: 1,
     flexShrink: 1,
-  },
-
-  copiarCodigoFamiliaButton: {
-    backgroundColor: "#1D1252",
-    padding: 8,
-    borderRadius: 5,
-    flexShrink: 0,
-    alignSelf: "flex-start",
   },
 
   prontoButton: {

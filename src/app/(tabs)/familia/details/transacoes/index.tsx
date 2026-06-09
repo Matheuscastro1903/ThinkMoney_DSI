@@ -1,31 +1,18 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, View, Image } from "react-native";
+import { Feather } from '@expo/vector-icons';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from '../../../../../components/headerBack';
+import { useFamiliaTransacoes } from '@/src/hooks/familia/useFamiliaTransacoes';
 
 const AVATAR_1 = require('../../../../../assets/images/avatarcapivara.png');
 const AVATAR_2 = require('../../../../../assets/images/avatarjacare.png');
 const AVATAR_3 = require('../../../../../assets/images/avatarleao.png');
 
-// Mocks simulando o agrupamento de transações por data
-const MOCK_TRANSACTIONS = [
-    {
-        section: 'HOJE',
-        data: [
-            { id: '1', title: 'Pão de Açúcar', time: '14:30', category: 'Mercados', value: 'R$ 142,30', icon: 'shopping-cart', iconColor: '#9333EA', iconBg: '#F3E8FF', memberName: 'Maria', memberAvatar: AVATAR_1 },
-            { id: '2', title: 'Uber Trip', time: '10:15', category: 'Transporte', value: 'R$ 28,50', icon: 'truck', iconColor: '#A855F7', iconBg: '#F3E8FF', memberName: 'Sofia', memberAvatar: AVATAR_2 },
-        ]
-    },
-    {
-        section: 'ONTEM',
-        data: [
-            { id: '3', title: 'Restaurante Sabor', time: '20:45', category: 'Alimentação', value: 'R$ 210,00', icon: 'coffee', iconColor: '#4F46E5', iconBg: '#E0E7FF', memberName: 'João', memberAvatar: AVATAR_3 },
-            { id: '4', title: 'Cinemark', time: '18:00', category: 'Lazer', value: 'R$ 95,00', icon: 'film', iconColor: '#E11D48', iconBg: '#FFE4E6', memberName: 'Sofia', memberAvatar: AVATAR_2 },
-        ]
-    }
-];
+const AVATARES = [AVATAR_1, AVATAR_2, AVATAR_3]
 
 export default function Transacoes() {
+    const { sections, gastoTotal, qtdMembros, isLoading } = useFamiliaTransacoes()
+
     return (
         <SafeAreaView style={styles.safeArea} edges={['right', 'bottom', 'left']}>
             <HeaderBack />
@@ -41,7 +28,9 @@ export default function Transacoes() {
                     <View style={styles.topCardBody}>
                         <View>
                             <Text style={styles.currency}>R$</Text>
-                            <Text style={styles.totalValue}>4.280,50</Text>
+                            <Text style={styles.totalValue}>
+                                {gastoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </Text>
                         </View>
                         <View style={styles.monthBadge}>
                             <Text style={styles.monthBadgeText}>Este{"\n"}mês</Text>
@@ -50,44 +39,59 @@ export default function Transacoes() {
 
                     <View style={styles.topCardFooter}>
                         <View style={styles.avatarGroup}>
-                            <Image source={AVATAR_1} style={[styles.avatar, { zIndex: 3 }]} />
-                            <Image source={AVATAR_2} style={[styles.avatar, { zIndex: 2, marginLeft: -12 }]} />
-                            <Image source={AVATAR_3} style={[styles.avatar, { zIndex: 1, marginLeft: -12 }]} />
+                            {AVATARES.slice(0, Math.min(qtdMembros, 3)).map((av, i) => (
+                                <Image key={i} source={av} style={[styles.avatar, { zIndex: 3 - i, marginLeft: i > 0 ? -12 : 0 }]} />
+                            ))}
                         </View>
-                        <Text style={styles.activeMembers}>3 membros ativos</Text>
+                        <Text style={styles.activeMembers}>{qtdMembros} membros ativos</Text>
                     </View>
                 </View>
 
                 {/* Sections */}
-                {MOCK_TRANSACTIONS.map((section, idx) => (
-                    <View key={idx}>
-                        <Text style={styles.sectionTitle}>{section.section}</Text>
-                        
-                        {section.data.map((tx) => (
-                            <View key={tx.id} style={styles.txCard}>
-                                <View style={[styles.txIconContainer, { backgroundColor: tx.iconBg }]}>
-                                    <Feather name={tx.icon as any} size={20} color={tx.iconColor} />
-                                </View>
-                                
-                                <View style={styles.txInfo}>
-                                    <Text style={styles.txTitle}>{tx.title}</Text>
-                                    <View style={styles.txSubtitleRow}>
-                                        <Text style={styles.txSubtitle}>{tx.time} • {tx.category}</Text>
-                                        
-                                        <View style={styles.memberPill}>
-                                            <Image source={tx.memberAvatar} style={styles.memberPillDot} />
-                                            <Text style={styles.memberPillText}>{tx.memberName}</Text>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
+                ) : sections.length === 0 ? (
+                    <Text style={styles.emptyText}>Nenhuma transação encontrada.</Text>
+                ) : (
+                    sections.map((section, idx) => (
+                        <View key={idx}>
+                            <Text style={styles.sectionTitle}>{section.section}</Text>
+                            
+                            {section.data.map((tx: any, txIdx: number) => (
+                                <View key={tx.id ?? txIdx} style={styles.txCard}>
+                                    <View style={[styles.txIconContainer, { backgroundColor: tx.iconBg ?? '#F1F5F9' }]}>
+                                        <Feather name={tx.iconName ?? 'credit-card'} size={20} color={tx.iconColor ?? '#1D1252'} />
+                                    </View>
+                                    
+                                    <View style={styles.txInfo}>
+                                        <Text style={styles.txTitle}>{tx.titulo ?? tx.title ?? '—'}</Text>
+                                        <View style={styles.txSubtitleRow}>
+                                            <Text style={styles.txSubtitle}>{tx.data ?? ''} • {tx.categoria ?? tx.category ?? ''}</Text>
+                                            
+                                            {tx.membroNome && (
+                                                <View style={styles.memberPill}>
+                                                    {tx.membroAvatar != null && (
+                                                        <Image source={AVATARES[tx.membroAvatar % AVATARES.length]} style={styles.memberPillDot} />
+                                                    )}
+                                                    <Text style={styles.memberPillText}>{tx.membroNome}</Text>
+                                                </View>
+                                            )}
                                         </View>
                                     </View>
+                                    
+                                    <View style={styles.txValueContainer}>
+                                        <Text style={styles.txValue}>
+                                            {tx.valor != null
+                                                ? `R$ ${tx.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                                                : tx.value ?? '—'
+                                            }
+                                        </Text>
+                                    </View>
                                 </View>
-                                
-                                <View style={styles.txValueContainer}>
-                                    <Text style={styles.txValue}>{tx.value}</Text>
-                                </View>
-                            </View>
-                        ))}
-                    </View>
-                ))}
+                            ))}
+                        </View>
+                    ))
+                )}
 
             </ScrollView>
         </SafeAreaView>
@@ -186,6 +190,11 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         marginTop: 10,
         paddingLeft: 4,
+    },
+    emptyText: {
+        color: 'rgba(255,255,255,0.6)',
+        textAlign: 'center',
+        marginTop: 20,
     },
     txCard: {
         backgroundColor: '#FFFFFF',

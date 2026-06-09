@@ -1,5 +1,5 @@
-// arquivo destinado a guardar a "primeira tela da família"
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
@@ -8,27 +8,28 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-
+import { useState } from "react";
 import { useRouter } from "expo-router";
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFamiliaAcoes } from "@/src/hooks/familia/useFamiliaAcoes";
 
-
-export default function Familia() {
+export default function EntrarFamilia() {
   const router = useRouter();
+  const { entrarEmFamilia, isLoading } = useFamiliaAcoes()
+  const [codigo, setCodigo] = useState("");
 
-  function abrirSaibaMaisFamilia() {
-    return;
+  async function handleEntrar() {
+    if (!codigo.trim()) return
+    const sucesso = await entrarEmFamilia(codigo)
+    if (sucesso) {
+      router.replace('/(tabs)/familia/home')
+    }
+    // Erros (código inválido / genérico) são tratados com Alert dentro do hook
   }
 
-  function entrarEmFamilia() {
-    return;
-  }
-
-  function criarFamilia() {
+  function handleCriarFamilia() {
     router.push("../criar");
-    return;
   }
 
   return (
@@ -56,30 +57,40 @@ export default function Familia() {
             placeholder="Digite o código da família"
             placeholderTextColor="#787581"
             keyboardType="default"
+            value={codigo}
+            onChangeText={setCodigo}
+            autoCapitalize="characters"
+            editable={!isLoading}
           />
 
           <TouchableOpacity
-            style={styles.confirmarButton}
+            style={[styles.confirmarButton, isLoading && styles.buttonDisabled]}
             activeOpacity={0.7}
-            onPress={entrarEmFamilia}
+            onPress={handleEntrar}
+            disabled={isLoading}
           >
-            <Text style={styles.textConfirmarButton}>Confirmar e Entrar</Text>
+            {isLoading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.textConfirmarButton}>Confirmar e Entrar</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.criarFamiliaButton}
             activeOpacity={0.7}
-            onPress={criarFamilia}
+            onPress={handleCriarFamilia}
+            disabled={isLoading}
           >
             <Text style={styles.textCriarFamiliaButton}>
               Criar minha família
             </Text>
           </TouchableOpacity>
 
-          <Text>
+          <Text style={{ color: '#787581', fontSize: 13 }}>
             Não tem um código?{" "}
-            <Text style={styles.textLink} onPress={abrirSaibaMaisFamilia}>
-              Saiba mais.
+            <Text style={styles.textLink}>
+              Peça ao administrador da família.
             </Text>
           </Text>
         </View>
@@ -99,7 +110,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     justifyContent: "center",
     alignItems: "center",
-    color: "white",
     marginBottom: 30,
   },
 
@@ -132,26 +142,29 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 30,
     padding: 30,
+    gap: 16,
   },
 
   input: {
     width: "100%",
     borderColor: "#ccc",
     borderWidth: 1,
-    marginBottom: 10,
     paddingHorizontal: 10,
     paddingVertical: 20,
     fontSize: 18,
+    borderRadius: 5,
   },
 
   confirmarButton: {
     backgroundColor: "#1D1252",
     padding: 20,
     borderRadius: 5,
-    marginBottom: 30,
     width: "100%",
     alignItems: "center",
-    color: "white",
+  },
+
+  buttonDisabled: {
+    opacity: 0.5,
   },
 
   textConfirmarButton: {
@@ -165,10 +178,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 20,
     borderRadius: 5,
-    marginBottom: 10,
     width: "100%",
     alignItems: "center",
-    color: "#1D1252",
   },
 
   textCriarFamiliaButton: {
@@ -178,7 +189,7 @@ const styles = StyleSheet.create({
   },
 
   textLink: {
-    color: "#1E90FF",
-    textDecorationLine: "underline",
+    color: "#1D1252",
+    fontWeight: "bold",
   },
 });

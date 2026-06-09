@@ -15,8 +15,10 @@ export interface UsuarioProps {
     cidade: string;
     cep: string;
     avatar: number;
+    // familiaId vincula o usuário ao documento da família no Firestore.
+    // undefined = usuário que ainda não pertence a nenhuma família.
+    familiaId?: string;
     // Adições futuras:
-    // familiaId?: string;
     // gastos?: Gastos[]
     // metas?: Metas[]
     // lembretes?: Lembretes[]
