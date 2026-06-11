@@ -1,17 +1,18 @@
 import { GastoProps } from "./gasto";
 import { LembreteProps } from "./lembrete";
-import { MetaProps } from "./meta";
+import { Meta } from "./meta";
+import { Usuario } from "../models/usuario";
 import { UsuarioFirestore } from "./usuario";
 
 export interface FamiliaProps {
     id: string
     nome: string
     codigo_convite: string // formato do código: THKM-X7R2-89
-    admin: UsuarioFirestore
-    membros: UsuarioFirestore[]
+    admin: Usuario
+    membros: Usuario[]
+
+    // Em breve esses campos abaixo vão ter seus tipos substituiídos por models.
     lembretes: LembreteProps[]
-    metas: MetaProps[]
+    metas: Meta[]
     gastos: GastoProps[]
 };
-
-export type FamiliaPayloadProps = Omit<FamiliaProps, 'id'>;

@@ -26,7 +26,7 @@ export default function telaInical(){
 
             {/* botao para teste das telas novas  */}
             
-            <Link href={'/familia/editar'} asChild>
+            <Link href={'./(tabs)/familia/home'} asChild>
 
                           <TouchableOpacity style={styles.button}>
                               <Ionicons name="arrow-forward" size={32} color="white" />

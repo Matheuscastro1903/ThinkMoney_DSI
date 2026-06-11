@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
+import { useFamilia } from "@/src/hooks/familia/useFamilia";
 import InputDate from "@/src/components/details/metas/inputdata";
 import { buscarUrlDaImagem } from "@/src/services/searchStorage";
 import InputImagem from "@/src/components/details/metas/inputimagem";
@@ -49,6 +50,7 @@ export default function EditMeta() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const id = params.id as string;
+  const familiaId = params.familiaId as string | undefined;
 
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
@@ -66,6 +68,8 @@ export default function EditMeta() {
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
   const [uriImagem, setUriImagem] = useState<string | null>(null);
 
+  const { familia, isLoading: isLoadingFamilia } = useFamilia(familiaId || null);
+
   useEffect(() => {
     async function loadMeta() {
       const userId = auth.currentUser?.uid;
@@ -74,8 +78,17 @@ export default function EditMeta() {
         return;
       }
       try {
-        const dataMetas = await metasService.buscarTodas(userId);
-        const meta = dataMetas.find((m) => m.id === id);
+        let meta;
+        if (familiaId) {
+          if (!isLoadingFamilia && familia) {
+            meta = familia.metas.find((m) => m.id === id);
+          } else if (isLoadingFamilia) {
+            return; // Aguarda o hook de família carregar
+          }
+        } else {
+          meta = await metasService.buscarPorId(userId, id);
+        }
+        
         if (meta) {
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
@@ -106,7 +119,7 @@ export default function EditMeta() {
       }
     }
     loadMeta();
-  }, [id]);
+  }, [id, familiaId, familia, isLoadingFamilia]);
 
   async function choosePhoto() {
     const fotoEscolhida = await pegarFotoDaGaleria();
@@ -181,7 +194,7 @@ export default function EditMeta() {
         dataLimite: data,
         descricao,
         id_imagem: idImagemGerado || idImagemAntiga,
-      });
+      }, familiaId);
 
       Alert.alert("Sucesso", "Meta atualizada com sucesso!");
       router.back();
@@ -209,7 +222,7 @@ export default function EditMeta() {
 
     setIsAporteLoading(true);
     try {
-      await metasService.contribuir(userId, id, valorFormatado);
+      await metasService.contribuir(userId, id, valorFormatado, familiaId);
       setValorPoupado((prev) => prev + valorFormatado);
       setValorAporte("");
       Alert.alert("Sucesso", "Dinheiro adicionado à meta!");
@@ -233,7 +246,7 @@ export default function EditMeta() {
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
-              await metasService.excluir(userId, id);
+              await metasService.excluir(userId, id, familiaId);
               Alert.alert("Sucesso", "Meta excluída.");
               router.back();
             } catch (error) {
@@ -433,7 +446,7 @@ export default function EditMeta() {
                 onPress={handleExcluir}
                 disabled={isFetching}
               >
-                <Text style={styles.buttonText}>Excluir Meta Pessoal</Text>
+                <Text style={styles.buttonText}>{familiaId ? "Excluir Meta Familiar" : "Excluir Meta Pessoal"}</Text>
                 <Ionicons name="trash-outline" size={20} color="white" />
               </TouchableOpacity>
 

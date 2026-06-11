@@ -19,10 +19,11 @@ import * as Crypto from 'expo-crypto';
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 
 import HeaderBack from "@/src/components/headerBack";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
 import InputDate from "@/src/components/details/metas/inputdata";
+import { useUsuarioLogado } from "@/src/hooks/useUsuarioLogado";
 
 import { pegarFotoDaGaleria } from "@/src/scripts/getImage";
 import { tirarFotoCamera } from "@/src/scripts/getImage";
@@ -49,6 +50,9 @@ const formatarMoeda = (valor: string) => {
 
 export default function AddMeta() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const familiaId = params.familiaId as string | undefined;
+  const { usuario } = useUsuarioLogado();
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
@@ -132,15 +136,22 @@ export default function AddMeta() {
         }
       }
 
-      //salva na firebase
-      await metasService.criar(userId, {
+      const novaMeta: any = {
         nomeMeta,
         categoria: categoriaSelecionada,
         valorTotal: valorFormatado,
         dataLimite: data,
         descricao,
         id_imagem: idImagemGerado //se não tiver foto será retornado null
-      });
+      };
+
+      if (familiaId && usuario) {
+        novaMeta.emailCriador = usuario.email;
+        novaMeta.nomeCriador = usuario.nome;
+      }
+
+      //salva na firebase centralizando a lógica (subcoleção individual ou array da família)
+      await metasService.criar(userId, novaMeta, familiaId);
 
       Alert.alert("Sucesso", "Sua meta foi criada!");
       router.back();
@@ -282,7 +293,9 @@ export default function AddMeta() {
                 <ActivityIndicator color="white" />
               ) : (
                 <>
-                  <Text style={styles.buttonText}>Criar Meta Pessoal</Text>
+                  <Text style={styles.buttonText}>
+                    {familiaId ? "Criar Meta Familiar" : "Criar Meta Pessoal"}
+                  </Text>
                   <Ionicons name="arrow-forward" size={20} color="white" />
                 </>
               )}

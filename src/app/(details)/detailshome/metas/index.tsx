@@ -15,7 +15,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
 
-import { metasService,Meta } from "@/src/services/metasService";
+import { metasService } from "@/src/services/metasService";
+
+import { Meta } from "@/src/types/meta";
 
 
 export default function Metas() {

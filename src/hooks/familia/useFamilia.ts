@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import familiaService from '@/src/services/familiasService'
-import { FamiliaProps } from '@/src/types/familia'
-import { UsuarioProps } from '@/src/types/usuario'
+import { Familia } from '@/src/models/familia'
+import { Usuario } from '@/src/models/usuario'
 
 /**
  * Hook central de leitura da família.
@@ -10,7 +10,7 @@ import { UsuarioProps } from '@/src/types/usuario'
  * (usuário ainda sem família).
  */
 export function useFamilia(familiaId: string | null) {
-    const [familia, setFamilia] = useState<FamiliaProps | null>(null)
+    const [familia, setFamilia] = useState<Familia | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -38,7 +38,7 @@ export function useFamilia(familiaId: string | null) {
         fetchFamilia()
     }, [fetchFamilia])
 
-    const membros: UsuarioProps[] = familia?.membros ?? []
+    const membros: Usuario[] = familia?.membros ?? []
 
     return {
         familia,

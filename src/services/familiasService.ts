@@ -18,10 +18,12 @@ import { db } from './firebaseConfig'
 import { UsuarioProps, UsuarioFirestore } from "@/src/types/usuario";
 import { Usuario } from "@/src/models/usuario";
 import { FamiliaPayloadProps, FamiliaProps } from "@/src/types/familia";
+import { Familia } from "@/src/models/familia";
+import { metasService } from "./metasService";
 
 export class FamiliaService {
 
-  async verMembrosFamilia(id: string): Promise<FamiliaProps | null> {
+  async verMembrosFamilia(id: string): Promise<Familia | null> {
     try {
       const docRef = doc(db, 'familias', id)
       const docSnap = await getDoc(docRef)
@@ -31,7 +33,10 @@ export class FamiliaService {
         return null
       }
 
-      return { id: docSnap.id, ...docSnap.data() } as FamiliaProps
+      // Busca a subcoleção de metas usando o MetasService
+      const metas = await metasService.buscarTodasFamilia(id)
+
+      return Familia.fromJson(docSnap.id, docSnap.data(), metas)
     } catch (error) {
       console.error('Erro ao buscar membros da família:', error)
       throw error
@@ -42,7 +47,7 @@ export class FamiliaService {
     try {
       const codigo_convite = await this.gerarCodigo()
 
-      const novaFamilia: FamiliaPayloadProps = {
+      const novaFamilia = {
         nome,
         codigo_convite,
         admin: admin.toFirestore(),

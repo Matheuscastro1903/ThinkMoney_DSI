@@ -1,18 +1,11 @@
 import { useState, useMemo } from 'react'
 import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
 import { useFamilia } from './useFamilia'
-import { MetaProps } from '@/src/types/meta'
+import { Meta } from '@/src/types/meta'
+import { UsuarioProps } from '@/src/types/usuario'
 
 // Tipo estendido localmente enquanto MetaProps ainda não tem campos definidos.
 // Remover esta extensão quando MetaProps for preenchida no types/meta.ts.
-type MetaComId = MetaProps & {
-    id: string
-    nomeMeta?: string
-    categoria?: string
-    valorPoupado?: number
-    valorTotal?: number
-    criador?: string
-}
 
 /**
  * Hook da tela Metas da família.
@@ -22,13 +15,13 @@ type MetaComId = MetaProps & {
 export function useFamiliaMetas() {
     const { familiaId } = useUsuarioLogado()
     const { familia, membros, isLoading, refetch } = useFamilia(familiaId)
-    const [membroFiltro, setMembroFiltro] = useState('')
+    const [membroFiltro, setMembroFiltro] = useState<UsuarioProps["email"] | null> (null)
 
-    const metas = (familia?.metas ?? []) as MetaComId[]
+    const metas = (familia?.metas ?? []) as Meta[]
 
     const metasFiltradas = useMemo(() => {
         if (!membroFiltro) return metas
-        return metas.filter((m) => m.criador === membroFiltro)
+        return metas.filter((m) => m.emailCriador === membroFiltro)
     }, [metas, membroFiltro])
 
     const patrimonioTotal = useMemo(() =>
@@ -46,5 +39,6 @@ export function useFamiliaMetas() {
         patrimonioTotal,
         isLoading,
         refetch,
+        familiaId,
     }
 }

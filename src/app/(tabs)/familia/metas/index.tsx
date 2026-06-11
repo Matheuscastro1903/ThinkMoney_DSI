@@ -14,15 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import NavBarFamilia from "@/src/components/tabs/familia/navbar/page";
 import InfoCards from "@/src/components/tabs/familia/info-cards";
 import { useFamiliaMetas } from "@/src/hooks/familia/useFamiliaMetas";
-
-type MetaComId = {
-  id: string
-  nomeMeta?: string
-  categoria?: string
-  valorPoupado?: number
-  valorTotal?: number
-  criador?: string
-}
+import { Meta } from "@/src/types/meta";
 
 export default function Metas() {
   const {
@@ -33,6 +25,7 @@ export default function Metas() {
     setMembroFiltro,
     patrimonioTotal,
     isLoading,
+    familiaId,
   } = useFamiliaMetas()
 
   const getIconeCategoria = (categoria?: string) => {
@@ -68,7 +61,7 @@ export default function Metas() {
           >
             <Picker.Item label="Filtrar por membros" value="" />
             {membros.map((m, i) => (
-              <Picker.Item key={m.email ?? i} label={m.nome} value={m.nome} />
+              <Picker.Item key={m.email ?? i} label={m.nome} value={m.email} />
             ))}
           </Picker>
         </View>
@@ -96,15 +89,15 @@ export default function Metas() {
           ) : metasFiltradas.length === 0 ? (
             <Text style={{ color: "white", marginTop: 20 }}>Nenhuma meta encontrada.</Text>
           ) : (
-            (metasFiltradas as MetaComId[]).map((meta) => {
+            (metasFiltradas as Meta[]).map((meta) => {
               const valorPoupado = meta.valorPoupado ?? 0
               const valorTotal = meta.valorTotal ?? 0
               const progresso = valorTotal > 0 ? valorPoupado / valorTotal : 0;
 
               return (
                 <Link key={meta.id} href={{
-                  pathname: "/(tabs)/familia/metas/editar_meta" as any,
-                  params: { id: meta.id }
+                  pathname: "/(details)/detailshome/metas/updatemetas" as any,
+                  params: { id: meta.id, familiaId }
                 }} asChild>
                   <TouchableOpacity style={{ width: "100%" }}>
                     <View style={styles.meta1}>
@@ -117,7 +110,7 @@ export default function Metas() {
                         </Text>
 
                         <Text style={{ color: "#aaa", fontSize: 12 }} numberOfLines={1} ellipsizeMode="tail">
-                          Criado por: {meta.criador}
+                          Criado por: {meta.nomeCriador}
                         </Text>
 
                         <View style={styles.progressValues}>
@@ -158,7 +151,10 @@ export default function Metas() {
             style={styles.linhaSeparadora}>
           </LinearGradient>
 
-          <Link href="/" asChild>
+          <Link href={{
+            pathname: "/(details)/detailshome/metas/cadastrometas",
+            params: { familiaId: familiaId }
+          }} asChild>
             <TouchableOpacity style={styles.addMetaButton}>
               <Ionicons name="add-outline" size={20} color="#1D1252" />
               <Text style={styles.addMetaText}>Nova Meta Familiar</Text>
