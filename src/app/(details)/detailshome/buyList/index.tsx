@@ -15,7 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
 import { ControllerBuscarResumoListas } from "@/src/hooks/useLBuyList";
-import { toBuyListService, ResumoListaCompra } from "@/src/services/buyList";
+import { ResumoListaCompra } from "@/src/services/buyList";
 
 export default function ListasComprasHome() {
   const [listas, setListas] = useState<ResumoListaCompra[]>([]);

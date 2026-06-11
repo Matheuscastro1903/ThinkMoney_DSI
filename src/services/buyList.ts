@@ -1,4 +1,4 @@
-import { collection, addDoc, Timestamp,query, orderBy, getDocs  } from 'firebase/firestore';
+import { collection, addDoc, Timestamp,query, orderBy, getDocs,doc,getDoc } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
 
@@ -10,6 +10,7 @@ export interface ListaCompra {
   totalCompra: number;
   descricao?: string;
   listaFinalizada: boolean; //status global para ver se todos os produtos já foram comprados
+
 }
 
 export interface ProdutoCompra {
@@ -105,7 +106,7 @@ class ToBuyListService {
       }
 
     } catch (error) {
-      console.error("❌ Erro ao criar a lista:",error);
+      console.error(" Erro ao criar a lista:",error);
       return {sucesso:false,
               mensagem:error
 
@@ -154,8 +155,75 @@ class ToBuyListService {
       };
     }
   }
+  async buscarListaPorId(idLista: string): Promise<respostaApi> {
+    try {
+      const docRef = doc(db, 'listasCompras', idLista);
+      const docSnap = await getDoc(docRef);
+
+      
+      const dadosDoBanco = docSnap.data();
+      return {
+        sucesso: true,
+        mensagem: "Lista recuperada com sucesso.",
+        dados: {
+          id: docSnap.id, //id da lista
+            ...dadosDoBanco
+          }
+        };
+       
+    } catch (error) {
+      console.error("Erro ao buscar a lista específica:", error);
+      
+      //falha na requisição
+      return {
+        sucesso: false,
+        // Captura a mensagem de erro original, se existir, para facilitar o debug
+        mensagem: error instanceof Error ? error.message : "Erro desconhecido ao conectar com o banco de dados.",
+      };
+    }
+  }
 
   
 }
 
 export const toBuyListService = new ToBuyListService();
+
+
+/* Retorno da função de retornar lista
+{
+  "sucesso": true,
+  "mensagem": "Lista recuperada com sucesso.",
+  "dados": {
+    "id": "K7mP9xL2wQzR1aB5c", //id da lista
+    "titulo": "Feira Mensal",
+    "categoria": "alimentacao",
+    "descricao": "Compras para a primeira semana de junho",
+    "totalCompra": 145.50,
+    "listaFinalizada": false,
+    "criadoEm": {
+      "seconds": 1718148867,
+      "nanoseconds": 0
+    },
+    "produtos": [
+      {
+        "nome": "Arroz 5kg",
+        "quantidade": 1,
+        "valor": 28.90,
+        "comprado": true
+      },
+      {
+        "nome": "Café em pó",
+        "quantidade": 2,
+        "valor": 15.00,
+        "comprado": false
+      },
+      {
+        "nome": "Leite Integral",
+        "quantidade": 12,
+        "valor": 5.50,
+        "comprado": false
+      }
+    ]
+  }
+}
+*/
