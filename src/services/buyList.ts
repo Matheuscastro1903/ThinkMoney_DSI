@@ -1,5 +1,6 @@
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp,query, orderBy, getDocs  } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+
 
 export interface ListaCompra {
   titulo: string;
@@ -18,10 +19,19 @@ export interface ProdutoCompra {
   comprado: boolean;
 }
 
-interface respostaApi{
-  sucesso:boolean
-  mensagem:string | unknown
+// O <T = any> significa que o campo 'dados' pode receber qualquer formato,
+// mas se não passarmos nada, ele aceita numa boa.
+interface respostaApi<T = any> {
+  sucesso: boolean;
+  mensagem: string | unknown;
+  dados?: T;
+}
 
+export interface ResumoListaCompra {
+  id: string;
+  titulo: string;
+  categoria: string;
+  totalCompra: number;
 }
 
 class ToBuyListService {
@@ -77,7 +87,7 @@ class ToBuyListService {
        */
       const novaListaDoc = await addDoc(listasRef, listaPayload);
 
-      console.log("✅ Capa da lista criada com ID:", novaListaDoc.id);
+      console.log(" Capa da lista criada com ID:", novaListaDoc.id);
 
       //Acessa a subcoleção "produtos" da lista recém-criada
       const produtosRef = collection(db, 'usuarios', userId, 'listasCompras', novaListaDoc.id, 'produtos');
@@ -87,7 +97,7 @@ class ToBuyListService {
         await addDoc(produtosRef, produto);
       }
 
-      console.log("🚀 Lista e produtos cadastrados com sucesso!");
+      console.log(" Lista e produtos cadastrados com sucesso!");
       
       return {sucesso:true,
               mensagem:"Sua lista de compras foi cadastrada!"
@@ -100,6 +110,48 @@ class ToBuyListService {
               mensagem:error
 
       }
+    }
+  }
+  async buscarResumoListas(userId: string): Promise<respostaApi<ResumoListaCompra[]>> {
+    try {
+      console.log("Buscando listas de compras do usuário...");
+
+      const q = query(
+        collection(db, 'usuarios', userId, 'listasCompras'),
+        orderBy('criadoEm', 'desc') 
+      );
+
+      const snapshot = await getDocs(q);
+      
+      //função pega apenas o necessário para mostrar na tela
+      const listas = snapshot.docs.map((doc) => {
+        const data = doc.data() as ListaCompra;
+        
+        return {
+          id: doc.id,
+          titulo: data.titulo,
+          categoria: data.categoria,
+          totalCompra: data.totalCompra
+        };
+      });
+
+      console.log(` ${listas.length} listas encontradas.`);
+      
+      //Retorno no padrão de SUCESSO
+      return {
+        sucesso: true,
+        mensagem: "Listas carregadas com sucesso!",
+        dados: listas
+      };
+
+    } catch (error) {
+      console.error(" Erro ao buscar as listas:", error);
+      
+      //Retorno no padrão de ERRO
+      return {
+        sucesso: false,
+        mensagem: error
+      };
     }
   }
 

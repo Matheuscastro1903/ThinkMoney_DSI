@@ -240,7 +240,7 @@ export default function CriarLista() {
             <View style={styles.sectionHeader}>
               <Text style={styles.labelSection}>PRODUTOS</Text>
             </View>
-            <Text style={styles.hintText}>Pressione um item para marcar como comprado</Text>
+            
 
             <Text style={styles.label}>NOME DO PRODUTO</Text>
             <View style={styles.inputWrapper}>

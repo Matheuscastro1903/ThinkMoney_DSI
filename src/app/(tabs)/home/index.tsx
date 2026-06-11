@@ -260,10 +260,10 @@ export default function Home() {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList/createList')}>
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList')}>
                     <Ionicons name="wallet-outline" size={22} color="#1D1252" />
                     <Text style={styles.text5}>
-                        Visualizar gastos
+                        Visualizar Listas
                     </Text>
                 </TouchableOpacity>
                 <View style={styles.linhaBotao}>
