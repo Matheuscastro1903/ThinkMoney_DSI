@@ -490,7 +490,7 @@ export default function UpdateCompras() {
               ) : (
                 <>
                   <Text style={styles.buttonText}>Salvar alterações</Text>
-                  <Ionicons name="save-outline" size={20} color="white" />
+                  <Ionicons name="pencil-outline" size={20} color="white" />
                 </>
               )}
             </TouchableOpacity>

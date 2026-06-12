@@ -261,7 +261,7 @@ export default function Home() {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList')}>
-                    <Ionicons name="wallet-outline" size={22} color="#1D1252" />
+                    <Ionicons name="basket" size={22} color="#1D1252" />
                     <Text style={styles.text5}>
                         Visualizar Listas
                     </Text>

@@ -29,14 +29,9 @@ const CATEGORIAS = [
   { key: "feira", label: "Feira", icon: "basket" },
 ];
 
-export interface ListaCompra {
-  titulo: string;
-  categoria: string;
-  descricao?: string;
-  localCompra:string
-}
 
-import { ProdutoCompra } from "@/src/models/lista"; 
+
+import { ProdutoCompra,ListaCompra } from "@/src/models/lista"; 
 
 const formatarMoeda = (valor: string) => {
   //troca qualquer valor que não seja numérico por ""
@@ -150,7 +145,7 @@ export default function CriarLista() {
   );
 };
 
-  async function CadastrarLista(){
+  async function CadastrarLista() {
     console.log("Criar lista");
     
     const userId = auth.currentUser?.uid;
@@ -165,44 +160,55 @@ export default function CriarLista() {
     }
 
     if (!tituloCompra.trim()) {
-    Alert.alert("Atenção", "Dê um título para a sua lista de compras.");
-    return;
-  }
+      Alert.alert("Atenção", "Dê um título para a sua lista de compras.");
+      return;
+    }
+
     if (!localCompra.trim()) {
-    Alert.alert("Atenção", "Coloque um local para a sua lista de compras.");
-    return;
-  }
-    
+      Alert.alert("Atenção", "Coloque um local para a sua lista de compras.");
+      return;
+    }
     
     setIsLoading(true);
-    const inforBasicas: ListaCompra = {
-      titulo: tituloCompra,
-      categoria: categoriaSelecionada, 
-      descricao: descricao,
-      localCompra:localCompra  
-    };
 
-    const resposta = await ControllerCriarLista(userId,inforBasicas,listaProdutos)
+    try {
+      const inforBasicas = {
+        titulo: tituloCompra,
+        categoria: categoriaSelecionada, 
+        descricao: descricao,
+        localCompra: localCompra  
+      } as ListaCompra;
 
-    if (resposta.sucesso){
-            Alert.alert("Sucesso", "Lista atualizada com sucesso!");
-            router.back();
+      const resposta = await ControllerCriarLista(userId, inforBasicas, listaProdutos);
 
-        }
-        else {
+      if (resposta.sucesso) {
+        Alert.alert("Sucesso", "Lista cadastrada com sucesso!");
+        router.back(); 
+      } else {
         
-        Alert.alert("Aviso", String(resposta.mensagem) || "Não foi possível atualizar sua lista.");
-        router.back();
-        }
+        Alert.alert("Aviso", String(resposta.mensagem) || "Não foi possível cadastrar sua lista.");
+      }
+
+    } catch (error) {
+      
+      console.error("Erro inesperado no CadastrarLista:", error);
+      Alert.alert("Erro", "Ocorreu um erro ao processar o cadastro.");
+    } finally {
+      //seta como false independente do resultado
+      setIsLoading(false); 
+    }
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+    //edges evita que o conteúdo vaze para as direções
+    <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <HeaderBack />
+        <View style={{ marginBottom: -10}}>
+                  <HeaderBack />
+          </View>
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -446,6 +452,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    paddingTop: 10
   },
   scrollContent: {
     paddingHorizontal: 20,
