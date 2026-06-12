@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import NavBarFamilia from "@/src/components/tabs/familia/navbar/page";
 import InfoCards from "@/src/components/tabs/familia/info-cards";
 import { useFamiliaMetas } from "@/src/hooks/familia/useFamiliaMetas";
-import { Meta } from "@/src/types/meta";
+import { Meta } from '@/src/models/meta';
 
 export default function Metas() {
   const {
@@ -110,7 +110,7 @@ export default function Metas() {
                         </Text>
 
                         <Text style={{ color: "#aaa", fontSize: 12 }} numberOfLines={1} ellipsizeMode="tail">
-                          Criado por: {meta.nomeCriador}
+                          Criado por: {meta.criador?.nome || "Desconhecido"}
                         </Text>
 
                         <View style={styles.progressValues}>

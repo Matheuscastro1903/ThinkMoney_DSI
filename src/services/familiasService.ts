@@ -17,7 +17,7 @@ import { db } from './firebaseConfig'
 
 import { UsuarioProps, UsuarioFirestore } from "@/src/types/usuario";
 import { Usuario } from "@/src/models/usuario";
-import { FamiliaPayloadProps, FamiliaProps } from "@/src/types/familia";
+import { FamiliaProps } from "@/src/types/familia";
 import { Familia } from "@/src/models/familia";
 import { metasService } from "./metasService";
 
@@ -34,7 +34,7 @@ export class FamiliaService {
       }
 
       // Busca a subcoleção de metas usando o MetasService
-      const metas = await metasService.buscarTodasFamilia(id)
+      const metas = await metasService.buscarTodas('dummy', id)
 
       return Familia.fromJson(docSnap.id, docSnap.data(), metas)
     } catch (error) {

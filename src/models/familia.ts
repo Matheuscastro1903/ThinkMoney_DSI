@@ -1,7 +1,7 @@
 import { FamiliaProps } from "../types/familia";
 import { GastoProps } from "../types/gasto";
 import { LembreteProps } from "../types/lembrete";
-import { Meta } from "../types/meta";
+import { Meta } from "./meta";
 import { Usuario } from "./usuario";
 
 export class Familia implements FamiliaProps {

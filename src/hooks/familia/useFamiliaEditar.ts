@@ -1,9 +1,10 @@
-import { Alert } from 'react-native'
+import { Usuario } from '@/src/models/usuario'
 import { useRouter } from 'expo-router'
+
 import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
+import { Alert } from 'react-native'
 import { useFamilia } from './useFamilia'
 import { useFamiliaAcoes } from './useFamiliaAcoes'
-import { UsuarioProps } from '@/src/types/usuario'
 
 /**
  * Hook da tela Editar família.
@@ -16,7 +17,7 @@ export function useFamiliaEditar() {
     const { familia, membros, isLoading, refetch } = useFamilia(familiaId)
     const acoes = useFamiliaAcoes()
 
-    function confirmarRemoverMembro(membro: UsuarioProps) {
+    function confirmarRemoverMembro(membro: Usuario) {
         Alert.alert(
             'Remover membro',
             `Deseja remover ${membro.nome} da família?`,
@@ -36,39 +37,11 @@ export function useFamiliaEditar() {
     }
 
     function confirmarSairDaFamilia() {
-        Alert.alert(
-            'Sair da Família',
-            'Tem certeza que deseja sair desta família? Você precisará de um novo código para entrar novamente.',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                    text: 'Sair',
-                    style: 'destructive',
-                    onPress: async () => {
-                        if (!familiaId) return
-                        await acoes.sairDaFamilia(familiaId)
-                    },
-                },
-            ]
-        )
+        router.push('./(tabs)/familia/editar/confirmar-saida')
     }
 
     function confirmarExcluirFamilia() {
-        Alert.alert(
-            'Excluir Família',
-            'Ao excluir a família, todos os dados compartilhados serão permanentemente removidos. Esta ação não pode ser desfeita.',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                    text: 'Excluir',
-                    style: 'destructive',
-                    onPress: async () => {
-                        if (!familiaId) return
-                        await acoes.excluirFamilia(familiaId)
-                    },
-                },
-            ]
-        )
+        router.push('./(tabs)/familia/editar/confirmar-exclusao')
     }
 
     async function salvarAlteracoes(novoNome: string) {

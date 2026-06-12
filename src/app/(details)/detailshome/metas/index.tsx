@@ -17,7 +17,7 @@ import { auth } from "@/src/services/firebaseConfig";
 
 import { metasService } from "@/src/services/metasService";
 
-import { Meta } from "@/src/types/meta";
+import { Meta } from "@/src/models/meta";
 
 
 export default function Metas() {

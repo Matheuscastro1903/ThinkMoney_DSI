@@ -4,7 +4,7 @@ import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 import InfoCards from '@/src/components/tabs/familia/info-cards';
 import { useFamiliaEditar } from '@/src/hooks/familia/useFamiliaEditar';
 import { useRouter } from 'expo-router';
-import { UsuarioProps } from '@/src/types/usuario';
+import { Usuario } from '@/src/models/usuario';
 
 export default function FamiliaEditar() {
   const router = useRouter()
@@ -36,7 +36,7 @@ export default function FamiliaEditar() {
         {isLoading ? (
           <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
         ) : (
-          membros.map((membro: UsuarioProps, index: number) => (
+          membros.map((membro: Usuario, index: number) => (
             <View key={membro.email ?? index} style={styles.membroRow}>
               <View style={styles.membroInicial}>
                 <Text style={styles.membroInicialText}>

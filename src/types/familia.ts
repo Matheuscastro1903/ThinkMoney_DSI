@@ -1,6 +1,6 @@
 import { GastoProps } from "./gasto";
 import { LembreteProps } from "./lembrete";
-import { Meta } from "./meta";
+import { Meta } from "../models/meta";
 import { Usuario } from "../models/usuario";
 import { UsuarioFirestore } from "./usuario";
 
