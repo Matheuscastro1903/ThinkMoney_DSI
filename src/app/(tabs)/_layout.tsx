@@ -3,8 +3,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Slot } from "expo-router"; //slot— renderiza a tela atual automaticamente
 import NavBar from "@/src/components/tabs/navbar";
 import Header from "@/src/components/Header";
+import { useNotificacoesLembretes } from "@/src/hooks/useNotificacoesLembretes";
 
 export default function Layout() {
+    useNotificacoesLembretes();
+
     return (
         <SafeAreaView style={styles.safeArea}>
 
