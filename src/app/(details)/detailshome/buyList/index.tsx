@@ -94,7 +94,7 @@ export default function ListasComprasHome() {
                 <Link 
                   key={lista.id} 
                   href={{
-                    pathname: "/(details)/detailshome/metas/updatemetas", // Caminho temporário conforme solicitado
+                    pathname: "/(details)/detailshome/buyList/upadateList", // Caminho temporário conforme solicitado
                     params: { id: lista.id }
                   }} 
                   asChild

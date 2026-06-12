@@ -169,7 +169,10 @@ export default function CriarLista() {
     Alert.alert("Atenção", "Dê um título para a sua lista de compras.");
     return;
   }
-    
+    if (!localCompra.trim()) {
+    Alert.alert("Atenção", "Coloque um local para a sua lista de compras.");
+    return;
+  }
     
     
     const inforBasicas: ListaCompra = {

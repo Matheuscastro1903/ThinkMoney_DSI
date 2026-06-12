@@ -44,10 +44,12 @@ export class ListaCompra {
     public totalCompra: number,
     public listaFinalizada: boolean,
     public produtos: ProdutoCompra[],
+    public localCompra:string,
     public id?: string,
     public descricao?: string,
     public dataPrazo?: Date | null,
-    public criadoEm?: Timestamp
+    public criadoEm?: Timestamp,
+    
   ) {}
 
   
@@ -71,10 +73,12 @@ export class ListaCompra {
       dados.totalCompra || 0,
       dados.listaFinalizada || false,
       produtosInstanciados,
+      dados.localCompra,
       dados.id, 
       dados.descricao,
       prazo,
-      dados.criadoEm
+      dados.criadoEm,
+      
     );
   }
 

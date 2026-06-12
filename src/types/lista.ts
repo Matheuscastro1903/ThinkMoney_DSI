@@ -9,7 +9,8 @@ export interface ListaCompraProps {
   totalCompra: number;
   listaFinalizada: boolean; 
   criadoEm?: Timestamp;
-  produtos: ProdutoCompraProps[]; 
+  produtos: ProdutoCompraProps[];
+  localCompra:string 
 }
 
 export interface ProdutoCompraProps {

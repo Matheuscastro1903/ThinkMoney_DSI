@@ -157,36 +157,54 @@ class ToBuyListService {
     }
   }
   async buscarListaPorId(userId: string, idLista: string): Promise<respostaApi> {
-    try {
-      //procurando lista por usuário 
-      const docRef = doc(db, 'usuarios', userId, 'listasCompras', idLista);
-      const docSnap = await getDoc(docRef);
+  try {
+    //pega as informações básicas da lista
+    const docRef = doc(db, 'usuarios', userId, 'listasCompras', idLista);
+    const docSnap = await getDoc(docRef);
+    
+    // Se existir as inf básica...
+    if (docSnap.exists()) {
+      const dadosDoBanco = docSnap.data();
       
-      //se existir algo
-      if (docSnap.exists()) {
-        const dadosDoBanco = docSnap.data();
-        
+      //abrimos a subcoleção para buscar os produtos dessa lista!
+      const produtosRef = collection(db, 'usuarios', userId, 'listasCompras', idLista, 'produtos');
+      const produtosSnap = await getDocs(produtosRef);
+      
+      //Transformamos os documentos do Firebase em um array legível
+      const arrayDeProdutos = produtosSnap.docs.map(docProduto => {
         return {
-          sucesso: true,
-          mensagem: "Lista recuperada com sucesso.",
-          dados: { id: docSnap.id, ...dadosDoBanco }
+          id: docProduto.id, // O ID real do documento do produto no banco
+          ...docProduto.data()
         };
-      } else {
-        //se não existir documento
-        return {
-          sucesso: false,
-          mensagem: "Nenhuma lista encontrada com este ID.",
-        };
-      }
-       
-    } catch (error) {
-      console.error("Erro ao buscar a lista específica:", error);
+      });
+      
+      
+      return {
+        sucesso: true,
+        mensagem: "Lista recuperada com sucesso.",
+        dados: { 
+          id: docSnap.id, 
+          ...dadosDoBanco, 
+          produtos: arrayDeProdutos 
+        }
+      };
+      
+    } else {
+      
       return {
         sucesso: false,
-        mensagem: error instanceof Error ? error.message : "Erro desconhecido ao conectar com o banco de dados.",
+        mensagem: "Nenhuma lista encontrada com este ID.",
       };
     }
+       
+  } catch (error) {
+    console.error("Erro ao buscar a lista específica:", error);
+    return {
+      sucesso: false,
+      mensagem: error instanceof Error ? error.message : "Erro desconhecido ao conectar com o banco de dados.",
+    };
   }
+}
 
   
 }
