@@ -11,10 +11,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "@/src/services/firebaseConfig";
 import { toBuyListService } from "@/src/services/buyList";
+import { ControllerCriarLista } from "@/src/hooks/useLBuyList";
 
 import InputDate from "@/src/components/details/metas/inputdata";
 import HeaderBack from "@/src/components/headerBack";
@@ -34,13 +36,7 @@ export interface ListaCompra {
   localCompra:string
 }
 
-export interface ProdutoCompra {
-  id: string;
-  nome: string;
-  quantidade: number;
-  valor: number; 
-  comprado: boolean;
-}
+import { ProdutoCompra } from "@/src/models/lista"; 
 
 const formatarMoeda = (valor: string) => {
   //troca qualquer valor que não seja numérico por ""
@@ -69,6 +65,8 @@ export default function CriarLista() {
 
   const [listaProdutos, setListaProdutos] = useState<ProdutoCompra[]>([]);
   const [produtoEditandoId, setProdutoEditandoId] = useState<string | null>(null);
+
+  const[isLoading,setIsLoading]=useState(false)
 
   //Prepara a tela para edição
   const handleIniciarEdicao = (produto: ProdutoCompra) => {
@@ -102,34 +100,34 @@ export default function CriarLista() {
 
     if (produtoEditandoId) {
       setListaProdutos(
-        listaProdutos.map((prod) =>
-          prod.id === produtoEditandoId
-            ? {
-                ...prod, 
-                nome: nomeProduto,
-                
-                
-                // Se o usuário editou a quantidade ("5"), convertemos para Number.
-                // Se ficou vazio, salvamos como 0.
-                
-                quantidade: Number(quantidade) || 0,
-                
-                //transformando o valor
-                valor: Number(valorUnitario.replace(/\./g, '').replace(',', '.')) || 0,
-              }
-            : prod
-        )
-      );
+    listaProdutos.map((prod) =>
+    prod.id === produtoEditandoId
+      ? {
+          ...prod, 
+          nome: nomeProduto,
+          
+          // Se o usuário editou a quantidade ("5"), convertemos para Number.
+          // Se ficou vazio, salvamos como 0.
+          quantidade: Number(quantidade) || 0,
+          
+          // transformando o valor
+          valor: Number(valorUnitario.replace(/\./g, '').replace(',', '.')) || 0,
+          
+        } as ProdutoCompra // <--- O "bigode falso" entra exatamente aqui!
+      : prod
+  )
+);
       setProdutoEditandoId(null);
     } else {
-      const novoProduto: ProdutoCompra = {
+      // 1. Tiramos o ": ProdutoCompra" daqui do lado do nome da variável
+      const novoProduto = {
         id: Math.random().toString(),
         nome: nomeProduto,
-        //tranformando o valor que veio como string do estado
         quantidade: Number(quantidade) || 0, 
         valor: Number(valorUnitario.replace(/\./g, '').replace(',', '.')) || 0,
         comprado: false,
-      };
+      } as ProdutoCompra; // 2. E colocamos o "bigode falso" aqui no final!
+
       setListaProdutos([...listaProdutos, novoProduto]);
     }
     
@@ -144,12 +142,13 @@ export default function CriarLista() {
   };
 
   const handleToggleComprado = (id: string) => {
-    setListaProdutos(
-      listaProdutos.map((prod) =>
-        prod.id === id ? { ...prod, comprado: !prod.comprado } : prod
-      )
-    );
-  };
+  setListaProdutos(
+    listaProdutos.map((prod) =>
+      // Se for o ID certo, inverte o 'comprado'. SENÃO (:), devolve o 'prod' original intacto.
+      prod.id === id ? { ...prod, comprado: !prod.comprado } as ProdutoCompra : prod
+    )
+  );
+};
 
   async function CadastrarLista(){
     console.log("Criar lista");
@@ -175,6 +174,7 @@ export default function CriarLista() {
   }
     
     
+    setIsLoading(true);
     const inforBasicas: ListaCompra = {
       titulo: tituloCompra,
       categoria: categoriaSelecionada, 
@@ -182,9 +182,18 @@ export default function CriarLista() {
       localCompra:localCompra  
     };
 
-    const resultado = await toBuyListService.criarLista(userId,inforBasicas,listaProdutos)
-  
-  
+    const resposta = await ControllerCriarLista(userId,inforBasicas,listaProdutos)
+
+    if (resposta.sucesso){
+            Alert.alert("Sucesso", "Lista atualizada com sucesso!");
+            router.back();
+
+        }
+        else {
+        
+        Alert.alert("Aviso", String(resposta.mensagem) || "Não foi possível atualizar sua lista.");
+        router.back();
+        }
   }
 
   return (
@@ -408,11 +417,22 @@ export default function CriarLista() {
               />
             </View>
 
-            <TouchableOpacity style={styles.buttonConfirmar} 
-            activeOpacity={0.85}
-            onPress={CadastrarLista}>
-              <Text style={styles.buttonText}>Criar Lista</Text>
-            </TouchableOpacity>
+            
+
+            <TouchableOpacity 
+                          style={[styles.buttonConfirmar, isLoading && { opacity: 0.7 }]} 
+                          activeOpacity={0.85}
+                          onPress={CadastrarLista}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <ActivityIndicator color="white" />
+                          ) : (
+                            <>
+                              <Text style={styles.buttonText}>Cadastrar Lista</Text>
+                            </>
+                          )}
+                        </TouchableOpacity>
 
           </View>
         </ScrollView>

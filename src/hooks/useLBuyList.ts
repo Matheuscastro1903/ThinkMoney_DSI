@@ -198,4 +198,36 @@ export async function ControllerExcluirLista(
       mensagem: "Erro inesperado ao tentar excluir a lista. Verifique sua conexão e tente novamente."
     };
   }
+
+}
+
+
+export async function ControllerCriarLista(
+  userId: string | undefined | null,
+  dadosBasicos: { titulo: string; categoria: string; descricao?: string; localCompra: string },
+  produtos: ProdutoCompra[] 
+): Promise<RespostaControllerListas> { 
+  
+  //trava de segurança
+  if (!userId || userId.trim() === '') {
+    return { sucesso: false, mensagem: "Usuário não autenticado. Faça login novamente." };
+  }
+
+  try {
+    
+    const resposta = await toBuyListService.criarLista(
+      userId, 
+      dadosBasicos, 
+      produtos
+    );
+
+    return resposta;
+
+  } catch (error) {
+    console.error("Erro no Controller ao criar lista:", error);
+    return {
+      sucesso: false,
+      mensagem: "Erro inesperado ao salvar sua nova lista. Tente novamente."
+    };
+  }
 }

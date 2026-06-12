@@ -6,6 +6,7 @@ export interface ListaCompra {
   titulo: string;
   criadoEm: Timestamp;
   categoria: string;
+  localCompra:string,
   dataPrazo?: Date | null;
   totalCompra: number;
   descricao?: string;
@@ -70,6 +71,7 @@ class ToBuyListService {
         titulo: dadosBasicos.titulo,
         categoria: dadosBasicos.categoria,
         descricao: dadosBasicos.descricao,
+        localCompra:dadosBasicos.localCompra,
         totalCompra: valorTotalCalculado,
         listaFinalizada: todosComprados,
         criadoEm: Timestamp.now(), //Gera a data exata do servidor do Google
