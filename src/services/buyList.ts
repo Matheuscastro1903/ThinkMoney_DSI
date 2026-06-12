@@ -35,6 +35,7 @@ export interface ResumoListaCompra {
   totalCompra: number;
 }
 
+
 class ToBuyListService {
   
   /**
@@ -155,29 +156,33 @@ class ToBuyListService {
       };
     }
   }
-  async buscarListaPorId(idLista: string): Promise<respostaApi> {
+  async buscarListaPorId(userId: string, idLista: string): Promise<respostaApi> {
     try {
-      const docRef = doc(db, 'listasCompras', idLista);
+      //procurando lista por usuário 
+      const docRef = doc(db, 'usuarios', userId, 'listasCompras', idLista);
       const docSnap = await getDoc(docRef);
-
       
-      const dadosDoBanco = docSnap.data();
-      return {
-        sucesso: true,
-        mensagem: "Lista recuperada com sucesso.",
-        dados: {
-          id: docSnap.id, //id da lista
-            ...dadosDoBanco
-          }
+      //se existir algo
+      if (docSnap.exists()) {
+        const dadosDoBanco = docSnap.data();
+        
+        return {
+          sucesso: true,
+          mensagem: "Lista recuperada com sucesso.",
+          dados: { id: docSnap.id, ...dadosDoBanco }
         };
+      } else {
+        //se não existir documento
+        return {
+          sucesso: false,
+          mensagem: "Nenhuma lista encontrada com este ID.",
+        };
+      }
        
     } catch (error) {
       console.error("Erro ao buscar a lista específica:", error);
-      
-      //falha na requisição
       return {
         sucesso: false,
-        // Captura a mensagem de erro original, se existir, para facilitar o debug
         mensagem: error instanceof Error ? error.message : "Erro desconhecido ao conectar com o banco de dados.",
       };
     }
