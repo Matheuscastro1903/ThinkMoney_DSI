@@ -1,4 +1,4 @@
-import { collection, addDoc, Timestamp,query, orderBy, getDocs,doc,getDoc } from 'firebase/firestore';
+import { collection, addDoc, Timestamp,query, orderBy, getDocs,doc,getDoc,deleteDoc } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
 
@@ -205,6 +205,44 @@ class ToBuyListService {
     };
   }
 }
+
+  async excluirLista(userId: string, idLista: string): Promise<respostaApi> {
+    try {
+      console.log(`Iniciando exclusão da lista ${idLista}...`);
+
+      //Primeiro, mapeamos a subcoleção de produtos
+      const produtosRef = collection(db, 'usuarios', userId, 'listasCompras', idLista, 'produtos');
+      const produtosSnap = await getDocs(produtosRef);
+
+      //Deletamos todos os produtos PRIMEIRO. para não restar coleções zumbis
+      //usar Promise.all para disparar todas as deleções ao mesmo tempo (Paralelo),
+      //sendo mais rápido do que deletar um por um com um "for" normal.
+      const deletarProdutosPromises = produtosSnap.docs.map((docProduto) => {
+        return deleteDoc(docProduto.ref);
+      });
+      await Promise.all(deletarProdutosPromises);
+
+      console.log(`${produtosSnap.size} produtos excluídos com sucesso.`);
+
+      //pasta de produtos está vazia, deleta as informações básicas da Lista
+      const listaRef = doc(db, 'usuarios', userId, 'listasCompras', idLista);
+      await deleteDoc(listaRef);
+
+      console.log("Capa da lista excluída com sucesso.");
+
+      return {
+        sucesso: true,
+        mensagem: "Lista de compras apagada permanentemente."
+      };
+
+    } catch (error) {
+      console.error("Erro ao excluir a lista:", error);
+      return {
+        sucesso: false,
+        mensagem: error instanceof Error ? error.message : "Erro desconhecido ao tentar excluir a lista.",
+      };
+    }
+  }
 
   
 }

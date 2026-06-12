@@ -179,9 +179,7 @@ export default function UpdateCompras() {
   };
 
 
-  // ----------------------------------------------------------------------
-  // 6. FUNÇÃO FINAL: ATUALIZAR LISTA NO BANCO DE DADOS
-  // ----------------------------------------------------------------------
+  
   const handleAtualizarLista = async () => {
     
     const userId = auth.currentUser?.uid;
@@ -208,31 +206,26 @@ export default function UpdateCompras() {
     
     
 
-    setIsLoading(true); // Trava os botões
+    setIsLoading(true); 
     
     try {
-      // AQUI ENTRARÁ A LÓGICA DO PRÓXIMO PASSO
-      // 1. Instanciar a classe ListaCompra passando os estados atuais
-      // 2. Chamar o service para mandar para o banco
-      // 3. Mostrar Alert de sucesso e dar router.back()
+      
       
       console.log("Preparando para atualizar...", { tituloCompra, categoriaSelecionada, listaProdutos });
       
-      // Simulando delay de rede para você ver o loading
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      
       Alert.alert("Próximo Passo", "A função de envio para o banco será conectada aqui!");
 
     } catch (error) {
       console.error("Erro ao atualizar lista:", error);
       Alert.alert("Erro", "Ocorreu um erro ao salvar as alterações.");
     } finally {
-      setIsLoading(false); // Destrava os botões
+      setIsLoading(false); 
     }
   };
 
-  // ----------------------------------------------------------------------
-  // 7. FUNÇÃO FINAL: EXCLUIR LISTA
-  // ----------------------------------------------------------------------
+  
   const handleExcluirLista = () => {
     Alert.alert(
       "Excluir Lista",
@@ -243,17 +236,22 @@ export default function UpdateCompras() {
           text: "Excluir",
           style: "destructive",
           onPress: async () => {
-            // AQUI ENTRARÁ O SERVICE DE EXCLUSÃO
-            console.log("Excluindo lista...");
+                const userId = auth.currentUser?.uid;
+                if (!userId) return;
+                try {
+                    await toBuyListService.excluirLista(userId,idLista);
+                    Alert.alert("Sucesso", "Meta excluída.");
+                    router.back();
+                } catch (error) {
+                        Alert.alert("Erro", "Ocorreu um erro ao excluir a meta.");
+                        }        
           },
         },
       ]
     );
   };
 
-  // ----------------------------------------------------------------------
-  // RENDERIZAÇÃO DE SEGURANÇA (Enquanto busca do banco)
-  // ----------------------------------------------------------------------
+
   if (isFetching) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' }}>
@@ -262,9 +260,7 @@ export default function UpdateCompras() {
     );
   }
 
-  // ----------------------------------------------------------------------
-  // RENDERIZAÇÃO DA VIEW
-  // ----------------------------------------------------------------------
+  
   return (
     <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
       <KeyboardAvoidingView
@@ -390,7 +386,7 @@ export default function UpdateCompras() {
               </TouchableOpacity>
             )}
 
-            {/* Renderização da lista de produtos mantida igual */}
+            
             {listaProdutos.map((produto) => (
               <View 
                 key={produto.id} 
@@ -429,7 +425,7 @@ export default function UpdateCompras() {
 
             <View style={styles.separator} />
 
-            {/* --- SEÇÃO: INFORMAÇÕES GERAIS --- */}
+            
             <Text style={styles.labelSection}>INFORMAÇÕES DA LISTA</Text>
 
             <Text style={styles.label}>TÍTULO DA COMPRA</Text>
@@ -471,7 +467,7 @@ export default function UpdateCompras() {
 
             <View style={styles.separator} />
 
-            {/* --- SEÇÃO: AÇÕES FINAIS --- */}
+            
             <TouchableOpacity 
               style={[styles.buttonAtualizar, isLoading && { opacity: 0.7 }]} 
               activeOpacity={0.85}
@@ -515,7 +511,7 @@ export default function UpdateCompras() {
   );
 }
 
-// O restante dos estilos (styles) é idêntico aos arquivos que analisamos:
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
