@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
 import { useFamilia } from './useFamilia'
-import { Meta } from '@/src/types/meta'
+import { Meta } from '@/src/models/meta'
 import { UsuarioProps } from '@/src/types/usuario'
 
 // Tipo estendido localmente enquanto MetaProps ainda não tem campos definidos.
@@ -21,7 +21,7 @@ export function useFamiliaMetas() {
 
     const metasFiltradas = useMemo(() => {
         if (!membroFiltro) return metas
-        return metas.filter((m) => m.emailCriador === membroFiltro)
+        return metas.filter((m) => m.criador?.email === membroFiltro)
     }, [metas, membroFiltro])
 
     const patrimonioTotal = useMemo(() =>

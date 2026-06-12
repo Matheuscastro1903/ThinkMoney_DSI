@@ -5,12 +5,12 @@ import { Component } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import InputTitle from "@/src/components/details/gastos/inputtitle2/page";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
-import InputEnderecoGasto, {
-  Endereco,
-} from "@/src/components/details/gastos/inputendereco/page";
+import InputEnderecoGasto from "@/src/components/details/gastos/inputendereco/page";
+import { EnderecoProps } from "@/src/types/endereco";
+import { Endereco } from "../../../../../models/endereco";
 
 import InputDate from "@/src/components/auth/inputdata";
 import InputFixo from "@/src/components/details/gastos/inputfixo/page";
@@ -18,12 +18,14 @@ import InputFixo from "@/src/components/details/gastos/inputfixo/page";
 import { criarGasto } from "../../../../../services/gastosService";
 import { geocodificarEndereco } from "../../../../../services/geocodingService";
 import { auth } from "../../../../../services/firebaseConfig";
+import usuarioService from "@/src/services/usuarioService";
+import { Gasto } from "@/src/models/gasto";
 
 interface State {
   title: string;
   tituloEndereco: string;
   inputValor: string;
-  inputEndereco: Endereco;
+  inputEndereco: EnderecoProps;
   inputData: Date;
   categoriaSelecionada: string;
   erroValor: string | null;
@@ -35,10 +37,11 @@ interface State {
 
 export default function CriarWithRouter(props: any) {
   const router = useRouter();
-  return <Criar {...props} router={router} />;
+  const params = useLocalSearchParams<{ context?: string; familiaId?: string }>();
+  return <Criar {...props} router={router} context={params.context} familiaId={params.familiaId} />;
 }
 
-export class Criar extends Component<{ router?: any }, State> {
+export class Criar extends Component<{ router?: any, context?: string, familiaId?: string }, State> {
   state: State = {
     title: "",
     tituloEndereco: "",
@@ -115,18 +118,37 @@ export class Criar extends Component<{ router?: any }, State> {
         inputEndereco.cep,
       );
 
-      await criarGasto(user.uid, {
-        valor: valorNumerico,
-        data: inputData,
-        descricao: title,
-        categoria: categoriaSelecionada,
+      const novoGasto = new Gasto(
+        title,
+        categoriaSelecionada,
+        valorNumerico,
+        inputData,
         fixo,
-        endereco: {
-          titulo: tituloEndereco,
-          ...inputEndereco,
-          ...(coordenadas ?? {}),
-        },
-      });
+        undefined,
+        undefined,
+        new Endereco(
+          inputEndereco.logradouro,
+          inputEndereco.numero,
+          inputEndereco.bairro,
+          inputEndereco.cidade,
+          inputEndereco.cep,
+          tituloEndereco,
+          coordenadas?.latitude,
+          coordenadas?.longitude
+        )
+      );
+
+      const { context, familiaId } = this.props;
+
+      if (context === 'familia' && familiaId) {
+        const dadosUsuario = await usuarioService.buscarDadosUsuario(user.uid);
+        if (dadosUsuario) {
+          novoGasto.criador = dadosUsuario;
+        }
+        await criarGasto(user.uid, novoGasto, familiaId);
+      } else {
+        await criarGasto(user.uid, novoGasto);
+      }
       
       this.props.router.back();
     } catch (error) {

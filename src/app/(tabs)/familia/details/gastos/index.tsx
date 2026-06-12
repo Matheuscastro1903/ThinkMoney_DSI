@@ -1,8 +1,9 @@
 import { Feather } from '@expo/vector-icons';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View, Image } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import HeaderBack from '../../../../../components/headerBack';
-import { useFamiliaTransacoes } from '@/src/hooks/familia/useFamiliaTransacoes';
+import { useFamiliaGastos } from '@/src/hooks/familia/useFamiliaGastos'
+import { useRouter } from 'expo-router';
+import HeaderBack from '@/src/components/headerBack';
 
 const AVATAR_1 = require('../../../../../assets/images/avatarcapivara.png');
 const AVATAR_2 = require('../../../../../assets/images/avatarjacare.png');
@@ -10,8 +11,9 @@ const AVATAR_3 = require('../../../../../assets/images/avatarleao.png');
 
 const AVATARES = [AVATAR_1, AVATAR_2, AVATAR_3]
 
-export default function Transacoes() {
-    const { sections, gastoTotal, qtdMembros, isLoading } = useFamiliaTransacoes()
+export default function Gastos() {
+    const router = useRouter();
+    const { isLoading, sections, gastoTotal, qtdMembros, familiaId } = useFamiliaGastos()
 
     return (
         <SafeAreaView style={styles.safeArea} edges={['right', 'bottom', 'left']}>
@@ -59,33 +61,44 @@ export default function Transacoes() {
                             
                             {section.data.map((tx: any, txIdx: number) => (
                                 <View key={tx.id ?? txIdx} style={styles.txCard}>
-                                    <View style={[styles.txIconContainer, { backgroundColor: tx.iconBg ?? '#F1F5F9' }]}>
-                                        <Feather name={tx.iconName ?? 'credit-card'} size={20} color={tx.iconColor ?? '#1D1252'} />
+                                    <View style={[styles.txIconContainer, { backgroundColor: '#F1F5F9' }]}>
+                                        <Feather name="credit-card" size={20} color="#1D1252" />
                                     </View>
                                     
                                     <View style={styles.txInfo}>
-                                        <Text style={styles.txTitle}>{tx.titulo ?? tx.title ?? '—'}</Text>
+                                        <Text style={styles.txTitle}>{tx.titulo ?? tx.descricao ?? '—'}</Text>
                                         <View style={styles.txSubtitleRow}>
-                                            <Text style={styles.txSubtitle}>{tx.data ?? ''} • {tx.categoria ?? tx.category ?? ''}</Text>
+                                            <Text style={styles.txSubtitle}>{tx.categoria ?? ''}</Text>
                                             
-                                            {tx.membroNome && (
+                                            {tx.criador && (
                                                 <View style={styles.memberPill}>
-                                                    {tx.membroAvatar != null && (
-                                                        <Image source={AVATARES[tx.membroAvatar % AVATARES.length]} style={styles.memberPillDot} />
+                                                    {tx.criador.avatar != null && (
+                                                        <Image source={AVATARES[tx.criador.avatar % AVATARES.length]} style={styles.memberPillDot} />
                                                     )}
-                                                    <Text style={styles.memberPillText}>{tx.membroNome}</Text>
+                                                    <Text style={styles.memberPillText}>{tx.criador.nome}</Text>
                                                 </View>
                                             )}
                                         </View>
                                     </View>
                                     
-                                    <View style={styles.txValueContainer}>
+                                    <View style={styles.txActionContainer}>
                                         <Text style={styles.txValue}>
                                             {tx.valor != null
                                                 ? `R$ ${tx.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                                                : tx.value ?? '—'
+                                                : '—'
                                             }
                                         </Text>
+                                        <View style={styles.actionButtons}>
+                                            <TouchableOpacity 
+                                                style={styles.actionBtn}
+                                                onPress={() => router.push({
+                                                    pathname: '/(details)/detailshome/gastos/editar_gasto',
+                                                    params: { gasto: JSON.stringify(tx), context: 'familia', familiaId }
+                                                } as any)}
+                                            >
+                                                <Feather name="edit-2" size={16} color="#4F46E5" />
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 </View>
                             ))}
@@ -254,12 +267,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#475569',
     },
-    txValueContainer: {
+    txActionContainer: {
         justifyContent: 'center',
+        alignItems: 'flex-end',
     },
     txValue: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#1D1252',
+        marginBottom: 8,
     },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    actionBtn: {
+        padding: 4,
+        backgroundColor: '#F1F5F9',
+        borderRadius: 8,
+    }
 });

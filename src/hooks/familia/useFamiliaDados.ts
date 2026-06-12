@@ -1,21 +1,9 @@
 import { useMemo } from 'react'
 import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
 import { useFamilia } from './useFamilia'
-import { GastoProps } from '@/src/types/gasto'
+import { Gasto } from '@/src/models/gasto'
 
-// Tipo estendido localmente enquanto GastoProps ainda não tem campos definidos.
-// Remover esta extensão quando GastoProps for preenchida no types/gasto.ts.
-type GastoComCampos = GastoProps & {
-    id?: string
-    titulo?: string
-    descricao?: string
-    valor?: number
-    categoria?: string
-    membroNome?: string
-    data?: string
-    iconName?: string
-    iconFamily?: string
-}
+
 
 /**
  * Hook da tela Dados da família.
@@ -30,7 +18,7 @@ export function useFamiliaDados() {
     const { familiaId } = useUsuarioLogado()
     const { familia, membros, isLoading, refetch } = useFamilia(familiaId)
 
-    const gastos = (familia?.gastos ?? []) as GastoComCampos[]
+    const gastos = (familia?.gastos ?? []) as Gasto[]
 
     const gastoTotal = useMemo(
         () => gastos.reduce((acc, g) => acc + (g.valor ?? 0), 0),
@@ -40,7 +28,7 @@ export function useFamiliaDados() {
     const gastosPorMembro = useMemo(() => {
         const map: Record<string, number> = {}
         gastos.forEach((g) => {
-            const nome = g.membroNome ?? 'Desconhecido'
+            const nome = g.criador?.nome ?? 'Desconhecido'
             map[nome] = (map[nome] ?? 0) + (g.valor ?? 0)
         })
         return Object.entries(map).map(([nome, valor]) => ({ nome, valor }))
@@ -60,8 +48,9 @@ export function useFamiliaDados() {
         gastoTotal,
         gastosPorMembro,
         gastosPorCategoria,
-        transacoes: gastos,
+        ultimosGastos: gastos,
         qtdMembros: membros.length,
+        familiaId,
         isLoading,
         refetch,
     }

@@ -11,15 +11,37 @@ const CATEGORY_COLORS = ['#1D1252', '#4F46E5', '#818CF8', '#CBD5E1', '#E2E8F0']
 
 export default function Dados() {
     const router = useRouter();
+    
     const {
         familyName,
-        gastoTotal,
-        gastosPorMembro,
-        gastosPorCategoria,
-        transacoes,
-        qtdMembros,
+        //gastoTotal,
+        //gastosPorMembro,
+        // ultimosGastos,
+        // qtdMembros,
+        familiaId,
         isLoading,
     } = useFamiliaDados()
+    
+
+    // --- INÍCIO DOS MOCKS (Apague isso depois) ---
+    const gastoTotal = 4500.50;
+    const qtdMembros = 4;
+    const gastosPorMembro = [
+        { nome: 'João Silva', valor: 2500.00 },
+        { nome: 'Maria Silva', valor: 1500.50 },
+        { nome: 'Pedro Silva', valor: 500.00 },
+    ];
+    const gastosPorCategoria = [
+        { nome: 'Alimentação', valor: 2000.00 },
+        { nome: 'Lazer', valor: 1500.00 },
+        { nome: 'Transporte', valor: 1000.50 },
+    ];
+    const ultimosGastos = [
+        { id: '1', iconFamily: 'Ionicons', iconName: 'cart-outline', titulo: 'Mercado', descricao: 'Compras do mês', valor: 850.00, data: '10/06/2026' },
+        { id: '2', iconFamily: 'Feather', iconName: 'monitor', titulo: 'Netflix', descricao: 'Assinatura', valor: 55.90, data: '05/06/2026' },
+        { id: '3', iconFamily: 'Ionicons', iconName: 'restaurant-outline', titulo: 'Pizzaria', descricao: 'Jantar de fim de semana', valor: 120.00, data: '01/06/2026' },
+    ];
+    // --- FIM DOS MOCKS ---
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -109,13 +131,13 @@ export default function Dados() {
                             </>
                         )}
 
-                        {transacoes.length > 0 && (
+                        {ultimosGastos.length > 0 && (
                             <>
-                                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/details/transacoes' as any)}>
+                                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/details/gastos' as any)}>
                                     <Text style={styles.verTodosLabel}>VER TODOS</Text>
                                 </TouchableOpacity>
 
-                                {transacoes.slice(0, 3).map((tx: any, i: number) => (
+                                {ultimosGastos.slice(0, 3).map((tx: any, i: number) => (
                                     <View key={tx.id ?? i} style={styles.transactionCard}>
                                         <View style={styles.transactionIcon}>
                                             {tx.iconFamily === 'Ionicons' ? (
@@ -142,6 +164,15 @@ export default function Dados() {
                 )}
 
             </ScrollView>
+
+            {!isLoading && familiaId && (
+                <TouchableOpacity
+                    style={styles.fab}
+                    onPress={() => router.push(`/(details)/detailshome/gastos/criar_gasto?context=familia&familiaId=${familiaId}` as any)}
+                >
+                    <Ionicons name="add" size={30} color="#FFFFFF" />
+                </TouchableOpacity>
+            )}
         </SafeAreaView>
     );
 }
@@ -373,5 +404,21 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#94A3B8',
         marginTop: 4,
+    },
+    fab: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 20,
+        bottom: 120, // acima da tab bar
+        backgroundColor: '#4F46E5',
+        borderRadius: 30,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 4 },
+        shadowRadius: 6,
     },
 });

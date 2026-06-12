@@ -13,7 +13,6 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import MaskInput from "react-native-mask-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
@@ -24,6 +23,7 @@ import { buscarUrlDaImagem } from "@/src/services/searchStorage";
 import InputImagem from "@/src/components/details/metas/inputimagem";
 import { pegarFotoDaGaleria} from "@/src/scripts/getImage";
 import { tirarFotoCamera } from "@/src/scripts/getImage";
+import { Meta } from "@/src/models/meta";
 import * as Crypto from 'expo-crypto';
 import { prepararImagemParaUpload } from "@/src/scripts/prepararImagemUpload";
 import { atualizarImagemSupabase } from "@/src/services/atualizarStorage";
@@ -63,6 +63,7 @@ export default function EditMeta() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAporteLoading, setIsAporteLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [metaOriginal, setMetaOriginal] = useState<Meta | null>(null);
 
   const [idImagemAntiga, setIdImagemAntiga] = useState<string | null>(null);
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
@@ -78,24 +79,16 @@ export default function EditMeta() {
         return;
       }
       try {
-        let meta;
-        if (familiaId) {
-          if (!isLoadingFamilia && familia) {
-            meta = familia.metas.find((m) => m.id === id);
-          } else if (isLoadingFamilia) {
-            return; // Aguarda o hook de família carregar
-          }
-        } else {
-          meta = await metasService.buscarPorId(userId, id);
-        }
+        const meta = await metasService.buscarPorId(userId, id, familiaId);
         
         if (meta) {
+          setMetaOriginal(meta);
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
           setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
           
           if (meta.dataLimite) {
-            setData((meta.dataLimite as any).toDate());
+            setData(new Date(meta.dataLimite));
           }
           
           setValorPoupado(meta.valorPoupado);
@@ -187,14 +180,19 @@ export default function EditMeta() {
         }
       }
 
-      await metasService.atualizar(userId, id, {
+      const metaAtualizada = new Meta(
         nomeMeta,
-        categoria: categoriaSelecionada,
-        valorTotal: valorFormatado,
-        dataLimite: data,
+        valorFormatado,
+        valorPoupado,
+        data,
+        categoriaSelecionada,
+        id,
         descricao,
-        id_imagem: idImagemGerado || idImagemAntiga,
-      }, familiaId);
+        idImagemGerado || idImagemAntiga,
+        metaOriginal?.criador
+      );
+
+      await metasService.atualizar(userId, id, metaAtualizada, familiaId);
 
       Alert.alert("Sucesso", "Meta atualizada com sucesso!");
       router.back();

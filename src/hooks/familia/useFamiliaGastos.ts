@@ -3,22 +3,9 @@ import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
 import { useFamilia } from './useFamilia'
 import { GastoProps } from '@/src/types/gasto'
 
-type GastoComCampos = GastoProps & {
-    id?: string
-    titulo?: string
-    descricao?: string
-    valor?: number
-    categoria?: string
-    membroNome?: string
-    membroAvatar?: number
-    data?: string
-    iconName?: string
-    iconFamily?: string
-}
-
 type TransacaoSection = {
     section: string
-    data: GastoComCampos[]
+    data: GastoProps[]
 }
 
 function labelData(data: Date): string {
@@ -36,19 +23,11 @@ function labelData(data: Date): string {
     return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' }).toUpperCase()
 }
 
-/**
- * Hook da tela Transações da família.
- * Lê familia.gastos (campo embutido) e agrupa por data em seções
- * (Hoje / Ontem / datas anteriores formatadas).
- *
- * NOTA: GastoProps ainda está vazio em types/gasto.ts.
- * Quando for preenchido, remover o cast GastoComCampos e ajustar os campos.
- */
-export function useFamiliaTransacoes() {
+export function useFamiliaGastos() {
     const { familiaId } = useUsuarioLogado()
     const { familia, membros, isLoading, refetch } = useFamilia(familiaId)
 
-    const gastos = (familia?.gastos ?? []) as GastoComCampos[]
+    const gastos = (familia?.gastos ?? []) as GastoProps[]
 
     const gastoTotal = useMemo(
         () => gastos.reduce((acc, g) => acc + (g.valor ?? 0), 0),
@@ -56,7 +35,7 @@ export function useFamiliaTransacoes() {
     )
 
     const sections = useMemo<TransacaoSection[]>(() => {
-        const mapa: Record<string, GastoComCampos[]> = {}
+        const mapa: Record<string, GastoProps[]> = {}
 
         gastos.forEach((g) => {
             const data = g.data ? new Date(g.data) : new Date()
@@ -71,7 +50,8 @@ export function useFamiliaTransacoes() {
     return {
         sections,
         gastoTotal,
-        qtdMembros: membros.length,
+        qtdMembros: membros?.length ?? 0,
+        familiaId,
         isLoading,
         refetch,
     }

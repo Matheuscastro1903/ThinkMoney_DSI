@@ -1,69 +1,55 @@
-import { Meta } from '@/src/types/meta';
-import * as Crypto from 'expo-crypto';
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, increment, orderBy, query, Timestamp, updateDoc, where } from 'firebase/firestore';
+import { Meta } from '../models/meta';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, increment, orderBy, query, Timestamp, updateDoc, where } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
+const getMetasCollection = (userId: string, familiaId?: string) =>
+  familiaId
+    ? collection(db, "familias", familiaId, "metas")
+    : collection(db, "usuarios", userId, "metas");
+
+const getMetaDoc = (userId: string, metaId: string, familiaId?: string) =>
+  familiaId
+    ? doc(db, "familias", familiaId, "metas", metaId)
+    : doc(db, "usuarios", userId, "metas", metaId);
+
 class MetasService {
-  async criar(userId: string, dados: Omit<Meta, 'valorPoupado'>, familiaId?: string): Promise<void> {
-    const metaPayload = {
-      ...dados,
-      valorPoupado: 0,
-      criadoEm: Timestamp.now()
-    };
+  async criar(userId: string, meta: Meta, familiaId?: string): Promise<void> {
+    const payload = meta.toJson();
+    // Garante que o valorPoupado inicial seja 0, mas se vier algo, mantém
+    payload.valorPoupado = payload.valorPoupado || 0;
+    payload.criadoEm = Timestamp.now();
 
-    // Para usuários individuais, o próprio Firestore gera o ID do documento na coleção.
-    // Para famílias, salvamos como objeto dentro de um array, então geramos o ID na mão com Crypto.
-    if (familiaId) {
-      metaPayload.id = Crypto.randomUUID();
-      const familiaRef = doc(db, 'familias', familiaId);
-      await updateDoc(familiaRef, {
-        metas: arrayUnion(metaPayload)
-      });
-    } else {
-      await addDoc(collection(db, 'usuarios', userId, 'metas'), metaPayload);
-    }
+    await addDoc(getMetasCollection(userId, familiaId), payload);
   }
 
-  async buscarTodas(userId: string): Promise<(Meta & { id: string })[]> {
+  async buscarTodas(userId: string, familiaId?: string): Promise<Meta[]> {
     const q = query(
-      collection(db, 'usuarios', userId, 'metas'),
+      getMetasCollection(userId, familiaId),
       orderBy('criadoEm', 'desc')
-    )
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Meta }))
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => Meta.fromJson(d.id, d.data()));
   }
 
-  async buscarTodasFamilia(familiaId: string): Promise<(Meta & { id: string })[]> {
-    const q = query(
-      collection(db, 'familias', familiaId, 'metas'),
-      orderBy('criadoEm', 'desc')
-    )
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Meta }))
-  }
-
-  async buscarPorId(userId: string, metaId: string, familiaId?: string): Promise<(Meta & { id: string }) | null> {
-    const metaRef = familiaId
-      ? doc(db, 'familias', familiaId, 'metas', metaId)
-      : doc(db, 'usuarios', userId, 'metas', metaId);
-
+  async buscarPorId(userId: string, metaId: string, familiaId?: string): Promise<Meta | null> {
+    const metaRef = getMetaDoc(userId, metaId, familiaId);
     const snapshot = await getDoc(metaRef);
+
     if (snapshot.exists()) {
-      return { id: snapshot.id, ...snapshot.data() as Meta };
+      return Meta.fromJson(snapshot.id, snapshot.data());
     }
     return null;
   }
 
   async contribuir(userId: string, metaId: string, valor: number, familiaId?: string): Promise<void> {
-    const metaRef = familiaId
-      ? doc(db, 'familias', familiaId, 'metas', metaId)
-      : doc(db, 'usuarios', userId, 'metas', metaId);
+    const metaRef = getMetaDoc(userId, metaId, familiaId);
 
     await updateDoc(metaRef, {
-      valorPoupado: increment(valor)
+      valorPoupado: increment(valor),
+      atualizadoEm: Timestamp.now()
     });
 
-    // Mantemos o histórico de contribuições na coleção do usuário logado (opcionalmente)
+    // Mantemos o histórico de contribuições na coleção do usuário logado
     await addDoc(collection(db, 'usuarios', userId, 'contribuicoes'), {
       valor,
       metaId,
@@ -98,21 +84,19 @@ class MetasService {
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
   }
 
-  async atualizar(userId: string, metaId: string, dados: Partial<Omit<Meta, 'valorPoupado'>>, familiaId?: string): Promise<void> {
-    const metaRef = familiaId
-      ? doc(db, 'familias', familiaId, 'metas', metaId)
-      : doc(db, 'usuarios', userId, 'metas', metaId);
+  async atualizar(userId: string, metaId: string, meta: Meta, familiaId?: string): Promise<void> {
+    const metaRef = getMetaDoc(userId, metaId, familiaId);
 
-    await updateDoc(metaRef, dados)
+    await updateDoc(metaRef, {
+      ...meta.toJson(),
+      atualizadoEm: Timestamp.now()
+    });
   }
 
   async excluir(userId: string, metaId: string, familiaId?: string): Promise<void> {
-    const metaRef = familiaId
-      ? doc(db, 'familias', familiaId, 'metas', metaId)
-      : doc(db, 'usuarios', userId, 'metas', metaId);
-
-    await deleteDoc(metaRef)
+    const metaRef = getMetaDoc(userId, metaId, familiaId);
+    await deleteDoc(metaRef);
   }
 }
 
-export const metasService = new MetasService()
+export const metasService = new MetasService();

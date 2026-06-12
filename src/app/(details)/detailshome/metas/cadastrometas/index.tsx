@@ -16,6 +16,8 @@ import {
 
 import InputImagem from "@/src/components/details/metas/inputimagem";
 import * as Crypto from 'expo-crypto';
+import { Meta } from "@/src/models/meta";
+import usuarioService from "@/src/services/usuarioService";
 import { SafeAreaView } from "react-native-safe-area-context"; // Importação mantida
 
 import HeaderBack from "@/src/components/headerBack";
@@ -136,19 +138,25 @@ export default function AddMeta() {
         }
       }
 
-      const novaMeta: any = {
-        nomeMeta,
-        categoria: categoriaSelecionada,
-        valorTotal: valorFormatado,
-        dataLimite: data,
-        descricao,
-        id_imagem: idImagemGerado //se não tiver foto será retornado null
-      };
-
-      if (familiaId && usuario) {
-        novaMeta.emailCriador = usuario.email;
-        novaMeta.nomeCriador = usuario.nome;
+      let criadorObj = undefined;
+      if (familiaId) {
+        const dadosUsuario = await usuarioService.buscarDadosUsuario(userId);
+        if (dadosUsuario) {
+          criadorObj = dadosUsuario;
+        }
       }
+
+      const novaMeta = new Meta(
+        nomeMeta,
+        valorFormatado,
+        0, // valorPoupado inicial
+        data,
+        categoriaSelecionada,
+        undefined, // id
+        descricao,
+        idImagemGerado,
+        criadorObj
+      );
 
       //salva na firebase centralizando a lógica (subcoleção individual ou array da família)
       await metasService.criar(userId, novaMeta, familiaId);
