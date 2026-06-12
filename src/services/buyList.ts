@@ -1,4 +1,4 @@
-import { collection, addDoc, Timestamp,query, orderBy, getDocs,doc,getDoc,deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, Timestamp,query, orderBy, getDocs,doc,getDoc,deleteDoc,updateDoc } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
 
@@ -14,6 +14,7 @@ export interface ListaCompra {
 }
 
 export interface ProdutoCompra {
+  id:string
   nome: string;
   quantidade: number;
   valor: number; 
@@ -240,6 +241,71 @@ class ToBuyListService {
       return {
         sucesso: false,
         mensagem: error instanceof Error ? error.message : "Erro desconhecido ao tentar excluir a lista.",
+      };
+    }
+  }
+  
+  async atualizarLista(userId: string, idLista: string, dadosBasicos: { 
+      titulo: string; 
+      categoria: string; 
+      descricao?: string;
+      localCompra: string;
+    }, produtos: ProdutoCompra[]): Promise<respostaApi> {
+    try {
+      console.log(`Iniciando a atualização da lista ${idLista}...`);
+
+      //Recalcula o valor total com base nos produtos atuais da tela
+      const valorTotalCalculado = produtos.reduce((total, produto) => total + Number(produto.valor * (produto.quantidade || 1)), 0);
+
+      //Recalcula se todos os produtos foram marcados como comprados
+      const todosComprados = produtos.length > 0 
+        ? produtos.every((produto) => produto.comprado) 
+        : false;
+
+      //montagem do envelope para enviar
+      const capaAtualizadaPayload = {
+        titulo: dadosBasicos.titulo,
+        categoria: dadosBasicos.categoria,
+        descricao: dadosBasicos.descricao || "",
+        localCompra: dadosBasicos.localCompra,
+        totalCompra: valorTotalCalculado,
+        listaFinalizada: todosComprados,
+      };
+
+      //Atualiza o documento principal  
+      const listaRef = doc(db, 'usuarios', userId, 'listasCompras', idLista);
+      await updateDoc(listaRef, capaAtualizadaPayload);
+
+      console.log("Capa da lista atualizada com sucesso. Limpando produtos antigos...");
+
+      
+      const produtosRef = collection(db, 'usuarios', userId, 'listasCompras', idLista, 'produtos');
+      //pega todas as subcoleções antigas
+      const produtosAntigosSnap = await getDocs(produtosRef);
+
+      //Deleta todos os produtos antigos para evitar duplicidade ou itens fantasmas
+      const promisesDelecao = produtosAntigosSnap.docs.map(docProd => deleteDoc(docProd.ref));
+      await Promise.all(promisesDelecao);
+
+      console.log("Produtos antigos limpos. Inserindo os novos produtos da tela...");
+
+      //Salva a nova configuração de produtos vinda da tela
+      for (const produto of produtos) { 
+        await addDoc(produtosRef, produto);
+      }
+
+      console.log("Lista e produtos atualizados com sucesso total!");
+
+      return {
+        sucesso: true,
+        mensagem: "Sua lista de compras foi atualizada com sucesso!"
+      };
+
+    } catch (error) {
+      console.error("Erro ao atualizar a lista de compras:", error);
+      return {
+        sucesso: false,
+        mensagem: error instanceof Error ? error.message : "Erro desconhecido ao atualizar a lista.",
       };
     }
   }

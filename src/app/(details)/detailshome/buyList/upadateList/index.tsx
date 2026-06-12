@@ -17,8 +17,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 
 import { ControllerBuscarListaPorId } from "@/src/hooks/useLBuyList";
-
+import { ControllerExcluirLista } from "@/src/hooks/useLBuyList";
 //Importações dos Serviços e Classes
+import { ControllerAtualizarLista } from "@/src/hooks/useLBuyList";
 import { auth } from "@/src/services/firebaseConfig";
 import { toBuyListService } from "@/src/services/buyList";
 import { ListaCompra,ProdutoCompra } from "@/src/models/lista";
@@ -210,12 +211,22 @@ export default function UpdateCompras() {
     
     try {
       
+        const pacoteRequisicao= {titulo:tituloCompra,
+            categoria: categoriaSelecionada,
+            descricao: descricao,
+            localCompra: localCompra}
+
+        const resposta= await ControllerAtualizarLista(userId,idLista,pacoteRequisicao,listaProdutos)
       
-      console.log("Preparando para atualizar...", { tituloCompra, categoriaSelecionada, listaProdutos });
-      
-      
-      
-      Alert.alert("Próximo Passo", "A função de envio para o banco será conectada aqui!");
+        if (resposta.sucesso){
+            Alert.alert("Sucesso", "Lista atualizada com sucesso!");
+            router.back();
+
+        }
+        else {
+        
+        Alert.alert("Aviso", String(resposta.mensagem) || "Não foi possível atualizar sua lista.");
+      }
 
     } catch (error) {
       console.error("Erro ao atualizar lista:", error);
@@ -239,11 +250,11 @@ export default function UpdateCompras() {
                 const userId = auth.currentUser?.uid;
                 if (!userId) return;
                 try {
-                    await toBuyListService.excluirLista(userId,idLista);
-                    Alert.alert("Sucesso", "Meta excluída.");
+                    await ControllerExcluirLista(userId,idLista);
+                    Alert.alert("Sucesso", "Lista excluída.");
                     router.back();
                 } catch (error) {
-                        Alert.alert("Erro", "Ocorreu um erro ao excluir a meta.");
+                        Alert.alert("Erro", "Ocorreu um erro ao excluir a Lista.");
                         }        
           },
         },
