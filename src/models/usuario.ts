@@ -1,7 +1,7 @@
 import { Timestamp } from "firebase/firestore";
-import { UsuarioFirestore } from "../types/usuario";
+import { UsuarioFirestore, UsuarioProps } from "../types/usuario";
 
-export class Usuario {
+export class Usuario implements Omit<UsuarioProps, 'senha'>{
     constructor(
         public nome: string,
         public email: string,
@@ -17,6 +17,8 @@ export class Usuario {
         public cep: string,
         public avatar: number,
         public criadoEm?: Timestamp,
+        // Vínculo com a família — preenchido ao criar/entrar e limpo ao sair/excluir.
+        public familiaId?: string,
   ) {}
 
   static fromFirestore(dados: UsuarioFirestore): Usuario {
@@ -35,6 +37,7 @@ export class Usuario {
         dados.cep,
         dados.avatar,
         dados.criadoEm,
+        dados.familiaId,
     );
   }
 
@@ -54,6 +57,7 @@ export class Usuario {
         cep: this.cep,
         avatar: this.avatar,
         criadoEm: this.criadoEm ?? Timestamp.now(),
+        ...(this.familiaId !== undefined && { familiaId: this.familiaId }),
     };
   }
 }
