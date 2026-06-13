@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useFocusEffect } from "expo-router";
+import { Link, useRouter, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -18,6 +18,7 @@ import { ControllerBuscarResumoListas } from "@/src/hooks/useLBuyList";
 import { ResumoListaCompra } from "@/src/services/buyList";
 
 export default function ListasComprasHome() {
+  const router = useRouter();
   const [listas, setListas] = useState<ResumoListaCompra[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -96,7 +97,7 @@ export default function ListasComprasHome() {
                   href={{
                     pathname: "/(details)/detailshome/buyList/upadateList", // Caminho temporário conforme solicitado
                     params: { id: lista.id }
-                  }} 
+                  } as any} 
                   asChild
                 >
                   <TouchableOpacity style={{ width: "100%" }}>
@@ -135,12 +136,13 @@ export default function ListasComprasHome() {
           </LinearGradient>
 
           
-          <Link href={"/(details)/detailshome/buyList/createList" as any} asChild>
-            <TouchableOpacity style={styles.botaoAdicionarLista}>
+          <TouchableOpacity 
+          style={styles.botaoAdicionarLista}
+          onPress={() => router.push("/(details)/detailshome/buyList/createList" as any)}
+        >
               <Ionicons name="add-outline" size={20} color="#1D1252" />
               <Text style={styles.textoBotaoAdicionar}>Nova Lista de Compras</Text>
-            </TouchableOpacity>
-          </Link> 
+        </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -274,14 +274,12 @@ export default function UpdateCompras() {
 
   
   return (
-    <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <View style={{ marginBottom: -10}}>
-          <HeaderBack />
-        </View>
+        <HeaderBack />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}

@@ -415,13 +415,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 8,
     marginTop: 25,
-    marginRight: 10,
+    width: '100%',
   },
   categoriasBotoes: {
     flexDirection: "row",
+    flexWrap: "wrap",
     marginTop: 8,
     width: "100%",
     justifyContent: "flex-start",
+    gap: 8,
   },
   categoriaBox: {
     paddingVertical: 6,
@@ -429,7 +431,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 70,
     alignItems: "center",
-    marginRight: 8,
   },
   categoriaIcon: { marginBottom: 6 },
   categoriaText: {

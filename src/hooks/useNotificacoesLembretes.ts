@@ -1,8 +1,13 @@
-import { useEffect } from 'react'
-import * as Notifications from 'expo-notifications'
-import { Platform } from 'react-native'
 import { auth } from '@/src/services/firebaseConfig'
 import { LembretesService } from '@/src/services/lembretesService'
+// import * as Notifications from 'expo-notifications' // Removido para evitar crash no Expo Go SDK 53
+import { useEffect } from 'react'
+import { Platform } from 'react-native'
+
+/* 
+  Notificações push remotas não são suportadas no Expo Go SDK 53. 
+  Comentado temporariamente para não quebrar a execução do aplicativo.
+  Descomente quando gerar um build nativo (APK/AAB).
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -75,12 +80,14 @@ async function agendarNotificacoesLembretes(userId: string) {
     })
   }
 }
+*/
 
 export function useNotificacoesLembretes() {
   useEffect(() => {
     const usuario = auth.currentUser
     if (!usuario) return
 
-    agendarNotificacoesLembretes(usuario.uid)
+    // agendarNotificacoesLembretes(usuario.uid)
+    console.warn("Notificações de lembrete desativadas temporariamente no Expo Go.")
   }, [])
 }

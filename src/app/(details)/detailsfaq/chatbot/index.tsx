@@ -98,7 +98,7 @@ export default function ChatBot() {
              e responda corretamente ao empurrão do teclado sem sumir. */
           contentContainerStyle={{
             flexGrow: 0,
-            paddingBottom: 24,
+            paddingBottom: 8,
             paddingTop: 0,
             justifyContent: "flex-start",
           }}
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   chat: {
-    paddingBottom: 20,
+    paddingBottom: 4,
   },
   ia: {
     marginTop: 12,

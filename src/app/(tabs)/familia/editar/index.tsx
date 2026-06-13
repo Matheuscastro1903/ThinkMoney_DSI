@@ -65,7 +65,7 @@ export default function FamiliaEditar() {
         </TouchableOpacity>
 
         {!isUsuarioLogadoAdmin && !isLoading && (
-          <TouchableOpacity style={styles.sairButton} onPress={() => router.push('/familia/editar/confirmar-saida')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.sairButton} onPress={() => router.push('/familia/editar/confirmar-saida' as any)} activeOpacity={0.7}>
             <Ionicons name="exit-outline" size={16} color="#E1FF00" />
             <Text style={styles.sairButtonText}>Sair da Família</Text>
           </TouchableOpacity>
@@ -78,7 +78,7 @@ export default function FamiliaEditar() {
               permanentemente removidos.
             </Text>
 
-            <TouchableOpacity style={styles.excluirButton} onPress={() => router.push('/familia/editar/confirmar-exclusao')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.excluirButton} onPress={() => router.push('/familia/editar/confirmar-exclusao' as any)} activeOpacity={0.7}>
               {isLoading ? (
                 <ActivityIndicator size="small" color="#EF4444" />
               ) : (

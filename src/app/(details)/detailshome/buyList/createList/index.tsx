@@ -199,14 +199,12 @@ export default function CriarLista() {
 
   return (
     //edges evita que o conteúdo vaze para as direções
-    <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <View style={{ marginBottom: -10}}>
-                  <HeaderBack />
-          </View>
+        <HeaderBack />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
