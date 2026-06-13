@@ -15,14 +15,7 @@ import { auth } from "../../../../../services/firebaseConfig";
 import { buscarGastos } from "../../../../../services/gastosService";
 import { useRouter, Router } from "expo-router";
 
-interface Gasto {
-  id: string;
-  descricao: string;
-  categoria: string;
-  valor: number;
-  data: Date | { toDate: () => Date };
-  fixo: boolean;
-}
+import { Gasto } from "@/src/models/gasto";
 
 const icones: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
   alimentacao: "basket",
@@ -97,7 +90,7 @@ class ListaGastos extends Component<Props, State> {
 
     const filtrados = gastos.filter(
       (g) =>
-        g.descricao.toLowerCase().includes(busca.toLowerCase()) ||
+        g.titulo.toLowerCase().includes(busca.toLowerCase()) ||
         g.categoria.toLowerCase().includes(busca.toLowerCase()),
     );
 
@@ -169,7 +162,7 @@ class ListaGastos extends Component<Props, State> {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {gasto.descricao}
+                    {gasto.titulo}
                   </Text>
                   <Text style={styles.gastoCategoria}>
                     {capitalizarCategoria(gasto.categoria)}

@@ -1,17 +1,9 @@
 import { View, TextInput, Text, StyleSheet } from "react-native";
-
-export interface Endereco {
-    logradouro: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
-    cep: string
-    
-}
+import { EnderecoProps } from "@/src/types/endereco";
 
 interface InputEnderecoProps {
-    inputEndereco: Endereco;
-    atualizando: (patch: Partial<Endereco>) => void;
+    inputEndereco: EnderecoProps;
+    atualizando: (patch: Partial<EnderecoProps>) => void;
     erros?: { logradouro?: string; numero?: string; bairro?: string; cidade?: string }
     maxLengthCEP?:number,
     maxLenght?:number;

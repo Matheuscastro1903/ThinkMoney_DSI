@@ -1,48 +1,39 @@
-import { useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-
-// Trocar pela interface correta depois
-interface FamiliaProps {
-    qtdMembros: number,
-    qtdMetas: number,
-}
-
-// Importar dados reais depois
-const mockData: FamiliaProps = {
-    qtdMembros: 3,
-    qtdMetas: 5,
-};
+import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado';
+import { useFamilia } from '@/src/hooks/familia/useFamilia';
 
 export default function InfoCards() {
-    const[qtdMembros, setQtdMembros] = useState<number>(0)
-    const[qtdMetas, setQtdMetas] = useState<number>(0)
+    const { familiaId } = useUsuarioLogado()
+    const { familia, isLoading } = useFamilia(familiaId)
 
-    useEffect(() => {
-        setQtdMembros(mockData.qtdMembros)
-        setQtdMetas(mockData.qtdMetas)
-    }, [])
+    const qtdMembros = familia?.membros.length ?? 0
+    const qtdMetas = familia?.metas.length ?? 0
 
     return (
-    <View style={styles.quickStats}>
-        <View style={styles.statCard}>
-            <Ionicons name="people" size={18} color="#1D1252" />
-            <View style={styles.statInfo}>
-            <Text style={styles.statNumber}>
-                {qtdMembros}
-            </Text>
-            <Text style={styles.statLabel}>MEMBROS</Text>
+        <View style={styles.quickStats}>
+            <View style={styles.statCard}>
+                <Ionicons name="people" size={18} color="#1D1252" />
+                <View style={styles.statInfo}>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#1D1252" />
+                    ) : (
+                        <Text style={styles.statNumber}>{qtdMembros}</Text>
+                    )}
+                    <Text style={styles.statLabel}>MEMBROS</Text>
+                </View>
             </View>
-        </View>
-        <View style={styles.statCard}>
-            <Ionicons name="flag-outline" size={18} color="#1D1252" />
-            <View style={styles.statInfo}>
-            <Text style={styles.statNumber}>
-                {qtdMetas}
-            </Text>
-            <Text style={styles.statLabel}>METAS</Text>
+            <View style={styles.statCard}>
+                <Ionicons name="flag-outline" size={18} color="#1D1252" />
+                <View style={styles.statInfo}>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#1D1252" />
+                    ) : (
+                        <Text style={styles.statNumber}>{qtdMetas}</Text>
+                    )}
+                    <Text style={styles.statLabel}>METAS</Text>
+                </View>
             </View>
-        </View>
         </View>
     )
 }
@@ -68,6 +59,8 @@ const styles = StyleSheet.create({
   },
   statInfo: {
     alignItems: 'center',
+    minHeight: 30,
+    justifyContent: 'center',
   },
   statNumber: {
     fontSize: 16,

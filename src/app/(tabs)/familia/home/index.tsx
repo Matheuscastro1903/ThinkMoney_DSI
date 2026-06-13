@@ -1,26 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { avatares } from '@/src/components/auth/escolhaavantar';
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 import InfoCards from '@/src/components/tabs/familia/info-cards';
-
-const familyData = {
-  name: 'Família Silva',
-  code: 'THKM-X7R2-89',
-  membersCount: 3,
-  goalsCount: 5,
-};
-
-const members = [
-  { id: 1, name: 'Henrique Cavalcante', role: 'Responsável', avatarId: 5 as keyof typeof avatares },
-  { id: 2, name: 'Mariana Cavalcante', role: 'Membro', avatarId: 3 as keyof typeof avatares },
-  { id: 3, name: 'Lucas Cavalcante', role: 'Membro', avatarId: 4 as keyof typeof avatares },
-];
+import { useFamiliaHome } from '@/src/hooks/familia/useFamiliaHome';
 
 export default function FamiliaHome() {
-  function copiarCodigo() {
-    Alert.alert('Código copiado!', `${familyData.code} foi copiado para a área de transferência.`);
-  }
+  const { familyName, membros, codigoConvite, isLoading, copiarCodigo, admin } = useFamiliaHome()
 
   return (
     <ScrollView
@@ -29,7 +15,7 @@ export default function FamiliaHome() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerContainer}>
-          <Text style={styles.familyName}>Família Silva</Text>
+          <Text style={styles.familyName}>{`Família ${familyName}`}</Text>
 
           <InfoCards/>
 
@@ -37,22 +23,33 @@ export default function FamiliaHome() {
         </View>
 
         <View style={styles.membersSection}>
-          {members.map((member) => (
-            <View key={member.id} style={styles.memberCard}>
-              <View style={styles.memberAvatar}>
-                <Image source={avatares[member.avatarId]} style={styles.memberAvatarImage} />
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
+          ) : membros.length === 0 ? (
+            <Text style={styles.emptyText}>Nenhum membro encontrado.</Text>
+          ) : (
+            membros.map((member, index) => (
+              <View key={member.email ?? index} style={styles.memberCard}>
+                <View style={styles.memberAvatar}>
+                  <Image
+                    source={avatares[member.avatar as keyof typeof avatares] ?? avatares[1]}
+                    style={styles.memberAvatarImage}
+                  />
+                </View>
+                <Text style={styles.memberName}>{member.nome}</Text>
+                <Text style={styles.memberRole}>
+                  {admin && member.email === admin.email ? 'ADMIN' : 'MEMBRO'}
+                </Text>
               </View>
-              <Text style={styles.memberName}>{member.name}</Text>
-              <Text style={styles.memberRole}>{member.role.toUpperCase()}</Text>
-            </View>
-          ))}
+            ))
+          )}
         </View>
 
         <View style={styles.codeCard}>
           <View style={styles.codeRow}>
             <View style={styles.codeInfo}>
               <Text style={styles.codeLabel}>CÓDIGO DE ACESSO DA FAMÍLIA</Text>
-              <Text style={styles.codeValue}>{familyData.code}</Text>
+              <Text style={styles.codeValue}>{codigoConvite}</Text>
             </View>
             <TouchableOpacity style={styles.copyButton} onPress={copiarCodigo} activeOpacity={0.7}>
               <Ionicons name="copy-outline" size={20} color="#ffffff" />
@@ -92,73 +89,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
     gap: 24,
-  },
-  quickStats: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 40,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  statInfo: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#000000',
-    letterSpacing: 1,
-    textAlign: 'center',
-  },
-  actionTabs: {
-    flexDirection: 'row',
-    width: '100%',
-    paddingHorizontal: 20,
-    gap: 8,
-  },
-  actionButton: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
-    elevation: 1,
-    borderWidth: 1,
-    borderColor: 'rgba(229,222,255,0.3)',
-  },
-  actionButtonActive: {
-    backgroundColor: '#000000',
-  },
-  actionButtonText: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#1D1252',
-  },
-  actionButtonTextActive: {
-    color: '#ffffff',
   },
   membersSection: {
     width: '100%',
@@ -200,6 +130,11 @@ const styles = StyleSheet.create({
     color: '#867DC1',
     letterSpacing: 1,
     textAlign: 'center',
+  },
+  emptyText: {
+    color: 'rgba(255,255,255,0.6)',
+    textAlign: 'center',
+    marginTop: 20,
   },
   codeCard: {
     backgroundColor: '#ffffff',

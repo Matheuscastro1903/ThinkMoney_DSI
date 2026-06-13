@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { Link } from "expo-router";
 import {
   ActivityIndicator,
   ScrollView,
@@ -14,29 +13,22 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import NavBarFamilia from "@/src/components/tabs/familia/navbar/page";
 import InfoCards from "@/src/components/tabs/familia/info-cards";
-
-type Meta = {
-  id: string,
-  nomeMeta: string,
-  categoria: string,
-  valorPoupado: number,
-  valorTotal: number,
-  criador: string
-}
-
-const metasMock: (Meta & { id: string })[] = [
-  { id: "1", nomeMeta: "Viagem para Europa", categoria: "viagem", valorPoupado: 8000, valorTotal: 20000, criador: "João" },
-  { id: "2", nomeMeta: "Casa própria", categoria: "casa", valorPoupado: 45000, valorTotal: 200000, criador: "Matheus" },
-  { id: "3", nomeMeta: "Carro novo", categoria: "carro", valorPoupado: 12000, valorTotal: 35000, criador: "Leo" },
-]
+import { useFamiliaMetas } from "@/src/hooks/familia/useFamiliaMetas";
+import { Meta } from '@/src/models/meta';
 
 export default function Metas() {
-  const router = useRouter();
-  const [membro, setMembro] = useState("");
-  const [metas, setMetas] = useState<(Meta & { id: string })[]>(metasMock);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    familyName,
+    metasFiltradas,
+    membros,
+    membroFiltro,
+    setMembroFiltro,
+    patrimonioTotal,
+    isLoading,
+    familiaId,
+  } = useFamiliaMetas()
 
-  const getIconeCategoria = (categoria: string) => {
+  const getIconeCategoria = (categoria?: string) => {
     switch (categoria) {
       case "viagem": return "airplane";
       case "casa": return "home";
@@ -51,7 +43,7 @@ export default function Metas() {
       <ScrollView style={styles.container}>
       <View>
         <View style={styles.headerContainer}>
-          <Text style={styles.title}>Família Silva</Text>
+          <Text style={styles.title}>{`Família ${familyName}`}</Text>
 
           <InfoCards/>
 
@@ -61,15 +53,16 @@ export default function Metas() {
 
         <View style={styles.containerPicker}>
           <Picker
-            selectedValue={membro}
-            onValueChange={(value) => setMembro(value)}
+            selectedValue={membroFiltro}
+            onValueChange={(value) => setMembroFiltro(value)}
             style={styles.picker}
             dropdownIconColor="#999"
             itemStyle={{ height: 40 }}
           >
             <Picker.Item label="Filtrar por membros" value="" />
-            <Picker.Item label="João" value="joao" />
-            <Picker.Item label="Maria" value="maria" />
+            {membros.map((m, i) => (
+              <Picker.Item key={m.email ?? i} label={m.nome} value={m.email} />
+            ))}
           </Picker>
         </View>
 
@@ -80,11 +73,11 @@ export default function Metas() {
             </View>
           </View>
           <Text style={styles.valor}>
-            R$ 45.000,00
+            R$ {patrimonioTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Text>
           <View style={styles.saldoFooter}>
             <Ionicons name="trending-up" size={16} color="#34D399" />
-            <Text style={styles.saldoTrend}> +R$ 2.450,00 este mês</Text>
+            <Text style={styles.saldoTrend}> Patrimônio acumulado</Text>
           </View>
         </View>
 
@@ -93,16 +86,18 @@ export default function Metas() {
 
           {isLoading ? (
             <ActivityIndicator size="large" color="white" style={{ marginTop: 20 }} />
-          ) : metas.length === 0 ? (
+          ) : metasFiltradas.length === 0 ? (
             <Text style={{ color: "white", marginTop: 20 }}>Nenhuma meta encontrada.</Text>
           ) : (
-            metas.map((meta) => {
-              const progresso = meta.valorTotal > 0 ? meta.valorPoupado / meta.valorTotal : 0;
+            (metasFiltradas as Meta[]).map((meta) => {
+              const valorPoupado = meta.valorPoupado ?? 0
+              const valorTotal = meta.valorTotal ?? 0
+              const progresso = valorTotal > 0 ? valorPoupado / valorTotal : 0;
 
               return (
                 <Link key={meta.id} href={{
-                  pathname: "/(tabs)/familia/metas/editar_meta" as any,
-                  params: { id: meta.id }
+                  pathname: "/(details)/detailshome/metas/updatemetas" as any,
+                  params: { id: meta.id, familiaId }
                 }} asChild>
                   <TouchableOpacity style={{ width: "100%" }}>
                     <View style={styles.meta1}>
@@ -115,20 +110,18 @@ export default function Metas() {
                         </Text>
 
                         <Text style={{ color: "#aaa", fontSize: 12 }} numberOfLines={1} ellipsizeMode="tail">
-                          Criado por: {meta.criador}
+                          Criado por: {meta.criador?.nome || "Desconhecido"}
                         </Text>
 
-                        {/* Valores */}
                         <View style={styles.progressValues}>
                           <Text style={styles.progressValueStart}>
-                            R$ {meta.valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            R$ {valorPoupado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </Text>
                           <Text style={styles.progressValueEnd}>
-                            de R$ {meta.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            de R$ {valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </Text>
                         </View>
 
-                        {/* Barra de Progresso */}
                         <View style={styles.progressBarContainer}>
                           <View
                             style={[
@@ -139,7 +132,6 @@ export default function Metas() {
                         </View>
                       </View>
 
-                      {/* Porcentagem no canto superior direito */}
                       <View style={styles.percentageContainer}>
                         <Text style={styles.percentageText}>
                           {Math.round(progresso * 100)}%
@@ -159,7 +151,10 @@ export default function Metas() {
             style={styles.linhaSeparadora}>
           </LinearGradient>
 
-          <Link href="/" asChild>
+          <Link href={{
+            pathname: "/(details)/detailshome/metas/cadastrometas",
+            params: { familiaId: familiaId }
+          }} asChild>
             <TouchableOpacity style={styles.addMetaButton}>
               <Ionicons name="add-outline" size={20} color="#1D1252" />
               <Text style={styles.addMetaText}>Nova Meta Familiar</Text>
@@ -333,7 +328,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 15,
-
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -367,7 +361,4 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     borderRadius: 25,
   },
-  criador: {
-    color: "black"
-  }
 });

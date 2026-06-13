@@ -8,7 +8,8 @@ import InputRenda from '@/src/components/auth/inputrenda';
 
 // Informacoes firebase
 import { auth, db } from '@/src/services/firebaseConfig';
-import { buscarGastos, Gasto } from '@/src/services/gastosService';
+import { buscarGastos } from '@/src/services/gastosService';
+import { Gasto } from '@/src/models/gasto';
 import { metasService } from '@/src/services/metasService';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -290,7 +291,7 @@ export default function Home() {
                                 <Ionicons name={icones[gasto.categoria?.toLowerCase()] ?? "cart-outline"} size={20} color="#1D1252" />
                             </View>
                             <View style={{ flex: 1, marginLeft: 12 }}>
-                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.descricao}</Text>
+                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.titulo}</Text>
                                 <Text style={styles.textCategoria}>{capitalizarCategoria(gasto.categoria)}</Text>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>

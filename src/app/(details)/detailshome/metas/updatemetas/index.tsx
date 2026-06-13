@@ -13,16 +13,17 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import MaskInput from "react-native-mask-input";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
+import { useFamilia } from "@/src/hooks/familia/useFamilia";
 import InputDate from "@/src/components/details/metas/inputdata";
 import { buscarUrlDaImagem } from "@/src/services/searchStorage";
 import InputImagem from "@/src/components/details/metas/inputimagem";
 import { pegarFotoDaGaleria} from "@/src/scripts/getImage";
 import { tirarFotoCamera } from "@/src/scripts/getImage";
+import { Meta } from "@/src/models/meta";
 import * as Crypto from 'expo-crypto';
 import { prepararImagemParaUpload } from "@/src/scripts/prepararImagemUpload";
 import { atualizarImagemSupabase } from "@/src/services/atualizarStorage";
@@ -39,6 +40,7 @@ export default function EditMeta() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const id = params.id as string;
+  const familiaId = params.familiaId as string | undefined;
 
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
@@ -51,10 +53,13 @@ export default function EditMeta() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAporteLoading, setIsAporteLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [metaOriginal, setMetaOriginal] = useState<Meta | null>(null);
 
   const [idImagemAntiga, setIdImagemAntiga] = useState<string | null>(null);
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
   const [uriImagem, setUriImagem] = useState<string | null>(null);
+
+  const { familia, isLoading: isLoadingFamilia } = useFamilia(familiaId || null);
 
   useEffect(() => {
     async function loadMeta() {
@@ -64,15 +69,16 @@ export default function EditMeta() {
         return;
       }
       try {
-        const dataMetas = await metasService.buscarTodas(userId);
-        const meta = dataMetas.find((m) => m.id === id);
+        const meta = await metasService.buscarPorId(userId, id, familiaId);
+        
         if (meta) {
+          setMetaOriginal(meta);
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
           setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
           
           if (meta.dataLimite) {
-            setData((meta.dataLimite as any).toDate());
+            setData(new Date(meta.dataLimite));
           }
           
           setValorPoupado(meta.valorPoupado);
@@ -96,7 +102,7 @@ export default function EditMeta() {
       }
     }
     loadMeta();
-  }, [id]);
+  }, [id, familiaId, familia, isLoadingFamilia]);
 
   async function choosePhoto() {
     const fotoEscolhida = await pegarFotoDaGaleria();
@@ -164,14 +170,19 @@ export default function EditMeta() {
         }
       }
 
-      await metasService.atualizar(userId, id, {
+      const metaAtualizada = new Meta(
         nomeMeta,
-        categoria: categoriaSelecionada,
-        valorTotal: valorFormatado,
-        dataLimite: data,
+        valorFormatado,
+        valorPoupado,
+        data,
+        categoriaSelecionada,
+        id,
         descricao,
-        id_imagem: idImagemGerado || idImagemAntiga,
-      });
+        idImagemGerado || idImagemAntiga,
+        metaOriginal?.criador
+      );
+
+      await metasService.atualizar(userId, id, metaAtualizada, familiaId);
 
       Alert.alert("Sucesso", "Meta atualizada com sucesso!");
       router.back();
@@ -199,7 +210,7 @@ export default function EditMeta() {
 
     setIsAporteLoading(true);
     try {
-      await metasService.contribuir(userId, id, valorFormatado);
+      await metasService.contribuir(userId, id, valorFormatado, familiaId);
       setValorPoupado((prev) => prev + valorFormatado);
       setValorAporte("");
       Alert.alert("Sucesso", "Dinheiro adicionado à meta!");
@@ -223,7 +234,7 @@ export default function EditMeta() {
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
-              await metasService.excluir(userId, id);
+              await metasService.excluir(userId, id, familiaId);
               Alert.alert("Sucesso", "Meta excluída.");
               router.back();
             } catch (error) {
@@ -423,16 +434,14 @@ export default function EditMeta() {
                 onPress={handleExcluir}
                 disabled={isFetching}
               >
-                <Text style={styles.buttonText}>Excluir Meta Pessoal</Text>
+                <Text style={styles.buttonText}>{familiaId ? "Excluir Meta Familiar" : "Excluir Meta Pessoal"}</Text>
                 <Ionicons name="trash-outline" size={20} color="white" />
               </TouchableOpacity>
 
               {/* Botão para cancelar */}
-              <Link href={"/"} asChild>
-                <TouchableOpacity style={styles.cancelar}>
-                  <Text style={styles.textocancelar}>Cancelar</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity style={styles.cancelar} onPress={() => router.back()}>
+                <Text style={styles.textocancelar}>Cancelar</Text>
+              </TouchableOpacity>
 
               {/* Footer */}
               <Text style={styles.footerText}>

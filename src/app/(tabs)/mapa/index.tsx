@@ -9,7 +9,8 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { buscarGastos, atualizarGasto, Gasto } from "../../../services/gastosService";
+import { buscarGastos, atualizarGasto } from "../../../services/gastosService";
+import { Gasto } from "@/src/models/gasto";
 import { geocodificarEndereco } from "../../../services/geocodingService";
 import { auth } from "../../../services/firebaseConfig";
 
@@ -82,14 +83,15 @@ export default function Mapa() {
 
           if (!coords) continue;
 
-          const gastoAtualizado = { ...g, endereco: { ...g.endereco!, ...coords } };
-          lista[i] = gastoAtualizado;
+          g.endereco!.latitude = coords.latitude;
+          g.endereco!.longitude = coords.longitude;
+          lista[i] = g;
 
           // Atualiza os marcadores progressivamente
           setGastos([...lista]);
 
           // Persiste no Firebase para não geocodificar novamente
-          atualizarGasto(uid, g.id, { endereco: gastoAtualizado.endereco }).catch(console.error);
+          atualizarGasto(uid, g.id as string, g).catch(console.error);
         }
 
         // Centraliza o mapa para englobar todos os pins
@@ -134,7 +136,7 @@ export default function Mapa() {
                 latitude: g.endereco!.latitude!,
                 longitude: g.endereco!.longitude!,
               }}
-              title={g.endereco?.titulo || g.descricao}
+              title={g.endereco?.titulo || g.titulo}
               description={`${formatarValor(g.valor)} • ${g.categoria}`}
             />
           ))}
@@ -155,7 +157,7 @@ export default function Mapa() {
           gastos.slice(0, 5).map((g, i) => (
             <TransactionItem
               key={g.id}
-              name={g.descricao}
+              name={g.titulo}
               info={`${g.endereco?.cidade || "—"} • ${formatarData(g.data)}`}
               amount={`- ${formatarValor(g.valor)}`}
               card={g.categoria}

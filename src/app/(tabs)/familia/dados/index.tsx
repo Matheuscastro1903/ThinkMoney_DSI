@@ -1,123 +1,157 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 import InfoCards from '@/src/components/tabs/familia/info-cards';
+import { useFamiliaDados } from '@/src/hooks/familia/useFamiliaDados';
 
-const MOCK_MEMBERS = [
-    { id: '1', name: 'Henrique', value: 'R$ 8.240,00', percent: '60%', color: '#1D1252' },
-    { id: '2', name: 'Mariana', value: 'R$ 4.880,00', percent: '40%', color: '#6366F1' },
-    { id: '3', name: 'Lucas', value: 'R$ 2.300,00', percent: '20%', color: '#94A3B8' },
-];
-
-const MOCK_CATEGORIES = [
-    { id: '1', name: 'Moradia', value: 'R$ 5.397,00', percent: '35%', color: '#1D1252' },
-    { id: '2', name: 'Alimentação', value: 'R$ 3.855,00', percent: '25%', color: '#4F46E5' },
-    { id: '3', name: 'Transporte', value: 'R$ 2.313,00', percent: '15%', color: '#818CF8' },
-    { id: '4', name: 'Lazer', value: 'R$ 2.313,00', percent: '15%', color: '#CBD5E1' },
-    { id: '5', name: 'Outros', value: 'R$ 1.542,00', percent: '10%', color: '#E2E8F0' },
-];
-
-const MOCK_TRANSACTIONS = [
-    { id: '1', iconName: 'shopping-bag', iconFamily: 'Feather', title: 'Mariana Cavalcante', desc: 'SUPERMERCADO PREMIUM', value: '- R$ 420,50', date: '10/05/2026' },
-    { id: '2', iconName: 'wallet-outline', iconFamily: 'Ionicons', title: 'Meta: Viagem Itália', desc: 'APORTE MENSAL AUTOMÁTICO', value: '+ R$ 2.000,00', date: '10/05/2026' },
-    { id: '3', iconName: 'credit-card', iconFamily: 'Feather', title: 'Lucas Cavalcante', desc: 'STREAMING & GAMES', value: '- R$ 54,90', date: '10/05/2026' },
-];
+// Cores fixas para os itens de categoria (visual)
+const CATEGORY_COLORS = ['#1D1252', '#4F46E5', '#818CF8', '#CBD5E1', '#E2E8F0']
 
 export default function Dados() {
     const router = useRouter();
-
+    
+    const {
+        familyName,
+        gastoTotal,
+        gastosPorMembro,
+        ultimosGastos,
+        qtdMembros,
+        gastosPorCategoria,
+        familiaId,
+        isLoading,
+    } = useFamiliaDados()
+    
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                 
                 <View style={styles.headerContainer}>
-                    <Text style={styles.title}>Família Silva</Text>
+                    <Text style={styles.title}>{`Família ${familyName}`}</Text>
 
                     <InfoCards/>
 
                     <NavBarFamilia></NavBarFamilia>
                 </View>
 
-                <View style={styles.mainCard}>
-                    <Text style={styles.cardHeaderTitle}>GASTO MENSAL DA FAMÍLIA</Text>
-                    <View style={styles.cardValueContainer}>
-                        <Text style={styles.currencySymbol}>R$</Text>
-                        <Text style={styles.cardValue}>15.420,00</Text>
-                    </View>
-                    <Text style={styles.cardFooterText}>3 membros ativos este mês</Text>
-                </View>
-
-                <Text style={styles.sectionTitle}>JANEIRO 2026</Text>
-                
-                <View style={styles.mainCard}>
-                    {MOCK_MEMBERS.map((member) => (
-                        <View key={member.id} style={styles.memberItem}>
-                            <View style={styles.memberHeader}>
-                                <Text style={styles.memberName}>{member.name}</Text>
-                                <Text style={styles.memberValue}>{member.value}</Text>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 40 }} />
+                ) : (
+                    <>
+                        <View style={styles.mainCard}>
+                            <Text style={styles.cardHeaderTitle}>GASTO MENSAL DA FAMÍLIA</Text>
+                            <View style={styles.cardValueContainer}>
+                                <Text style={styles.currencySymbol}>R$</Text>
+                                <Text style={styles.cardValue}>
+                                    {gastoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </Text>
                             </View>
-                            <View style={styles.progressBarBackground}>
-                                <View style={[styles.progressBarFill, { width: member.percent as any, backgroundColor: member.color }]} />
-                            </View>
+                            <Text style={styles.cardFooterText}>{qtdMembros} membros ativos este mês</Text>
                         </View>
-                    ))}
-                </View>
 
-                <Text style={styles.sectionTitle}>DESPESAS</Text>
-
-                <View style={styles.mainCard}>
-                    <View style={styles.donutContainer}>
-                        <View style={styles.donutRing}>
-                            <View style={styles.donutHole}>
-                                <Text style={styles.donutLabel}>TOP 1</Text>
-                                <Text style={styles.donutValue}>{MOCK_CATEGORIES[0].name}</Text>
-                            </View>
-                        </View>
-                    </View>
-
-                    <View style={styles.categoryList}>
-                        {MOCK_CATEGORIES.map((category) => (
-                            <View key={category.id} style={styles.categoryItem}>
-                                <View style={styles.categoryLeft}>
-                                    <View style={[styles.categoryDot, { backgroundColor: category.color }]} />
-                                    <Text style={styles.categoryName}>{category.name}</Text>
+                        {gastosPorMembro.length > 0 && (
+                            <>
+                                <Text style={styles.sectionTitle}>GASTOS POR MEMBRO</Text>
+                                <View style={styles.mainCard}>
+                                    {gastosPorMembro.map((item, i) => (
+                                        <View key={i} style={styles.memberItem}>
+                                            <View style={styles.memberHeader}>
+                                                <Text style={styles.memberName}>{item.nome}</Text>
+                                                <Text style={styles.memberValue}>
+                                                    R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.progressBarBackground}>
+                                                <View style={[styles.progressBarFill, {
+                                                    width: gastoTotal > 0 ? `${(item.valor / gastoTotal) * 100}%` as any : '0%',
+                                                    backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length]
+                                                }]} />
+                                            </View>
+                                        </View>
+                                    ))}
                                 </View>
-                                <View style={styles.categoryRight}>
-                                    <Text style={styles.categoryAmount}>{category.value}</Text>
-                                    <Text style={styles.categoryPercent}>{category.percent}</Text>
+                            </>
+                        )}
+
+                        {gastosPorCategoria.length > 0 && (
+                            <>
+                                <Text style={styles.sectionTitle}>DESPESAS</Text>
+                                <View style={styles.mainCard}>
+                                    <View style={styles.donutContainer}>
+                                        <View style={styles.donutRing}>
+                                            <View style={styles.donutHole}>
+                                                <Text style={styles.donutLabel}>TOP 1</Text>
+                                                <Text style={styles.donutValue}>
+                                                    {gastosPorCategoria[0]?.nome ?? '—'}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.categoryList}>
+                                        {gastosPorCategoria.map((cat, i) => (
+                                            <View key={i} style={styles.categoryItem}>
+                                                <View style={styles.categoryLeft}>
+                                                    <View style={[styles.categoryDot, { backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }]} />
+                                                    <Text style={styles.categoryName}>{cat.nome}</Text>
+                                                </View>
+                                                <View style={styles.categoryRight}>
+                                                    <Text style={styles.categoryAmount}>
+                                                        R$ {cat.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </Text>
+                                                    <Text style={styles.categoryPercent}>
+                                                        {gastoTotal > 0 ? `${Math.round((cat.valor / gastoTotal) * 100)}%` : '0%'}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        ))}
+                                    </View>
                                 </View>
-                            </View>
-                        ))}
-                    </View>
-                </View>
+                            </>
+                        )}
 
-                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/details/transacoes' as any)}>
-                    <Text style={styles.verTodosLabel}>VER TODOS</Text>
-                </TouchableOpacity>
+                        {ultimosGastos.length > 0 && (
+                            <>
+                                <TouchableOpacity onPress={() => router.push('/(tabs)/familia/details/gastos' as any)}>
+                                    <Text style={styles.verTodosLabel}>VER TODOS</Text>
+                                </TouchableOpacity>
 
-                {MOCK_TRANSACTIONS.map((tx) => (
-                    <View key={tx.id} style={styles.transactionCard}>
-                        <View style={styles.transactionIcon}>
-                            {tx.iconFamily === 'Ionicons' ? (
-                                <Ionicons name={tx.iconName as any} size={20} color="#1D1252" />
-                            ) : (
-                                <Feather name={tx.iconName as any} size={20} color="#1D1252" />
-                            )}
-                        </View>
-                        <View style={styles.transactionInfo}>
-                            <Text style={styles.transactionTitle} numberOfLines={1}>{tx.title}</Text>
-                            <Text style={styles.transactionDesc} numberOfLines={1}>{tx.desc}</Text>
-                        </View>
-                        <View style={styles.transactionValueContainer}>
-                            <Text style={styles.transactionValueText}>{tx.value}</Text>
-                            <Text style={styles.transactionDate}>{tx.date}</Text>
-                        </View>
-                    </View>
-                ))}
+                                {ultimosGastos.slice(0, 3).map((tx: any, i: number) => (
+                                    <View key={tx.id ?? i} style={styles.transactionCard}>
+                                        <View style={styles.transactionIcon}>
+                                            <Feather name="credit-card" size={20} color="#1D1252" />
+                                        </View>
+                                        <View style={styles.transactionInfo}>
+                                            <Text style={styles.transactionTitle} numberOfLines={1}>{tx.titulo ?? tx.title ?? '—'}</Text>
+                                            <Text style={styles.transactionDesc} numberOfLines={1}>{tx.descricao ?? tx.categoria ?? ''}</Text>
+                                        </View>
+                                        <View style={styles.transactionValueContainer}>
+                                            <Text style={styles.transactionValueText}>
+                                                {tx.valor != null ? `R$ ${tx.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : tx.value ?? '—'}
+                                            </Text>
+                                            <Text style={styles.transactionDate}>
+                                                {tx.data instanceof Date ? tx.data.toLocaleDateString('pt-BR') : tx.data ?? tx.date ?? ''}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ))}
+                            </>
+                        )}
+                        
+                        <TouchableOpacity 
+                            style={styles.addGastoButton}
+                            onPress={() => router.push(`/(details)/detailshome/gastos/criar_gasto?context=familia&familiaId=${familiaId}` as any)}
+                        >
+                            <Ionicons name="add-outline" size={20} color="#1D1252" />
+                            <Text style={styles.addGastoText}>Adicionar gasto</Text>
+                        </TouchableOpacity>
+
+                    </>
+                )}
 
             </ScrollView>
+
         </SafeAreaView>
     );
 }
@@ -131,7 +165,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1D1252',
     },
-        headerContainer: {
+    headerContainer: {
         width: '100%',
         paddingHorizontal: 20,
         paddingTop: 10,
@@ -148,62 +182,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 30,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 24,
-        gap: 12,
-    },
-    statCard: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        paddingVertical: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-    },
-    statTextGroup: {
-        alignItems: 'center',
-    },
-    statNumber: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    statLabel: {
-        fontSize: 10,
-        color: '#000',
-        letterSpacing: 1,
-    },
-    navMenu: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 30,
-        gap: 8,
-    },
-    navPill: {
-        flex: 1,
-        flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 8,
-        paddingVertical: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-    },
-    navPillActive: {
-        backgroundColor: '#000000',
-    },
-    navPillText: {
-        color: '#1D1252',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    navPillTextActive: {
-        color: '#FFFFFF',
     },
     mainCard: {
         backgroundColor: '#FFFFFF',
@@ -405,5 +383,22 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#94A3B8',
         marginTop: 4,
+    },
+    addGastoButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        paddingVertical: 16,
+        gap: 10,
+        width: "100%",
+        marginTop: 15,
+        marginBottom: 15
+    },
+    addGastoText: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "#1D1252",
     },
 });

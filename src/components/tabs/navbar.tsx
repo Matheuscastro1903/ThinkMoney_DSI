@@ -1,6 +1,5 @@
 //arquivo destinado a gardar um footer de navegação
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-//biblioteca para a importação dos icons
 import { Ionicons } from '@expo/vector-icons';
 import { Link, usePathname } from 'expo-router';
 
@@ -87,7 +86,7 @@ export default function NavBar() {
             </Link>
 
             {/* botão Família */}
-            <Link href="/familia/home" asChild>
+            <Link href="./familia" asChild>
                 <TouchableOpacity style={caminho.startsWith('/familia')
                     ? styles.botaoAtivo
                     : styles.botaoDesativado}>
