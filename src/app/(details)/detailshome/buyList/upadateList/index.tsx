@@ -211,10 +211,11 @@ export default function UpdateCompras() {
     
     try {
       
-        const pacoteRequisicao= {titulo:tituloCompra,
+        const pacoteRequisicao= {
+            titulo:tituloCompra,
             categoria: categoriaSelecionada,
             descricao: descricao,
-            localCompra: localCompra}
+            localCompra: localCompra} as ListaCompra
 
         const resposta= await ControllerAtualizarLista(userId,idLista,pacoteRequisicao,listaProdutos)
       

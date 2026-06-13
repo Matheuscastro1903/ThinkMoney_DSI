@@ -124,27 +124,36 @@ export async function ControllerAtualizarLista(
     
     //cria um aarray com cada produto instanciado e vai adicionando no formato
     //que o firestore recebe
-    const produtosProntosProBanco = produtos.map((prod) => {
-      
-      const instanciaReal = new ProdutoCompra(
+     const produtosInstanciados = produtos.map((prod) => {
+      return new ProdutoCompra(
         prod.id, 
         prod.nome, 
         Number(prod.quantidade) || 0, 
         Number(prod.valor) || 0, 
         prod.comprado
       );
-      
-      //agora que todos são uma classe usa o método para transformar no formtato
-      //desejado pelo firebase
-      return instanciaReal.toFirestore();
     });
+
+    const novaLista = new ListaCompra(
+      dadosBasicos.titulo,              //titulo (string)
+      dadosBasicos.categoria,           //categoria 
+      0,                                //totalCompra 
+      false,                            //listaFinalizada 
+      produtosInstanciados,             //produtos 
+      dadosBasicos.localCompra || "",   //localCompra 
+      undefined,                        //id (opcional - passamos undefined para poder acessar os próximos parâmetros)
+      dadosBasicos.descricao,           //descricao 
+      undefined,                        //dataPrazo 
+      undefined                         //criadoEm 
+    );
+
+    const pacoteFirebase=novaLista.toFirestore();
 
     // 3. Enviamos o pacote perfeito pro Service
     const resposta = await toBuyListService.atualizarLista(
       userId, 
       idLista, 
-      dadosBasicos, 
-      produtosProntosProBanco
+      pacoteFirebase
     );
 
     return resposta;

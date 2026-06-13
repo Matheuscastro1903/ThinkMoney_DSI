@@ -40,9 +40,7 @@ export interface ResumoListaCompra {
 
 class ToBuyListService {
   
-  /**
-   * Função oficial para criar uma nova lista de compras no Firebase
-   */
+  
   async criarLista(
     userId: string, 
     pacoteCompleto: any //recebe o JSON inteiro gerado pelo toFirestore()
@@ -234,23 +232,20 @@ class ToBuyListService {
     }
   }
   
-  async atualizarLista(userId: string, idLista: string, dadosBasicos: { 
-      titulo: string; 
-      categoria: string; 
-      descricao?: string;
-      localCompra: string;
-    }, produtos: ProdutoCompra[]): Promise<respostaApi> {
+  async atualizarLista(userId: string, idLista: string,pacoteCompleto: any): Promise<respostaApi> {
     try {
       console.log(`Iniciando a atualização da lista ${idLista}...`);
 
       //Recalcula o valor total com base nos produtos atuais da tela
       
-      const valorTotalCalculado = produtos.reduce((total, produto) => 
+      const { produtos, ...dadosBasicos } = pacoteCompleto;
+
+      const valorTotalCalculado = produtos.reduce((total:any, produto:any) => 
           total + Number(produto.valor * (produto.quantidade || 1)), 0
       );
       //Recalcula se todos os produtos foram marcados como comprados
       const todosComprados = produtos.length > 0 
-        ? produtos.every((produto) => produto.comprado) 
+        ? produtos.every((produto:any) => produto.comprado) 
         : false;
 
       //montagem do envelope para enviar
