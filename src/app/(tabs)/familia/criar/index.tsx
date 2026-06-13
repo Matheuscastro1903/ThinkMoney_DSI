@@ -1,18 +1,21 @@
-import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useFamiliaAcoes } from "@/src/hooks/familia/useFamiliaAcoes";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import * as Clipboard from 'expo-clipboard';
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CriarFamilia() {
   const router = useRouter();
@@ -28,7 +31,13 @@ export default function CriarFamilia() {
 
     // Armazena o código localmente para exibir na UI.
     // O familiaId real já foi gravado no perfil do usuário pelo hook.
-    setCodigoGerado(novoId)
+    setCodigoGerado(novoId.codigo_convite)
+  }
+
+  async function copiarCodigo() {
+    if (!codigoGerado) return
+    await Clipboard.setStringAsync(codigoGerado)
+    Alert.alert('Sucesso', 'Código copiado para a área de transferência!')
   }
 
   function handlePronto() {
@@ -41,68 +50,75 @@ export default function CriarFamilia() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, justifyContent: "center" }}
+        style={{ flex: 1 }}
       >
-        <View style={styles.header}>
-          <View style={styles.familyIcon}>
-            <MaterialIcons name="family-restroom" size={50} color="#000000" />
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <View style={styles.familyIcon}>
+              <MaterialIcons name="family-restroom" size={50} color="#000000" />
+            </View>
+
+            <Text style={styles.title}>Criar Família</Text>
           </View>
 
-          <Text style={styles.title}>Criar Família</Text>
-        </View>
+          <View style={styles.inputCodeContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite um nome para a família"
+              placeholderTextColor="#dfdbeb"
+              keyboardType="default"
+              value={familyName}
+              onChangeText={setFamilyName}
+              editable={!codigoGerado} // bloqueia edição após criação
+            />
 
-        <View style={styles.inputCodeContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite um nome para a família"
-            placeholderTextColor="#dfdbeb"
-            keyboardType="default"
-            value={familyName}
-            onChangeText={setFamilyName}
-            editable={!codigoGerado} // bloqueia edição após criação
-          />
+            <TouchableOpacity
+              style={[styles.gerarCodigoButton, (isLoading || !!codigoGerado) && styles.buttonDisabled]}
+              activeOpacity={0.7}
+              onPress={handleGerarCodigo}
+              disabled={isLoading || !!codigoGerado}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text style={styles.textGerarCodigoButton}>
+                  {codigoGerado ? 'Família criada!' : 'Gerar código de família'}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.gerarCodigoButton, (isLoading || !!codigoGerado) && styles.buttonDisabled]}
-            activeOpacity={0.7}
-            onPress={handleGerarCodigo}
-            disabled={isLoading || !!codigoGerado}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={styles.textGerarCodigoButton}>
-                {codigoGerado ? 'Família criada!' : 'Gerar código de família'}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.codeContainer}>
-          <View style={styles.codeContentContainer}>
-            <Text style={styles.codeTitle}>Código de Acesso da Família</Text>
-
-            <Text style={styles.codeText}>
-              {codigoGerado ?? '— — — — — —'}
-            </Text>
-
-            <View style={styles.infoCodeContainer}>
-              <MaterialIcons name="info-outline" size={18} color="#1D1252" />
-              <Text style={styles.infoCodeText}>
+          <View style={styles.codeCard}>
+            <View style={styles.codeRow}>
+              <View style={styles.codeInfo}>
+                <Text style={styles.codeLabel}>CÓDIGO DE ACESSO DA FAMÍLIA</Text>
+                <Text style={styles.codeValue}>{codigoGerado ?? '— — — — — —'}</Text>
+              </View>
+              <TouchableOpacity style={styles.copyButton} onPress={copiarCodigo} activeOpacity={0.7} disabled={!codigoGerado}>
+                <Ionicons name="copy-outline" size={20} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.codeHint}>
+              <Ionicons name="information-circle-outline" size={14} color="rgba(72,69,80,0.8)" />
+              <Text style={styles.codeHintText}>
                 Compartilhe este código com quem deseja convidar para o grupo.
               </Text>
             </View>
           </View>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.prontoButton, !codigoGerado && styles.buttonDisabled]}
-          activeOpacity={0.7}
-          onPress={handlePronto}
-          disabled={!codigoGerado}
-        >
-          <Text style={styles.textProntoButton}>Pronto</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.prontoButton, !codigoGerado && styles.buttonDisabled]}
+            activeOpacity={0.7}
+            onPress={handlePronto}
+            disabled={!codigoGerado}
+          >
+            <Text style={styles.textProntoButton}>Pronto</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -112,7 +128,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1252",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
+    paddingVertical: 20,
   },
 
   header: {
@@ -174,44 +194,51 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
-  codeContainer: {
-    flexDirection: "row",
-    backgroundColor: "#ffffff",
+  codeCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 25,
     marginHorizontal: 20,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: "center",
-    gap: 20,
+    gap: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(201,196,209,0.1)',
   },
-
-  codeContentContainer: {
-    flex: 1,
-    minWidth: 0,
-    gap: 12,
+  codeRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
-
-  codeTitle: {
-    textTransform: "uppercase",
-    fontSize: 12,
+  codeInfo: {
+    gap: 4,
   },
-
-  codeText: {
+  codeLabel: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#484550',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  codeValue: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#1D1252",
-    letterSpacing: 2,
+    fontWeight: 'bold',
+    color: '#1D1252',
+    letterSpacing: 2.4,
   },
-
-  infoCodeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  copyButton: {
+    backgroundColor: '#1D1252',
+    borderRadius: 8,
+    padding: 12,
+  },
+  codeHint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 8,
   },
-
-  infoCodeText: {
+  codeHintText: {
     fontSize: 11,
+    color: 'rgba(72,69,80,0.8)',
+    lineHeight: 16.5,
     flex: 1,
-    flexShrink: 1,
   },
 
   prontoButton: {

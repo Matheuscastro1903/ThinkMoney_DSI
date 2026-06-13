@@ -25,7 +25,6 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { metasService } from "@/src/services/metasService";
 import { auth } from "@/src/services/firebaseConfig";
 import InputDate from "@/src/components/details/metas/inputdata";
-import { useUsuarioLogado } from "@/src/hooks/useUsuarioLogado";
 
 import { pegarFotoDaGaleria } from "@/src/scripts/getImage";
 import { tirarFotoCamera } from "@/src/scripts/getImage";
@@ -54,7 +53,6 @@ export default function AddMeta() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const familiaId = params.familiaId as string | undefined;
-  const { usuario } = useUsuarioLogado();
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
   const [nomeMeta, setNomeMeta] = useState("");
   const [capital, setCapital] = useState("");
@@ -92,8 +90,14 @@ export default function AddMeta() {
   };
 
   const handleSalvarMeta = async () => {
-    if (!categoriaSelecionada || !nomeMeta || !capital || !data) {
-      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (Categoria, Nome, Capital e Data).");
+    const camposFaltando = [];
+    if (!categoriaSelecionada) camposFaltando.push("Categoria");
+    if (!nomeMeta) camposFaltando.push("Nome da Meta");
+    if (!capital) camposFaltando.push("Capital Necessário");
+    if (!data) camposFaltando.push("Data de Realização");
+
+    if (camposFaltando.length > 0) {
+      Alert.alert("Atenção", `Por favor, preencha os seguintes campos obrigatórios: ${camposFaltando.join(", ")}.`);
       return;
     }
 
@@ -150,8 +154,8 @@ export default function AddMeta() {
         nomeMeta,
         valorFormatado,
         0, // valorPoupado inicial
-        data,
-        categoriaSelecionada,
+        data!,
+        categoriaSelecionada!,
         undefined, // id
         descricao,
         idImagemGerado,
@@ -186,10 +190,6 @@ export default function AddMeta() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Badge */}
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>PLANEJAMENTO</Text>
-          </View>
 
           {/* Título */}
           <Text style={styles.title}>Construa o amanhã,{"\n"}hoje.</Text>
@@ -307,6 +307,11 @@ export default function AddMeta() {
                   <Ionicons name="arrow-forward" size={20} color="white" />
                 </>
               )}
+            </TouchableOpacity>
+
+            {/* Botão para cancelar */}
+            <TouchableOpacity style={styles.cancelar} onPress={() => router.back()}>
+              <Text style={styles.textocancelar}>Cancelar</Text>
             </TouchableOpacity>
 
             {/* Footer */}
@@ -480,4 +485,11 @@ const styles = StyleSheet.create({
     color: "#BBBBBB",
     letterSpacing: 1,
   },
+  cancelar: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+    marginTop: 10,
+  },
+  textocancelar: {},
 });

@@ -146,11 +146,11 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
           novoGasto.criador = dadosUsuario;
         }
         await criarGasto(user.uid, novoGasto, familiaId);
+        this.props.router.replace('/(tabs)/familia/dados');
       } else {
         await criarGasto(user.uid, novoGasto);
+        this.props.router.back();
       }
-      
-      this.props.router.back();
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível registrar o gasto. Tente novamente.");

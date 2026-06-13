@@ -26,5 +26,6 @@ export function useFamiliaHome() {
         error,
         refetch,
         copiarCodigo,
+        admin: familia?.admin,
     }
 }

@@ -7,6 +7,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ScrollView,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
@@ -29,15 +30,20 @@ export default function EntrarFamilia() {
   }
 
   function handleCriarFamilia() {
-    router.push("../criar");
+    router.push("/(tabs)/familia/criar");
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, justifyContent: "center" }}
+        style={{ flex: 1 }}
       >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer} 
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
         <View style={styles.header}>
           <View style={styles.familyIcon}>
             <MaterialIcons name="family-restroom" size={50} color="#000000" />
@@ -94,6 +100,7 @@ export default function EntrarFamilia() {
             </Text>
           </Text>
         </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -103,7 +110,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1252",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
+    paddingVertical: 20,
   },
 
   header: {

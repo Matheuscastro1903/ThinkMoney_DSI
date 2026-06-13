@@ -10,11 +10,11 @@ export default function FamiliaEditar() {
   const router = useRouter()
   const {
     familia,
+    familyName,
     membros,
     isLoading,
+    isUsuarioLogadoAdmin,
     confirmarRemoverMembro,
-    confirmarSairDaFamilia,
-    confirmarExcluirFamilia,
   } = useFamiliaEditar()
 
   return (
@@ -24,7 +24,7 @@ export default function FamiliaEditar() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.headerContainer}>
-        <Text style={styles.familyName}>{familia?.nome ?? 'Família'}</Text>
+        <Text style={styles.familyName}>{`Família ${familyName}`}</Text>
 
         <InfoCards/>
 
@@ -45,11 +45,15 @@ export default function FamiliaEditar() {
               </View>
               <View style={styles.membroInfo}>
                 <Text style={styles.membroNome}>{membro.nome}</Text>
-                <Text style={styles.membroRole}>MEMBRO</Text>
+                <Text style={styles.membroRole}>
+                  {familia?.admin && membro.email === familia.admin.email ? 'ADMIN' : 'MEMBRO'}
+                </Text>
               </View>
-              <TouchableOpacity onPress={() => confirmarRemoverMembro(membro)} activeOpacity={0.7}>
-                <Ionicons name="close-circle-outline" size={24} color="#94A3B8" />
-              </TouchableOpacity>
+              {isUsuarioLogadoAdmin && (!familia?.admin || membro.email !== familia.admin.email) && (
+                <TouchableOpacity onPress={() => confirmarRemoverMembro(membro)} activeOpacity={0.7}>
+                  <Ionicons name="close-circle-outline" size={24} color="#94A3B8" />
+                </TouchableOpacity>
+              )}
             </View>
           ))
         )}
@@ -60,23 +64,29 @@ export default function FamiliaEditar() {
           <Text style={styles.cancelarButtonText}>Cancelar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.sairButton} onPress={confirmarSairDaFamilia} activeOpacity={0.7}>
-          <Ionicons name="exit-outline" size={16} color="#E1FF00" />
-          <Text style={styles.sairButtonText}>Sair da Família</Text>
-        </TouchableOpacity>
+        {!isUsuarioLogadoAdmin && !isLoading && (
+          <TouchableOpacity style={styles.sairButton} onPress={() => router.push('/familia/editar/confirmar-saida')} activeOpacity={0.7}>
+            <Ionicons name="exit-outline" size={16} color="#E1FF00" />
+            <Text style={styles.sairButtonText}>Sair da Família</Text>
+          </TouchableOpacity>
+        )}
 
-        <Text style={styles.avisoText}>
-          Ao excluir a conta da família, todos os dados compartilhados e pertences de membros serão
-          permanentemente removidos.
-        </Text>
+        {isUsuarioLogadoAdmin && !isLoading && (
+          <>
+            <Text style={styles.avisoText}>
+              Ao excluir a conta da família, todos os dados compartilhados e pertences de membros serão
+              permanentemente removidos.
+            </Text>
 
-        <TouchableOpacity style={styles.excluirButton} onPress={confirmarExcluirFamilia} activeOpacity={0.7}>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#EF4444" />
-          ) : (
-            <Text style={styles.excluirButtonText}>Excluir Família</Text>
-          )}
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.excluirButton} onPress={() => router.push('/familia/editar/confirmar-exclusao')} activeOpacity={0.7}>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#EF4444" />
+              ) : (
+                <Text style={styles.excluirButtonText}>Excluir Família</Text>
+              )}
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </ScrollView>
   );

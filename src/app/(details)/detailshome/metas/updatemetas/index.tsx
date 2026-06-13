@@ -449,11 +449,9 @@ export default function EditMeta() {
               </TouchableOpacity>
 
               {/* Botão para cancelar */}
-              <Link href={"/"} asChild>
-                <TouchableOpacity style={styles.cancelar}>
-                  <Text style={styles.textocancelar}>Cancelar</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity style={styles.cancelar} onPress={() => router.back()}>
+                <Text style={styles.textocancelar}>Cancelar</Text>
+              </TouchableOpacity>
 
               {/* Footer */}
               <Text style={styles.footerText}>

@@ -3,6 +3,7 @@ import { GastoProps } from "../types/gasto";
 import { LembreteProps } from "../types/lembrete";
 import { Meta } from "./meta";
 import { Usuario } from "./usuario";
+import { Gasto } from "./gasto";
 
 export class Familia implements FamiliaProps {
     constructor(
@@ -16,7 +17,7 @@ export class Familia implements FamiliaProps {
         public gastos: GastoProps[]
     ) {}
 
-    static fromJson(id: string, dadosFamilia: any, dadosMetas: Meta[]): Familia {
+    static fromJson(id: string, dadosFamilia: any, dadosMetas: Meta[], dadosGastos: Gasto[] = []): Familia {
         return new Familia(
             id,
             dadosFamilia.nome,
@@ -25,7 +26,7 @@ export class Familia implements FamiliaProps {
             (dadosFamilia.membros || []).map((m: any) => Usuario.fromFirestore(m)),
             dadosFamilia.lembretes || [],
             dadosMetas || [],
-            dadosFamilia.gastos || []
+            dadosGastos
         );
     }
 

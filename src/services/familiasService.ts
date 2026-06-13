@@ -1,25 +1,23 @@
 import {
-  collection,
-  doc,
   addDoc,
-  updateDoc,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  doc,
   getDoc,
   getDocs,
-  deleteDoc,
   query,
-  where,
-  arrayUnion,
-  arrayRemove,
   Timestamp,
-  setDoc,
-} from 'firebase/firestore'
-import { db } from './firebaseConfig'
+  updateDoc,
+  where
+} from 'firebase/firestore';
+import { db } from './firebaseConfig';
 
-import { UsuarioProps, UsuarioFirestore } from "@/src/types/usuario";
+import { Familia } from "@/src/models/familia";
 import { Usuario } from "@/src/models/usuario";
 import { FamiliaProps } from "@/src/types/familia";
-import { Familia } from "@/src/models/familia";
 import { metasService } from "./metasService";
+import { buscarGastos } from './gastosService';
 
 export class FamiliaService {
 
@@ -35,15 +33,18 @@ export class FamiliaService {
 
       // Busca a subcoleção de metas usando o MetasService
       const metas = await metasService.buscarTodas('dummy', id)
+      
+      // Busca a subcoleção de gastos
+      const gastos = await buscarGastos('dummy', id)
 
-      return Familia.fromJson(docSnap.id, docSnap.data(), metas)
+      return Familia.fromJson(docSnap.id, docSnap.data(), metas, gastos)
     } catch (error) {
       console.error('Erro ao buscar membros da família:', error)
       throw error
     }
   }
-  
-  async criarFamilia(nome: string, admin: Usuario): Promise<string> {
+
+  async criarFamilia(nome: string, admin: Usuario): Promise<{ id: string, codigo_convite: string }> {
     try {
       const codigo_convite = await this.gerarCodigo()
 
@@ -58,7 +59,7 @@ export class FamiliaService {
       }
 
       const docRef = await addDoc(collection(db, 'familias'), novaFamilia)
-      return docRef.id
+      return { id: docRef.id, codigo_convite }
     } catch (error) {
       console.error('Erro ao criar família:', error)
       throw error

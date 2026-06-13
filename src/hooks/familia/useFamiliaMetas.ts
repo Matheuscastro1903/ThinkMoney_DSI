@@ -30,7 +30,7 @@ export function useFamiliaMetas() {
     )
 
     return {
-        familyName: familia?.nome ?? '—',
+        familyName: familia?.nome ?? '',
         metas,
         metasFiltradas,
         membros,

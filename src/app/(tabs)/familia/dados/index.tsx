@@ -14,35 +14,15 @@ export default function Dados() {
     
     const {
         familyName,
-        //gastoTotal,
-        //gastosPorMembro,
-        // ultimosGastos,
-        // qtdMembros,
+        gastoTotal,
+        gastosPorMembro,
+        ultimosGastos,
+        qtdMembros,
+        gastosPorCategoria,
         familiaId,
         isLoading,
     } = useFamiliaDados()
     
-
-    // --- INÍCIO DOS MOCKS (Apague isso depois) ---
-    const gastoTotal = 4500.50;
-    const qtdMembros = 4;
-    const gastosPorMembro = [
-        { nome: 'João Silva', valor: 2500.00 },
-        { nome: 'Maria Silva', valor: 1500.50 },
-        { nome: 'Pedro Silva', valor: 500.00 },
-    ];
-    const gastosPorCategoria = [
-        { nome: 'Alimentação', valor: 2000.00 },
-        { nome: 'Lazer', valor: 1500.00 },
-        { nome: 'Transporte', valor: 1000.50 },
-    ];
-    const ultimosGastos = [
-        { id: '1', iconFamily: 'Ionicons', iconName: 'cart-outline', titulo: 'Mercado', descricao: 'Compras do mês', valor: 850.00, data: '10/06/2026' },
-        { id: '2', iconFamily: 'Feather', iconName: 'monitor', titulo: 'Netflix', descricao: 'Assinatura', valor: 55.90, data: '05/06/2026' },
-        { id: '3', iconFamily: 'Ionicons', iconName: 'restaurant-outline', titulo: 'Pizzaria', descricao: 'Jantar de fim de semana', valor: 120.00, data: '01/06/2026' },
-    ];
-    // --- FIM DOS MOCKS ---
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -140,39 +120,38 @@ export default function Dados() {
                                 {ultimosGastos.slice(0, 3).map((tx: any, i: number) => (
                                     <View key={tx.id ?? i} style={styles.transactionCard}>
                                         <View style={styles.transactionIcon}>
-                                            {tx.iconFamily === 'Ionicons' ? (
-                                                <Ionicons name={tx.iconName ?? 'wallet-outline'} size={20} color="#1D1252" />
-                                            ) : (
-                                                <Feather name={tx.iconName ?? 'credit-card'} size={20} color="#1D1252" />
-                                            )}
+                                            <Feather name="credit-card" size={20} color="#1D1252" />
                                         </View>
                                         <View style={styles.transactionInfo}>
                                             <Text style={styles.transactionTitle} numberOfLines={1}>{tx.titulo ?? tx.title ?? '—'}</Text>
-                                            <Text style={styles.transactionDesc} numberOfLines={1}>{tx.descricao ?? tx.desc ?? ''}</Text>
+                                            <Text style={styles.transactionDesc} numberOfLines={1}>{tx.descricao ?? tx.categoria ?? ''}</Text>
                                         </View>
                                         <View style={styles.transactionValueContainer}>
                                             <Text style={styles.transactionValueText}>
                                                 {tx.valor != null ? `R$ ${tx.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : tx.value ?? '—'}
                                             </Text>
-                                            <Text style={styles.transactionDate}>{tx.data ?? tx.date ?? ''}</Text>
+                                            <Text style={styles.transactionDate}>
+                                                {tx.data instanceof Date ? tx.data.toLocaleDateString('pt-BR') : tx.data ?? tx.date ?? ''}
+                                            </Text>
                                         </View>
                                     </View>
                                 ))}
                             </>
                         )}
+                        
+                        <TouchableOpacity 
+                            style={styles.addGastoButton}
+                            onPress={() => router.push(`/(details)/detailshome/gastos/criar_gasto?context=familia&familiaId=${familiaId}` as any)}
+                        >
+                            <Ionicons name="add-outline" size={20} color="#1D1252" />
+                            <Text style={styles.addGastoText}>Adicionar gasto</Text>
+                        </TouchableOpacity>
+
                     </>
                 )}
 
             </ScrollView>
 
-            {!isLoading && familiaId && (
-                <TouchableOpacity
-                    style={styles.fab}
-                    onPress={() => router.push(`/(details)/detailshome/gastos/criar_gasto?context=familia&familiaId=${familiaId}` as any)}
-                >
-                    <Ionicons name="add" size={30} color="#FFFFFF" />
-                </TouchableOpacity>
-            )}
         </SafeAreaView>
     );
 }
@@ -405,20 +384,21 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
         marginTop: 4,
     },
-    fab: {
-        position: 'absolute',
-        width: 60,
-        height: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        right: 20,
-        bottom: 120, // acima da tab bar
-        backgroundColor: '#4F46E5',
-        borderRadius: 30,
-        elevation: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 6,
+    addGastoButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        paddingVertical: 16,
+        gap: 10,
+        width: "100%",
+        marginTop: 15,
+        marginBottom: 15
+    },
+    addGastoText: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "#1D1252",
     },
 });

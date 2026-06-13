@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFamiliaAcoes } from '@/src/hooks/familia/useFamiliaAcoes';
@@ -6,8 +6,9 @@ import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado';
 
 export default function ConfirmarExclusaoFamilia() {
   const router = useRouter();
-  const { familiaId } = useUsuarioLogado();
-  const { excluirFamilia, isLoading } = useFamiliaAcoes();
+  const { familiaId, isLoading: isLoadingUsuario } = useUsuarioLogado();
+  const { excluirFamilia, isLoading: isLoadingAcoes } = useFamiliaAcoes();
+  const isLoading = isLoadingUsuario || isLoadingAcoes;
 
   const handleExcluir = async () => {
     if (!familiaId) return;

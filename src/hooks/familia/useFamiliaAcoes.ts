@@ -1,11 +1,10 @@
-import { useState } from 'react'
-import { Alert } from 'react-native'
-import { useRouter } from 'expo-router'
+import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
+import { Usuario } from '@/src/models/usuario'
 import familiaService from '@/src/services/familiasService'
 import usuarioService from '@/src/services/usuarioService'
-import { useUsuarioLogado } from '@/src/hooks/useUsuarioLogado'
-import { UsuarioProps } from '@/src/types/usuario'
-import { Usuario } from '@/src/models/usuario'
+import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { Alert } from 'react-native'
 
 /**
  * Hook de mutações da família.
@@ -20,7 +19,7 @@ export function useFamiliaAcoes() {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    async function criarFamilia(nome: string): Promise<string | null> {
+    async function criarFamilia(nome: string): Promise<{ id: string, codigo_convite: string } | null> {
         if (!uid || !usuario) return null
         if (!nome.trim()) {
             Alert.alert('Campo obrigatório', 'Por favor, insira um nome para a família.')
@@ -30,9 +29,9 @@ export function useFamiliaAcoes() {
         setIsLoading(true)
         setError(null)
         try {
-            const novoId = await familiaService.criarFamilia(nome.trim(), usuario as Usuario)
-            await usuarioService.atualizarFamiliaId(uid, novoId)
-            return novoId
+            const resultado = await familiaService.criarFamilia(nome.trim(), usuario as Usuario)
+            await usuarioService.atualizarFamiliaId(uid, resultado.id)
+            return resultado
         } catch (err) {
             console.error('Erro ao criar família:', err)
             setError('Não foi possível criar a família.')

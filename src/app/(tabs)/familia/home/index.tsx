@@ -6,7 +6,7 @@ import InfoCards from '@/src/components/tabs/familia/info-cards';
 import { useFamiliaHome } from '@/src/hooks/familia/useFamiliaHome';
 
 export default function FamiliaHome() {
-  const { familyName, membros, codigoConvite, isLoading, copiarCodigo } = useFamiliaHome()
+  const { familyName, membros, codigoConvite, isLoading, copiarCodigo, admin } = useFamiliaHome()
 
   return (
     <ScrollView
@@ -15,7 +15,7 @@ export default function FamiliaHome() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerContainer}>
-          <Text style={styles.familyName}>{familyName}</Text>
+          <Text style={styles.familyName}>{`Família ${familyName}`}</Text>
 
           <InfoCards/>
 
@@ -37,7 +37,9 @@ export default function FamiliaHome() {
                   />
                 </View>
                 <Text style={styles.memberName}>{member.nome}</Text>
-                <Text style={styles.memberRole}>MEMBRO</Text>
+                <Text style={styles.memberRole}>
+                  {admin && member.email === admin.email ? 'ADMIN' : 'MEMBRO'}
+                </Text>
               </View>
             ))
           )}

@@ -51,6 +51,7 @@ export function useFamiliaGastos() {
         sections,
         gastoTotal,
         qtdMembros: membros?.length ?? 0,
+        membros: membros ?? [],
         familiaId,
         isLoading,
         refetch,

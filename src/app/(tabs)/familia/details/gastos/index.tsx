@@ -13,7 +13,7 @@ const AVATARES = [AVATAR_1, AVATAR_2, AVATAR_3]
 
 export default function Gastos() {
     const router = useRouter();
-    const { isLoading, sections, gastoTotal, qtdMembros, familiaId } = useFamiliaGastos()
+    const { isLoading, sections, gastoTotal, qtdMembros, membros, familiaId } = useFamiliaGastos()
 
     return (
         <SafeAreaView style={styles.safeArea} edges={['right', 'bottom', 'left']}>
@@ -41,8 +41,12 @@ export default function Gastos() {
 
                     <View style={styles.topCardFooter}>
                         <View style={styles.avatarGroup}>
-                            {AVATARES.slice(0, Math.min(qtdMembros, 3)).map((av, i) => (
-                                <Image key={i} source={av} style={[styles.avatar, { zIndex: 3 - i, marginLeft: i > 0 ? -12 : 0 }]} />
+                            {membros.slice(0, 3).map((membro, i) => (
+                                <Image 
+                                  key={membro.email || i} 
+                                  source={membro.avatar != null ? AVATARES[membro.avatar % AVATARES.length] : AVATARES[0]} 
+                                  style={[styles.avatar, { zIndex: 3 - i, marginLeft: i > 0 ? -12 : 0 }]} 
+                                />
                             ))}
                         </View>
                         <Text style={styles.activeMembers}>{qtdMembros} membros ativos</Text>

@@ -13,9 +13,11 @@ import { useFamiliaAcoes } from './useFamiliaAcoes'
  */
 export function useFamiliaEditar() {
     const router = useRouter()
-    const { familiaId } = useUsuarioLogado()
-    const { familia, membros, isLoading, refetch } = useFamilia(familiaId)
+    const { familiaId, usuario: usuarioLogado, isLoading: isLoadingUsuario } = useUsuarioLogado()
+    const { familia, membros, isLoading: isLoadingFamilia, refetch } = useFamilia(familiaId)
     const acoes = useFamiliaAcoes()
+
+    const isUsuarioLogadoAdmin = usuarioLogado?.email === familia?.admin.email
 
     function confirmarRemoverMembro(membro: Usuario) {
         Alert.alert(
@@ -36,14 +38,6 @@ export function useFamiliaEditar() {
         )
     }
 
-    function confirmarSairDaFamilia() {
-        router.push('./(tabs)/familia/editar/confirmar-saida')
-    }
-
-    function confirmarExcluirFamilia() {
-        router.push('./(tabs)/familia/editar/confirmar-exclusao')
-    }
-
     async function salvarAlteracoes(novoNome: string) {
         if (!familiaId) return
         await acoes.editarFamilia(familiaId, novoNome)
@@ -53,11 +47,11 @@ export function useFamiliaEditar() {
 
     return {
         familia,
+        familyName: familia?.nome ?? '',
         membros,
-        isLoading: isLoading || acoes.isLoading,
+        isLoading: isLoadingFamilia || acoes.isLoading || isLoadingUsuario,
+        isUsuarioLogadoAdmin,
         confirmarRemoverMembro,
-        confirmarSairDaFamilia,
-        confirmarExcluirFamilia,
         salvarAlteracoes,
     }
 }
