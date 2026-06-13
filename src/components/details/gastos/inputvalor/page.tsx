@@ -1,4 +1,4 @@
-//import { useState } from 'react';
+import { useState } from 'react';
 import { View, TextInput, StyleSheet, Text} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
@@ -17,6 +17,7 @@ export default function InputValor({ label, placeholder, atualizando, value, err
 
     //const [protegido, setProtegido] = useState(true);
 
+    const [exibicao, setExibicao] = useState("")
     function formatarMoeda(texto: string): string {
         // Remove tudo que não for número
         const apenasNumeros = texto.replace(/\D/g, '');
@@ -31,11 +32,11 @@ export default function InputValor({ label, placeholder, atualizando, value, err
     }
 
     function handleChange(texto: string) {
+        const digitos = texto.replace(/\D/g, '');
         const formatado = formatarMoeda(texto);
+        setExibicao(formatado);
         if (typeof atualizando === 'function') {
-            atualizando(formatado);
-        } else {
-            console.warn('InputValor: prop "atualizando" is not a function', atualizando);
+            atualizando(digitos);
         }
     }
 
@@ -61,12 +62,12 @@ export default function InputValor({ label, placeholder, atualizando, value, err
                     onChangeText={handleChange}
                     keyboardType= "numeric"
                   
-                    maxLength={15}        // limita tamanho
+                    //maxLength={15}        // limita tamanho
                     returnKeyType="done"  //  botão "OK" no teclado
                     // MUDANÇA 6: secureTextEntry controla se a senha fica visível ou oculta
                     // "protegido = true" → esconde | "protegido = false" → mostra
                     
-                    value={value}
+                    value={exibicao}
                 />
 
                 

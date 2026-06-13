@@ -144,15 +144,7 @@ export default function Login() {
               onPress={() => setManterConectado(!manterConectado)}
               activeOpacity={0.7}
             >
-              <View
-                style={[
-                  styles.checkbox,
-                  manterConectado && styles.checkboxMarcado,
-                ]}
-              >
-                {manterConectado && <Text style={styles.checkmark}>✓</Text>}
-              </View>
-              <Text style={styles.checkboxLabel}>Me mantenha conectado</Text>
+              
             </TouchableOpacity>
             <View style={{ gap: 10 }}>
               {mensagemErro && (
