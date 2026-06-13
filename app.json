@@ -28,6 +28,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/images/logothinkmoney.png",
+          "color": "#1A73E8",
+          "sounds": []
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./src/assets/images/logothinkmoney.png",

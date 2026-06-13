@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
        
         
         
-        
 
     },
 
