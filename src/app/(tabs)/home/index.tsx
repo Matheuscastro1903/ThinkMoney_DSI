@@ -259,6 +259,13 @@ export default function Home() {
                         Visualizar gastos
                     </Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList')}>
+                    <Ionicons name="basket" size={22} color="#1D1252" />
+                    <Text style={styles.text5}>
+                        Visualizar Listas
+                    </Text>
+                </TouchableOpacity>
                 <View style={styles.linhaBotao}>
                     <Link href="/(details)/detailshome/metas" asChild>
                         <TouchableOpacity style={styles.metasPessoais}>
