@@ -60,13 +60,14 @@ const styles = StyleSheet.create({
   containerText: {
     justifyContent: "center",
     alignItems: "flex-start",
-    margin: 10,
+    marginVertical: 10,
+    width: "100%",
     gap: 8,
   },
   input: {
     backgroundColor: "#EDEEEF",
     borderRadius: 10,
-    width: 300,
+    width: "100%",
     height: 56,
     flexDirection: "row",
     alignItems: "center",

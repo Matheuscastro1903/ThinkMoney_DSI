@@ -1,19 +1,19 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import LayoutNavBar from "@/src/components/layoutnavbar";
 import HeaderBack from "@/src/components/headerBack";
-import React, { useCallback, useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter, Link, useFocusEffect } from "expo-router";
+import LayoutNavBar from "@/src/components/layoutnavbar";
 import { auth } from "@/src/services/firebaseConfig";
 import { LembretesService } from "@/src/services/lembretesService";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type Lembrete = {
   id: string;
@@ -83,37 +83,37 @@ export default function Lembretes() {
                 />
               </View>
               <View style={styles.lembreteInfo}>
-                  <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
-                  <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
-                    {item.categoria} • VENCE {item.vencimento}
-                  </Text>
+                <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
+                <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
+                  {item.categoria} • VENCE {item.vencimento}
+                </Text>
               </View>
-                <View style={styles.lembreteDireita}>
-                  <Text style={styles.lembreteMoeda} numberOfLines={1}>
-                    R${" "}
-                    <Text style={styles.lembreteValor} numberOfLines={1}>
-                      {item.valor.toFixed(2).replace(".", ",")}
-                    </Text>
+              <View style={styles.lembreteDireita}>
+                <Text style={styles.lembreteMoeda} numberOfLines={1}>
+                  R${" "}
+                  <Text style={styles.lembreteValor} numberOfLines={1}>
+                    {item.valor.toFixed(2).replace(".", ",")}
                   </Text>
-                  <View
+                </Text>
+                <View
+                  style={
+                    item.status === "PAGO"
+                      ? styles.badgePago
+                      : styles.badgePendente
+                  }
+                >
+                  <Text
                     style={
                       item.status === "PAGO"
-                        ? styles.badgePago
-                        : styles.badgePendente
+                        ? styles.badgeTextPago
+                        : styles.badgeTextPendente
                     }
+                    numberOfLines={1}
                   >
-                    <Text
-                      style={
-                        item.status === "PAGO"
-                          ? styles.badgeTextPago
-                          : styles.badgeTextPendente
-                      }
-                      numberOfLines={1}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
+                    {item.status}
+                  </Text>
                 </View>
+              </View>
             </TouchableOpacity>
           ))
         )}
@@ -178,52 +178,60 @@ const styles = StyleSheet.create({
     paddingLeft: 1,
   },
   containerLembretes: {
-    width: "92%",
-  backgroundColor: "#FFFFFF",
-  borderRadius: 14,
-  alignSelf: "center",
-  marginTop: 10,
-  flexDirection: "row",
-  alignItems: "center",        // era justify-content: space-between
-  marginBottom: 10,
-  paddingHorizontal: 14,
-  paddingVertical: 14,
-  gap: 10,    
+    height: 72,
+    width: "90%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    alignSelf: "center",
+    alignItems: "center",
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    gap: 12,
   },
   lembreteIcone: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
   },
-  lembreteInfo: {flex: 1,                     // mantém o flex: 1
-  marginLeft: 4,               // era 12 (o gap já cuida do espaço)
-  justifyContent: "center",
-  minWidth: 0,} ,
-  lembreteTitulo: {  fontSize: 14,                // era 15
-  color: "#1D1252",
-  fontWeight: "700",
-  lineHeight: 20,
-  flexShrink: 1,  },
-  lembreteSubtitulo: { fontSize: 11,                // era 12
-  color: "#94A3B8",
-  marginTop: 3,
-  lineHeight: 15,
-  flexShrink: 1,},
-  lembreteDireita: { alignItems: "flex-end",
-  width: 90,                   // era 100
-  justifyContent: "center",
-  flexShrink: 0, },
-  lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "700" },
-  lembreteValor: { fontSize: 16, lineHeight: 18 },
+  lembreteInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  lembreteTitulo: {
+    fontSize: 16,
+    color: "#1D1252",
+    fontWeight: "bold",
+  },
+  lembreteSubtitulo: {
+    fontSize: 12,
+    color: "#94A3B8",
+    marginTop: 2,
+  },
+  lembreteDireita: {
+    alignItems: "flex-end",
+  },
+  lembreteMoeda: {
+    fontSize: 14,
+    color: "#1D1252",
+    fontWeight: "bold",
+  },
+  lembreteValor: {
+    fontSize: 14,
+    color: "#1D1252",
+    fontWeight: "bold",
+  },
   badgePendente: {
     backgroundColor: "#FEE2E2",
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 10,
-    marginTop: 6,
+    marginTop: 4,
   },
   badgeTextPendente: { color: "#B91C1C", fontSize: 10, fontWeight: "700" },
   badgePago: {

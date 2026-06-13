@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -9,9 +9,9 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { buscarGastos, atualizarGasto, Gasto } from "../../../services/gastosService";
-import { geocodificarEndereco } from "../../../services/geocodingService";
 import { auth } from "../../../services/firebaseConfig";
+import { atualizarGasto, buscarGastos, Gasto } from "../../../services/gastosService";
+import { geocodificarEndereco } from "../../../services/geocodingService";
 
 type GastoComId = Gasto & { id: string };
 
@@ -152,14 +152,14 @@ export default function Mapa() {
         ) : gastos.length === 0 ? (
           <Text style={styles.vazio}>Nenhum gasto registrado ainda.</Text>
         ) : (
-          gastos.slice(0, 5).map((g, i) => (
+          gastos.slice(0, 5).map((g) => (
             <TransactionItem
               key={g.id}
               name={g.descricao}
               info={`${g.endereco?.cidade || "—"} • ${formatarData(g.data)}`}
               amount={`- ${formatarValor(g.valor)}`}
               card={g.categoria}
-              light={i % 2 === 0}
+              light={true}
             />
           ))
         )}
