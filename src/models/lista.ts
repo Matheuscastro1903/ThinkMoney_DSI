@@ -90,6 +90,7 @@ export class ListaCompra {
       categoria: this.categoria,
       totalCompra: this.totalCompra,
       listaFinalizada: this.listaFinalizada,
+      localCompra:this.localCompra,
       produtos: produtosFormatados,
       descricao: this.descricao || null,
       dataPrazo: this.dataPrazo || null,

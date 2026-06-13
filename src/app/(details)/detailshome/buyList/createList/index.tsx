@@ -15,12 +15,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "@/src/services/firebaseConfig";
-import { toBuyListService } from "@/src/services/buyList";
-import { ControllerCriarLista } from "@/src/hooks/useLBuyList";
 
-import InputDate from "@/src/components/details/metas/inputdata";
+import { ControllerCriarLista } from "@/src/hooks/useLBuyList";
 import HeaderBack from "@/src/components/headerBack";
-import { Timestamp } from 'firebase/firestore';
+
 
 const CATEGORIAS = [
   { key: "alimentacao", label: "Alimentação", icon: "restaurant" },

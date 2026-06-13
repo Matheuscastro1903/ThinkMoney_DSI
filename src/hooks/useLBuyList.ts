@@ -113,7 +113,7 @@ export async function ControllerAtualizarLista(
   userId: string | undefined | null,
   idLista: string | undefined | null,
   dadosBasicos: { titulo: string; categoria: string; descricao?: string; localCompra: string },
-  produtos: ProdutoCompraProps[] 
+  produtos: ProdutoCompra[] 
 ): Promise<RespostaControllerListas> {
   
   if (!userId || !idLista) {
@@ -208,19 +208,42 @@ export async function ControllerCriarLista(
   produtos: ProdutoCompra[] 
 ): Promise<RespostaControllerListas> { 
   
-  //trava de segurança
   if (!userId || userId.trim() === '') {
     return { sucesso: false, mensagem: "Usuário não autenticado. Faça login novamente." };
   }
 
   try {
-    
-    const resposta = await toBuyListService.criarLista(
-      userId, 
-      dadosBasicos, 
-      produtos
+    // 1. Transformando o JSON da tela em instâncias reais de ProdutoCompra
+    const produtosInstanciados = produtos.map((prod) => {
+      return new ProdutoCompra(
+        prod.id, 
+        prod.nome, 
+        Number(prod.quantidade) || 0, 
+        Number(prod.valor) || 0, 
+        prod.comprado
+      );
+    });
+
+    // 2. Instanciando a classe seguindo rigorosamente a ordem posicional do construtor
+    const novaLista = new ListaCompra(
+      dadosBasicos.titulo,              //titulo (string)
+      dadosBasicos.categoria,           //categoria 
+      0,                                //totalCompra 
+      false,                            //listaFinalizada 
+      produtosInstanciados,             //produtos 
+      dadosBasicos.localCompra || "",   //localCompra 
+      undefined,                        //id (opcional - passamos undefined para poder acessar os próximos parâmetros)
+      dadosBasicos.descricao,           //descricao 
+      undefined,                        //dataPrazo 
+      undefined                         //criadoEm 
     );
 
+    
+    const pacotePerfeitoProFirebase = novaLista.toFirestore();
+
+    // 4. Enviando o pacote unificado para o Service
+    const resposta = await toBuyListService.criarLista(userId, pacotePerfeitoProFirebase);
+    
     return resposta;
 
   } catch (error) {
