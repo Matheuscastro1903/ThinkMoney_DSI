@@ -137,6 +137,7 @@ export default function TelaUpdateLembrete() {
               label="Escolha a data:"
               icon={require("../../../../../assets/icons/iconedata.svg")}
               onChange={setData}
+              value={params.vencimento as string}
             />
 
             <InputTexto

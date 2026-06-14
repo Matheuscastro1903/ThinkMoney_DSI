@@ -1,10 +1,4 @@
-
 import { ListaCompraProps,ProdutoCompraProps } from "../types/lista";
-
-
-import { Timestamp } from "firebase/firestore";
-
-
 
 export class ProdutoCompra {
   constructor(
@@ -48,7 +42,7 @@ export class ListaCompra {
     public id?: string,
     public descricao?: string,
     public dataPrazo?: Date | null,
-    public criadoEm?: Timestamp,
+    public criadoEm?: Date,
     
   ) {}
 
@@ -57,7 +51,12 @@ export class ListaCompra {
     
     let prazo = null;
     if (dados.dataPrazo) {
-      prazo = dados.dataPrazo instanceof Timestamp ? dados.dataPrazo.toDate() : dados.dataPrazo;
+      prazo = (typeof dados.dataPrazo.toDate === 'function') ? dados.dataPrazo.toDate() : new Date(dados.dataPrazo);
+    }
+
+    let dataCriacao = dados.criadoEm;
+    if (dataCriacao && typeof dataCriacao.toDate === 'function') {
+        dataCriacao = dataCriacao.toDate();
     }
     
     //vai pegar o dado que for array do json de produtos
@@ -77,7 +76,7 @@ export class ListaCompra {
       dados.id, 
       dados.descricao,
       prazo,
-      dados.criadoEm,
+      dataCriacao,
       
     );
   }
@@ -94,7 +93,7 @@ export class ListaCompra {
       produtos: produtosFormatados,
       descricao: this.descricao || null,
       dataPrazo: this.dataPrazo || null,
-      criadoEm: this.criadoEm ?? Timestamp.now(),
+      criadoEm: this.criadoEm ?? new Date(),
     };
   }
 }

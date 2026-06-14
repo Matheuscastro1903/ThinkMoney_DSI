@@ -1,6 +1,8 @@
 import { auth } from '@/src/services/firebaseConfig'
 import { LembretesController } from '@/src/hooks/LembretesController'
+import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
 
 /*
 Notifications.setNotificationHandler({
@@ -73,7 +75,6 @@ async function agendarNotificacoesLembretes(userId: string) {
     })
   }
 }
-*/
 
 export function useNotificacoesLembretes() {
   useEffect(() => {

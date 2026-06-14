@@ -57,6 +57,8 @@ export default function VerTodosLembretes() {
         titulo: item.nomeGasto,
         categoria: item.categoria,
         valor: item.valor.toString(),
+        vencimento: item.vencimento,
+        descricao: item.descricao || "",
       },
     });
   };

@@ -1,11 +1,6 @@
 import HeaderBack from "@/src/components/headerBack";
 import LayoutNavBar from "@/src/components/layoutnavbar";
-import { LembretesController } from "@/src/hooks/LembretesController";
-import { Lembrete } from "@/src/models/Lembrete";
-import { auth } from "@/src/services/firebaseConfig";
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,6 +10,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter, Link, useFocusEffect } from "expo-router";
+import { auth } from "@/src/services/firebaseConfig";
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
+
 export default function Lembretes() {
   const router = useRouter();
   const [lembretes, setLembretes] = useState<Lembrete[]>([]);
@@ -40,6 +43,8 @@ export default function Lembretes() {
         titulo: item.nomeGasto,
         categoria: item.categoria,
         valor: item.valor.toString(),
+        vencimento: item.vencimento,
+        descricao: item.descricao || "",
       },
     });
   };

@@ -1,5 +1,9 @@
-import { Timestamp } from "firebase/firestore";
 import { UsuarioFirestore, UsuarioProps } from "../types/usuario";
+import { Endereco } from "./endereco";
+import { Familia } from "./familia";
+import { Gasto } from "./gasto";
+import { Meta } from "./meta";
+import { Lembrete } from "./Lembrete";
 
 export class Usuario implements Omit<UsuarioProps, 'senha'>{
     constructor(
@@ -10,18 +14,21 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         public renda: string,
         public telefone: string,
         public profissao: string,
-        public logradouro: string,
-        public numero: string,
-        public bairro: string,
-        public cidade: string,
-        public cep: string,
+        public endereco: Endereco,
         public avatar: number,
-        public criadoEm?: Timestamp,
-        // Vínculo com a família — preenchido ao criar/entrar e limpo ao sair/excluir.
-        public familiaId?: string,
+        public criadoEm?: Date,
+        public familia?: Familia,
+        public gastos?: Gasto[],
+        public metas?: Meta[],
+        public lembretes?: Lembrete[],
   ) {}
 
   static fromFirestore(dados: UsuarioFirestore): Usuario {
+    let dataCriacao = dados.criadoEm;
+    if (dataCriacao && typeof (dataCriacao as any).toDate === 'function') {
+        dataCriacao = (dataCriacao as any).toDate();
+    }
+
     return new Usuario(
         dados.nome,
         dados.email,
@@ -30,14 +37,13 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         dados.renda,
         dados.telefone,
         dados.profissao,
-        dados.logradouro,
-        dados.numero,
-        dados.bairro,
-        dados.cidade,
-        dados.cep,
+        Endereco.fromJson(dados),
         dados.avatar,
-        dados.criadoEm,
-        dados.familiaId,
+        dataCriacao as unknown as Date,
+        dados?.familia,
+        dados?.gastos,
+        dados?.metas,
+        dados?.lembretes,
     );
   }
 
@@ -50,14 +56,13 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         renda: this.renda,
         telefone: this.telefone,
         profissao: this.profissao,
-        logradouro: this.logradouro,
-        numero: this.numero,
-        bairro: this.bairro,
-        cidade: this.cidade,
-        cep: this.cep,
+        endereco: this.endereco,
         avatar: this.avatar,
-        criadoEm: this.criadoEm ?? Timestamp.now(),
-        ...(this.familiaId !== undefined && { familiaId: this.familiaId }),
+        criadoEm: this.criadoEm ?? new Date(),
+        ...(this.familia !== undefined && { familia: this.familia }),
+        ...(this.gastos !== undefined && { gastos: this.gastos }),
+        ...(this.metas !== undefined && { metas: this.metas }),
+        ...(this.lembretes !== undefined && { lembretes: this.lembretes }),
     };
   }
 }

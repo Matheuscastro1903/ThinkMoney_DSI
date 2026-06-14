@@ -1,5 +1,3 @@
-import { Timestamp } from "firebase/firestore";
-
 export interface ListaCompraProps {
   id: string; 
   titulo: string;
@@ -8,7 +6,7 @@ export interface ListaCompraProps {
   dataPrazo?: Date | null;
   totalCompra: number;
   listaFinalizada: boolean; 
-  criadoEm?: Timestamp;
+  criadoEm?: Date;
   produtos: ProdutoCompraProps[];
   localCompra:string 
 }

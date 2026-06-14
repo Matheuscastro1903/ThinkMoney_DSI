@@ -20,8 +20,15 @@ export default function InputValor({ label, placeholder, atualizando, value, err
 
     //const [protegido, setProtegido] = useState(true);
 
-    const [exibicao, setExibicao] = useState("")
-
+    const [exibicao, setExibicao] = useState(() => {
+        if (!value) return "";
+        const numericValue = parseFloat(value.toString().replace(',', '.'));
+        if (isNaN(numericValue)) return "";
+        const digits = Math.round(numericValue * 100).toString();
+        const apenasNumeros = digits.replace(/\D/g, '');
+        const val = (parseInt(apenasNumeros) / 100).toFixed(2);
+        return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    });
     function formatarMoeda(texto: string): string {
         const apenasNumeros = texto.replace(/\D/g, '');
         if (!apenasNumeros) return '';
