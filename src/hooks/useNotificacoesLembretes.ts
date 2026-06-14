@@ -1,6 +1,8 @@
 import { auth } from '@/src/services/firebaseConfig'
 import { LembretesController } from '@/src/hooks/LembretesController'
+import { useEffect } from 'react'
 
+/*
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,

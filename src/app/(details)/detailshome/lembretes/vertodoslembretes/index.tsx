@@ -77,7 +77,7 @@ export default function VerTodosLembretes() {
 
     const novoStatus = resultado.mensagem as 'PENDENTE' | 'PAGO';
     setLembretes((prev) =>
-      prev.map((l) => (l.id === item.id ? { ...l, status: novoStatus } : l)),
+      prev.map((l) => (l.id === item.id ? new Lembrete(l.nomeGasto, l.categoria, l.vencimento, l.valor, novoStatus, l.descricao, l.id, l.criadoEm) : l)),
     );
   }
 

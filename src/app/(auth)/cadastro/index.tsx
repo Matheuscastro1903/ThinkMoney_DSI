@@ -180,14 +180,8 @@ export default function Cadastro() {
   function validarRenda(valor: string): string | null {
     const apenasNumeros = valor.replace(/\D/g, "");
 
-    if (!apenasNumeros || apenasNumeros === "000") {
+    if (!apenasNumeros || parseInt(apenasNumeros) <= 0) {
       return "Informe um valor válido";
-    }
-
-    const numero = parseInt(apenasNumeros) / 100;
-
-    if (numero > 999999.99) {
-      return "Valor muito alto";
     }
 
     return null;

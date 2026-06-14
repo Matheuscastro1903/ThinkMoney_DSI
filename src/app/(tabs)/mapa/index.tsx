@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { buscarGastos, atualizarGasto } from "../../../services/gastosService";
@@ -162,6 +163,21 @@ export default function Mapa() {
               amount={`- ${formatarValor(g.valor)}`}
               card={g.categoria}
               light={true}
+              onPress={() => {
+                if (g.endereco?.latitude != null && g.endereco?.longitude != null) {
+                  mapRef.current?.animateToRegion(
+                    {
+                      latitude: g.endereco.latitude,
+                      longitude: g.endereco.longitude,
+                      latitudeDelta: 0.01, // Zoom de aproximação
+                      longitudeDelta: 0.01,
+                    },
+                    1000
+                  );
+                } else {
+                  Alert.alert("Localização indisponível", "Este gasto não possui um endereço associado no mapa.");
+                }
+              }}
             />
           ))
         )}
@@ -176,11 +192,12 @@ type Props = {
   amount: string;
   card: string;
   light?: boolean;
+  onPress?: () => void;
 };
 
-function TransactionItem({ name, info, amount, card, light }: Props) {
+function TransactionItem({ name, info, amount, card, light, onPress }: Props) {
   return (
-    <View style={[styles.item, light && styles.itemLight]}>
+    <TouchableOpacity onPress={onPress} activeOpacity={onPress ? 0.7 : 1} style={[styles.item, light && styles.itemLight]}>
       <View style={styles.itemLeft}>
         <Text style={[styles.itemName, light && styles.textDark]}>{name}</Text>
         <Text style={styles.itemInfo}>{info}</Text>
@@ -189,7 +206,7 @@ function TransactionItem({ name, info, amount, card, light }: Props) {
         <Text style={[styles.itemAmount, light && styles.textDark]}>{amount}</Text>
         <Text style={styles.itemCard}>{card}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

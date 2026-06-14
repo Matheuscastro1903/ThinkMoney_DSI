@@ -41,7 +41,16 @@ export default function App() {
   
 
   const avatarKey = (usuario?.avatar || 1) as keyof typeof avatares;
-  const data = usuario?.datanascimento?.toDate?.(); // garantir que não haja erro de TimeStamp pelo firestore
+  
+  let dataFormatada = "";
+  if (usuario?.datanascimento) {
+    if (typeof usuario.datanascimento === "string") {
+      dataFormatada = usuario.datanascimento.split("-").reverse().join("/");
+    } else if (typeof usuario.datanascimento.toDate === "function") {
+      dataFormatada = usuario.datanascimento.toDate().toLocaleDateString("pt-BR");
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderBack />
@@ -71,7 +80,7 @@ export default function App() {
                 <Ionicons name="calendar-outline" size={24} color="grey" />
                 <Text style={styles.rowLabel}>Data de Nascimento</Text>
               </View>
-              <Text style={styles.rowValue}>{data ? data.toLocaleDateString("pt-br") : ""}</Text>
+              <Text style={styles.rowValue}>{dataFormatada}</Text>
             </View>
 
             <View style={styles.row}>
@@ -172,7 +181,7 @@ const styles = StyleSheet.create({
   },
   container2: {
     alignItems: "center",
-    marginTop: 60,
+    marginTop: 20,
   },
   name: {
     color: "white",

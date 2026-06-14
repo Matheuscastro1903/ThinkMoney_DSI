@@ -1,7 +1,8 @@
 import HeaderBack from "@/src/components/headerBack";
 import LayoutNavBar from "@/src/components/layoutnavbar";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useFocusEffect, useRouter } from "expo-router";
@@ -14,16 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import LayoutNavBar from "@/src/components/layoutnavbar";
-import HeaderBack from "@/src/components/headerBack";
-import React, { useCallback, useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter, Link, useFocusEffect } from "expo-router";
-import { auth } from "@/src/services/firebaseConfig";
-import { LembretesController } from "@/src/hooks/LembretesController";
-import { Lembrete } from "@/src/models/Lembrete";
-
 export default function Lembretes() {
   const router = useRouter();
   const [lembretes, setLembretes] = useState<Lembrete[]>([]);

@@ -50,6 +50,13 @@ export default function AddMeta() {
   const [descricao, setDescricao] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const formatarMoeda = (texto: string) => {
+    const apenasNumeros = texto.replace(/\D/g, '');
+    if (!apenasNumeros) return '';
+    const numero = parseInt(apenasNumeros, 10);
+    return (numero / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   
   const [uriImagem,setUriImagem]=useState<string | null>(null);
 
@@ -167,7 +174,7 @@ export default function AddMeta() {
 
   return (
 
-    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -252,7 +259,7 @@ export default function AddMeta() {
                 placeholderTextColor="#BBBBBB"
                 keyboardType="numeric"
                 value={capital}
-                onChangeText={setCapital}
+                onChangeText={(text) => setCapital(formatarMoeda(text))}
               />
             </View>
 
