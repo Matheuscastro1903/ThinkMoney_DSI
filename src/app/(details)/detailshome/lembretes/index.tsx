@@ -13,16 +13,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, Link, useFocusEffect } from "expo-router";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
-
-type Lembrete = {
-  id: string;
-  nomeGasto: string;
-  categoria: string;
-  vencimento: string;
-  valor: number;
-  status: "PENDENTE" | "PAGO";
-};
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
 
 export default function Lembretes() {
   const router = useRouter();
@@ -34,8 +26,8 @@ export default function Lembretes() {
       const user = auth.currentUser;
       if (!user) return;
       setCarregando(true);
-      new LembretesService(user.uid).buscarLembretes().then((dados) => {
-        setLembretes(dados as Lembrete[]);
+      new LembretesController(user.uid).buscar().then(({ dados }) => {
+        setLembretes(dados);
         setCarregando(false);
       });
     }, []),
@@ -184,11 +176,11 @@ const styles = StyleSheet.create({
   alignSelf: "center",
   marginTop: 10,
   flexDirection: "row",
-  alignItems: "center",        // era justify-content: space-between
+  alignItems: "center",
   marginBottom: 10,
   paddingHorizontal: 14,
   paddingVertical: 14,
-  gap: 10,    
+  gap: 10,
   },
   lembreteIcone: {
     width: 48,
@@ -198,22 +190,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  lembreteInfo: {flex: 1,                     // mantém o flex: 1
-  marginLeft: 4,               // era 12 (o gap já cuida do espaço)
+  lembreteInfo: {flex: 1,
+  marginLeft: 4,
   justifyContent: "center",
   minWidth: 0,} ,
-  lembreteTitulo: {  fontSize: 14,                // era 15
+  lembreteTitulo: {  fontSize: 14,
   color: "#1D1252",
   fontWeight: "700",
   lineHeight: 20,
   flexShrink: 1,  },
-  lembreteSubtitulo: { fontSize: 11,                // era 12
+  lembreteSubtitulo: { fontSize: 11,
   color: "#94A3B8",
   marginTop: 3,
   lineHeight: 15,
   flexShrink: 1,},
   lembreteDireita: { alignItems: "flex-end",
-  width: 90,                   // era 100
+  width: 90,
   justifyContent: "center",
   flexShrink: 0, },
   lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "700" },

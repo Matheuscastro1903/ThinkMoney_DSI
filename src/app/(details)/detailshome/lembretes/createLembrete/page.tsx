@@ -17,7 +17,7 @@ import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
+import { LembretesController } from "@/src/hooks/LembretesController";
 
 export default function TelaCreateLembrete() {
   const router = useRouter();
@@ -31,18 +31,18 @@ export default function TelaCreateLembrete() {
     const user = auth.currentUser;
     if (!user) return;
 
-    if (!inputNomeGasto || !escolhaGastos || !valorGasto || !inputData) {
-      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
-      return;
-    }
-
-    await new LembretesService(user.uid).criarLembrete({
+    const resultado = await new LembretesController(user.uid).criar({
       nomeGasto: inputNomeGasto,
       categoria: escolhaGastos,
-      vencimento: inputData.toISOString().split("T")[0],
-      valor: parseFloat(valorGasto.replace(",", ".")),
-      status: "PENDENTE",
+      valor: valorGasto,
+      vencimento: inputData,
+      descricao,
     });
+
+    if (!resultado.sucesso) {
+      Alert.alert("Atenção", resultado.mensagem);
+      return;
+    }
 
     router.back();
   }

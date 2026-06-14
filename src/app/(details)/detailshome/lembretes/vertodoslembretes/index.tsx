@@ -5,6 +5,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,16 +16,8 @@ import {
   View,
 } from "react-native";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
-
-type Lembrete = {
-  id: string;
-  nomeGasto: string;
-  categoria: string;
-  vencimento: string;
-  valor: number;
-  status: "PENDENTE" | "PAGO";
-};
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
 
 export default function VerTodosLembretes() {
   const [filtro, setFiltro] = useState("Todos");
@@ -38,8 +31,8 @@ export default function VerTodosLembretes() {
       const user = auth.currentUser;
       if (!user) return;
       setCarregando(true);
-      new LembretesService(user.uid).buscarLembretes().then((dados) => {
-        setLembretes(dados as Lembrete[]);
+      new LembretesController(user.uid).buscar().then(({ dados }) => {
+        setLembretes(dados);
         setCarregando(false);
       });
     }, []),
@@ -70,13 +63,19 @@ export default function VerTodosLembretes() {
 
   async function handleAlterarStatus(item: Lembrete) {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user || !item.id) return;
 
-    const novoStatus = item.status === "PAGO" ? "PENDENTE" : "PAGO";
-    await new LembretesService(user.uid).atualizar(item.id, {
-      status: novoStatus,
-    });
+    const resultado = await new LembretesController(user.uid).alterarStatus(
+      item.id,
+      item.status,
+    );
 
+    if (!resultado.sucesso) {
+      Alert.alert("Erro", resultado.mensagem);
+      return;
+    }
+
+    const novoStatus = resultado.mensagem as 'PENDENTE' | 'PAGO';
     setLembretes((prev) =>
       prev.map((l) => (l.id === item.id ? { ...l, status: novoStatus } : l)),
     );
@@ -283,7 +282,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 12,
     marginTop: 10,
-    width: 80,           
+    width: 80,
     alignItems: "center"
   },
   badgeTextPendente: { color: "#000000", fontSize: 9, fontWeight: "bold" },
@@ -294,7 +293,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 10,
     color: "white",
-    width: 80,           
+    width: 80,
     alignItems: "center"
   },
   badgeTextPago: { color: "#000000", fontSize: 9, fontWeight: "bold" },
