@@ -1,4 +1,3 @@
-import { Timestamp } from 'firebase/firestore'
 import { Endereco } from '@/src/models/endereco';
 import { Familia } from '@/src/models/familia';
 import { Gasto } from '@/src/models/gasto';
@@ -23,5 +22,5 @@ export interface UsuarioProps {
 }
 
 export type UsuarioFirestore = Omit<UsuarioProps, "senha"> & {
-    criadoEm: Timestamp;
+    criadoEm: Date;
 };

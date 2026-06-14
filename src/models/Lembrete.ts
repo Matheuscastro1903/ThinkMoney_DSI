@@ -1,4 +1,3 @@
-import { Timestamp } from 'firebase/firestore'
 import { LembreteProps } from '../types/lembrete'
 
 export class Lembrete implements LembreteProps {
@@ -10,10 +9,14 @@ export class Lembrete implements LembreteProps {
     public status: 'PENDENTE' | 'PAGO',
     public descricao?: string,
     public id?: string,
-    public criadoEm?: Timestamp,
+    public criadoEm?: Date,
   ) {}
 
   static fromFirestore(id: string, dados: any): Lembrete {
+    let dataCriacao = dados.criadoEm;
+    if (dataCriacao && typeof dataCriacao.toDate === 'function') {
+      dataCriacao = dataCriacao.toDate();
+    }
     return new Lembrete(
       dados.nomeGasto,
       dados.categoria,
@@ -22,7 +25,7 @@ export class Lembrete implements LembreteProps {
       dados.status,
       dados.descricao,
       id,
-      dados.criadoEm,
+      dataCriacao,
     )
   }
 
@@ -34,7 +37,7 @@ export class Lembrete implements LembreteProps {
       valor: this.valor,
       status: this.status,
       ...(this.descricao !== undefined && { descricao: this.descricao }),
-      criadoEm: this.criadoEm ?? Timestamp.now(),
+      criadoEm: this.criadoEm ?? new Date(),
     }
   }
 }

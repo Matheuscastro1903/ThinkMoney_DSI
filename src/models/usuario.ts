@@ -1,4 +1,3 @@
-import { Timestamp } from "firebase/firestore";
 import { UsuarioFirestore, UsuarioProps } from "../types/usuario";
 import { Endereco } from "./endereco";
 import { Familia } from "./familia";
@@ -17,7 +16,7 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         public profissao: string,
         public endereco: Endereco,
         public avatar: number,
-        public criadoEm?: Timestamp,
+        public criadoEm?: Date,
         public familia?: Familia,
         public gastos?: Gasto[],
         public metas?: Meta[],
@@ -25,6 +24,11 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
   ) {}
 
   static fromFirestore(dados: UsuarioFirestore): Usuario {
+    let dataCriacao = dados.criadoEm;
+    if (dataCriacao && typeof (dataCriacao as any).toDate === 'function') {
+        dataCriacao = (dataCriacao as any).toDate();
+    }
+
     return new Usuario(
         dados.nome,
         dados.email,
@@ -35,7 +39,7 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         dados.profissao,
         Endereco.fromJson(dados),
         dados.avatar,
-        dados.criadoEm,
+        dataCriacao as unknown as Date,
         dados?.familia,
         dados?.gastos,
         dados?.metas,
@@ -54,7 +58,7 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         profissao: this.profissao,
         endereco: this.endereco,
         avatar: this.avatar,
-        criadoEm: this.criadoEm ?? Timestamp.now(),
+        criadoEm: this.criadoEm ?? new Date(),
         ...(this.familia !== undefined && { familia: this.familia }),
         ...(this.gastos !== undefined && { gastos: this.gastos }),
         ...(this.metas !== undefined && { metas: this.metas }),

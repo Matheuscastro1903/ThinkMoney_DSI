@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
-
 export interface LembreteProps {
   nomeGasto: string;
   categoria: string;
@@ -8,5 +6,5 @@ export interface LembreteProps {
   status: 'PENDENTE' | 'PAGO';
   descricao?: string;
   id?: string;
-  criadoEm?: Timestamp;
+  criadoEm?: Date;
 }

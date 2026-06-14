@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc, deleteField, Timestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteField } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 import { UsuarioFirestore, UsuarioProps } from '../types/usuario'
 import { Usuario } from '../models/usuario'
@@ -12,7 +12,7 @@ class UsuarioService {
         }
         await setDoc(docRef, {
             ...dados,
-            criadoEm: Timestamp.now(),
+            criadoEm: new Date(),
         } as UsuarioFirestore)
     }
 
