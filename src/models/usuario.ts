@@ -1,10 +1,5 @@
 import { Timestamp } from "firebase/firestore";
 import { UsuarioFirestore, UsuarioProps } from "../types/usuario";
-import { Endereco } from "./endereco";
-import { Familia } from "./familia";
-import { Gasto } from "./gasto";
-import { Meta } from "./meta";
-import { Lembrete } from "./Lembrete";
 
 export class Usuario implements Omit<UsuarioProps, 'senha'>{
     constructor(
@@ -15,13 +10,15 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         public renda: string,
         public telefone: string,
         public profissao: string,
-        public endereco: Endereco,
+        public logradouro: string,
+        public numero: string,
+        public bairro: string,
+        public cidade: string,
+        public cep: string,
         public avatar: number,
         public criadoEm?: Timestamp,
-        public familia?: Familia,
-        public gastos?: Gasto[],
-        public metas?: Meta[],
-        public lembretes?: Lembrete[],
+        // Vínculo com a família — preenchido ao criar/entrar e limpo ao sair/excluir.
+        public familiaId?: string,
   ) {}
 
   static fromFirestore(dados: UsuarioFirestore): Usuario {
@@ -33,13 +30,14 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         dados.renda,
         dados.telefone,
         dados.profissao,
-        Endereco.fromJson(dados),
+        dados.logradouro,
+        dados.numero,
+        dados.bairro,
+        dados.cidade,
+        dados.cep,
         dados.avatar,
         dados.criadoEm,
-        dados?.familia,
-        dados?.gastos,
-        dados?.metas,
-        dados?.lembretes,
+        dados.familiaId,
     );
   }
 
@@ -52,13 +50,14 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         renda: this.renda,
         telefone: this.telefone,
         profissao: this.profissao,
-        endereco: this.endereco,
+        logradouro: this.logradouro,
+        numero: this.numero,
+        bairro: this.bairro,
+        cidade: this.cidade,
+        cep: this.cep,
         avatar: this.avatar,
         criadoEm: this.criadoEm ?? Timestamp.now(),
-        ...(this.familia !== undefined && { familia: this.familia }),
-        ...(this.gastos !== undefined && { gastos: this.gastos }),
-        ...(this.metas !== undefined && { metas: this.metas }),
-        ...(this.lembretes !== undefined && { lembretes: this.lembretes }),
+        ...(this.familiaId !== undefined && { familiaId: this.familiaId }),
     };
   }
 }

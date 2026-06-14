@@ -1,9 +1,4 @@
 import { Timestamp } from 'firebase/firestore'
-import { Endereco } from '@/src/models/endereco';
-import { Familia } from '@/src/models/familia';
-import { Gasto } from '@/src/models/gasto';
-import { Meta } from '@/src/models/meta';
-import { Lembrete } from '@/src/models/Lembrete';
 
 export interface UsuarioProps {
     nome: string;
@@ -14,12 +9,19 @@ export interface UsuarioProps {
     renda: string;
     telefone: string;
     profissao: string;
-    endereco: Endereco;
+    logradouro: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    cep: string;
     avatar: number;
-    familia?: Familia;
-    gastos?: Gasto[];
-    metas?: Meta[];
-    lembretes?: Lembrete[];
+    // familiaId vincula o usuário ao documento da família no Firestore.
+    // undefined = usuário que ainda não pertence a nenhuma família.
+    familiaId?: string;
+    // Adições futuras:
+    // gastos?: Gastos[]
+    // metas?: Metas[]
+    // lembretes?: Lembretes[]
 }
 
 export type UsuarioFirestore = Omit<UsuarioProps, "senha"> & {
