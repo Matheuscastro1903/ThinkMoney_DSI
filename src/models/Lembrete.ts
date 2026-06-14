@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore'
+import { LembreteProps } from '../types/lembrete'
 
-export class Lembrete {
+export class Lembrete implements LembreteProps {
   constructor(
     public nomeGasto: string,
     public categoria: string,
