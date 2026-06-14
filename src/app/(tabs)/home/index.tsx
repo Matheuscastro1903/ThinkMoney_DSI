@@ -54,7 +54,6 @@ export default function Home() {
     const [salvandoRenda, setSalvandoRenda] = useState(false);
 
     const [usuario, setUsuario] = useState<any>(null);
-    const [entradasHoje, setEntradasHoje] = useState<number>(0);
     const [gastos, setGastos] = useState<(Gasto & { id: string })[]>([]);
     const [metas, setMetas] = useState<any[]>([]);
 
@@ -70,9 +69,6 @@ export default function Home() {
             if (docSnap.exists()) {
                 setUsuario(docSnap.data());
             }
-
-            const entradas = await metasService.buscarContribuicoesDoDia(uid);
-            setEntradasHoje(entradas);
 
             try {
                 const listaGastos = await buscarGastos(uid);
@@ -104,6 +100,15 @@ export default function Home() {
         .filter(gasto => {
             const dataGasto = toDate(gasto.data);
             return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual;
+        })
+        .reduce((acc, gasto) => acc + gasto.valor, 0);
+
+    const gastosHoje = gastos
+        .filter(gasto => {
+            const dataGasto = toDate(gasto.data);
+            return dataGasto.getDate() === dataAtual.getDate() && 
+                   dataGasto.getMonth() === mesAtual && 
+                   dataGasto.getFullYear() === anoAtual;
         })
         .reduce((acc, gasto) => acc + gasto.valor, 0);
 
@@ -140,8 +145,17 @@ export default function Home() {
                     </View>
                     <Text style={styles.text2}>{isBalanceVisible ? formatarValor(saldoDisponivel) : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
-                        <Feather name="arrow-up-right" size={16} color="#34D399" />
-                        <Text style={styles.saldoTrend}>R$ {entradasHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} entraram hoje</Text>
+                        {gastosHoje > 0 ? (
+                            <>
+                                <Feather name="arrow-down-right" size={16} color="#EF4444" />
+                                <Text style={styles.saldoTrend}>R$ {gastosHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gastos hoje</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Feather name="check-circle" size={16} color="#34D399" />
+                                <Text style={styles.saldoTrend}>Nenhum gasto hoje</Text>
+                            </>
+                        )}
                     </View>
                     <TouchableOpacity style={styles.botaoAtualizarRenda} onPress={() => setModalVisible(true)}>
                         <View style={styles.itensBotaoAtualizar}>

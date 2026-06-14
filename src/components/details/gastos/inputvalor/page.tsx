@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
@@ -30,20 +30,25 @@ export default function InputValor({ label, placeholder, atualizando, value, err
         return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     });
     function formatarMoeda(texto: string): string {
-        // Remove tudo que não for número
         const apenasNumeros = texto.replace(/\D/g, '');
-        
         if (!apenasNumeros) return '';
-
-        // Converte para formato monetário (ex: 1234 → "12,34")
         const valor = (parseInt(apenasNumeros) / 100).toFixed(2);
-        
         return valor.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        // Resultado: "1.234,56"
     }
 
+    useEffect(() => {
+        if (value) {
+            const num = value.replace(/\D/g, "");
+            if (num) {
+                const formatado = formatarMoeda(num);
+                if (formatado !== exibicao) {
+                    setExibicao(formatado);
+                }
+            }
+        }
+    }, [value]);
+
     function handleChange(texto: string) {
-        const digitos = texto.replace(/\D/g, '');
         const formatado = formatarMoeda(texto);
         setExibicao(formatado);
         if (typeof atualizando === 'function') {

@@ -1,7 +1,6 @@
-//import { useState } from 'react';
-import { View, TextInput, StyleSheet, Text} from 'react-native'
+import { View, TextInput, StyleSheet, Text } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 interface campoInputRendaProps {
     label: string,
     placeholder: string,
@@ -31,11 +30,23 @@ export default function InputRenda({ label, placeholder, atualizando, value, err
     }
 
     const [exibicao, setExibicao ] = useState("")
+
+    useEffect(() => {
+        if (value) {
+            const num = value.replace(/\D/g, "");
+            if (num) {
+                const formatado = formatarMoeda(num);
+                if (formatado !== exibicao) {
+                    setExibicao(formatado);
+                }
+            }
+        }
+    }, [value]);
+
     function handleChange(texto: string) {
         const formatado = formatarMoeda(texto);
         setExibicao(formatado)
-        const digitos = texto.replace(/\D/g, "")
-        atualizando(digitos)
+        atualizando(formatado)
     }
 
     const temErro = !!erro;

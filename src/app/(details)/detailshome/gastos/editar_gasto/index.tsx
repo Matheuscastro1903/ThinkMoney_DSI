@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Switch,
 } from "react-native";
 import { Component } from "react";
 import { useLocalSearchParams, useRouter, Router } from "expo-router";
@@ -69,6 +70,7 @@ interface State {
   erroValor: string | null;
   salvando: boolean;
   excluindo: boolean;
+  incluirEndereco: boolean;
 }
 
 class EditarGasto extends Component<Props, State> {
@@ -101,6 +103,7 @@ class EditarGasto extends Component<Props, State> {
       erroValor: null,
       salvando: false,
       excluindo: false,
+      incluirEndereco: !!g?.endereco?.logradouro,
     };
   }
 
@@ -112,19 +115,33 @@ class EditarGasto extends Component<Props, State> {
     const { title, tituloEndereco, inputValor, categoriaSelecionada, fixo, inputData, inputEndereco } = this.state;
     const valorNumerico = parseValor(inputValor);
     const tituloOriginal = g.titulo ?? "";
-    return (
+    const enderecoOriginalFoiPreenchido = !!g.endereco?.logradouro;
+
+    if (
       title !== tituloOriginal ||
-      tituloEndereco !== (g.endereco?.titulo ?? "") ||
       valorNumerico !== g.valor ||
       categoriaSelecionada !== g.categoria ||
       fixo !== g.fixo ||
       inputData.getTime() !== new Date(g.data).getTime() ||
-      inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
-      inputEndereco.numero !== (g.endereco?.numero ?? "") ||
-      inputEndereco.bairro !== (g.endereco?.bairro ?? "") ||
-      inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
-      inputEndereco.cep !== (g.endereco?.cep ?? "")
-    );
+      this.state.incluirEndereco !== enderecoOriginalFoiPreenchido
+    ) {
+      return true;
+    }
+
+    if (this.state.incluirEndereco) {
+      if (
+        tituloEndereco !== (g.endereco?.titulo ?? "") ||
+        inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
+        inputEndereco.numero !== (g.endereco?.numero ?? "") ||
+        inputEndereco.bairro !== (g.endereco?.bairro ?? "") ||
+        inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
+        inputEndereco.cep !== (g.endereco?.cep ?? "")
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
   handleSalvar = async () => {
@@ -144,9 +161,11 @@ class EditarGasto extends Component<Props, State> {
       return;
     }
 
-    if (!this.validarCEP()) {
-      Alert.alert("Atenção", "CEP inválido. Informe um CEP com 8 dígitos.");
-      return;
+    if (this.state.incluirEndereco) {
+      if (!this.validarCEP()) {
+        Alert.alert("Atenção", "CEP inválido. Informe um CEP com 8 dígitos.");
+        return;
+      }
     }
 
     if (!this.houveMudanca()) {
@@ -163,21 +182,36 @@ class EditarGasto extends Component<Props, State> {
     try {
       this.setState({ salvando: true });
 
-      const enderecoMudou =
-        inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
-        inputEndereco.numero !== (g.endereco?.numero ?? "") ||
-        inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
-        inputEndereco.cep !== (g.endereco?.cep ?? "");
+      let enderecoObj = undefined;
 
-      const coordenadas = enderecoMudou
-        ? await geocodificarEndereco(
-            inputEndereco.logradouro,
-            inputEndereco.numero,
-            inputEndereco.bairro,
-            inputEndereco.cidade,
-            inputEndereco.cep,
-          )
-        : null;
+      if (this.state.incluirEndereco) {
+        const enderecoMudou =
+          inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
+          inputEndereco.numero !== (g.endereco?.numero ?? "") ||
+          inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
+          inputEndereco.cep !== (g.endereco?.cep ?? "");
+
+        const coordenadas = enderecoMudou
+          ? await geocodificarEndereco(
+              inputEndereco.logradouro,
+              inputEndereco.numero,
+              inputEndereco.bairro,
+              inputEndereco.cidade,
+              inputEndereco.cep,
+            )
+          : null;
+
+        enderecoObj = new Endereco(
+          inputEndereco.logradouro,
+          inputEndereco.numero,
+          inputEndereco.bairro,
+          inputEndereco.cidade,
+          inputEndereco.cep,
+          tituloEndereco,
+          coordenadas?.latitude ?? (g.endereco as any)?.latitude,
+          coordenadas?.longitude ?? (g.endereco as any)?.longitude
+        );
+      }
 
       const novoGasto = new Gasto(
         title,
@@ -187,16 +221,7 @@ class EditarGasto extends Component<Props, State> {
         fixo,
         undefined,
         g.status,
-        new Endereco(
-          inputEndereco.logradouro,
-          inputEndereco.numero,
-          inputEndereco.bairro,
-          inputEndereco.cidade,
-          inputEndereco.cep,
-          tituloEndereco,
-          coordenadas?.latitude ?? (g.endereco as any)?.latitude,
-          coordenadas?.longitude ?? (g.endereco as any)?.longitude
-        ),
+        enderecoObj,
         g.criador // Mantém o criador original
       );
 
@@ -261,7 +286,7 @@ class EditarGasto extends Component<Props, State> {
 
     const {
       title, inputValor, salvando, excluindo, erroValor,
-      fixo, inputEndereco, tituloEndereco, categoriaSelecionada,
+      fixo, inputEndereco, tituloEndereco, categoriaSelecionada, incluirEndereco
     } = this.state;
 
     return (
@@ -343,24 +368,41 @@ class EditarGasto extends Component<Props, State> {
 
               <InputFixo value={fixo} onChange={(v) => this.setState({ fixo: v })} />
 
-              <InputTitle
-                placeholder="ex: Barraquinha do seu zé"
-                label="TÍTULO DO ENDEREÇO"
-                value={tituloEndereco}
-                onChangeText={(v) => this.setState({ tituloEndereco: v })}
-              />
+              <View style={styles.toggleContainer}>
+                <View style={styles.toggleHeader}>
+                  <Text style={styles.toggleTitle}>Adicionar local (Opcional)</Text>
+                  <Switch 
+                    value={incluirEndereco} 
+                    onValueChange={(v) => this.setState({ incluirEndereco: v })} 
+                    trackColor={{ false: "#E2E8F0", true: "#34D399" }}
+                    thumbColor={"#ffffff"}
+                  />
+                </View>
+                <Text style={styles.toggleDica}>📍 Dica: Adicione o local para visualizar este gasto no seu Mapa</Text>
+              </View>
 
-              <InputEnderecoGasto
-                inputEndereco={inputEndereco}
-                atualizando={(patch) =>
-                  this.setState((prev) => ({
-                    inputEndereco: { ...prev.inputEndereco, ...patch },
-                  }))
-                }
-              />
+              {incluirEndereco && (
+                <>
+                  <InputTitle
+                    placeholder="ex: Barraquinha do seu zé"
+                    label="TÍTULO DO ENDEREÇO"
+                    value={tituloEndereco}
+                    onChangeText={(v) => this.setState({ tituloEndereco: v })}
+                  />
+
+                  <InputEnderecoGasto
+                    inputEndereco={inputEndereco}
+                    atualizando={(patch) =>
+                      this.setState((prev) => ({
+                        inputEndereco: { ...prev.inputEndereco, ...patch },
+                      }))
+                    }
+                  />
+                </>
+              )}
             </View>
 
-            {this.validarCEP() && (
+            {incluirEndereco && this.validarCEP() && (
               <Text style={styles.enderecoValidado}>Endereço validado</Text>
             )}
 
@@ -465,5 +507,29 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 30,
     textAlign: "center",
+  },
+  toggleContainer: {
+    marginTop: 20,
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  toggleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  toggleTitle: {
+    fontWeight: 'bold',
+    color: '#1D1252',
+    fontSize: 14,
+  },
+  toggleDica: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#64748B',
+    lineHeight: 18,
   },
 });

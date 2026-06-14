@@ -59,6 +59,13 @@ export default function EditMeta() {
   const [imagemUrl, setImagemUrl] = useState<string | null>(null);
   const [uriImagem, setUriImagem] = useState<string | null>(null);
 
+  const formatarMoeda = (texto: string) => {
+    const apenasNumeros = texto.replace(/\D/g, '');
+    if (!apenasNumeros) return '';
+    const numero = parseInt(apenasNumeros, 10);
+    return (numero / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const { familia, isLoading: isLoadingFamilia } = useFamilia(familiaId || null);
 
   useEffect(() => {
@@ -75,7 +82,7 @@ export default function EditMeta() {
           setMetaOriginal(meta);
           setCategoriaSelecionada(meta.categoria);
           setNomeMeta(meta.nomeMeta);
-          setCapital(meta.valorTotal.toFixed(2).replace(".", ","));
+          setCapital(formatarMoeda(meta.valorTotal.toFixed(2)));
           
           if (meta.dataLimite) {
             setData(new Date(meta.dataLimite));
@@ -345,7 +352,7 @@ export default function EditMeta() {
                   placeholderTextColor="#BBBBBB"
                   keyboardType="numeric"
                   value={capital}
-                  onChangeText={setCapital}
+                  onChangeText={(text) => setCapital(formatarMoeda(text))}
                 />
               </View>
 
@@ -388,7 +395,7 @@ export default function EditMeta() {
                   placeholderTextColor="#BBBBBB"
                   keyboardType="numeric"
                   value={valorAporte}
-                  onChangeText={setValorAporte}
+                  onChangeText={(text) => setValorAporte(formatarMoeda(text))}
                 />
               </View>
 

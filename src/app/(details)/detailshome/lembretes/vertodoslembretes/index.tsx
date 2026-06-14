@@ -136,6 +136,10 @@ export default function VerTodosLembretes() {
 
           {carregando ? (
             <ActivityIndicator color="#FFFFFF" style={{ marginTop: 40 }} />
+          ) : lembretesFiltrados.length === 0 ? (
+            <Text style={{ color: "#94A3B8", textAlign: "center", marginTop: 40, fontSize: 14 }}>
+              Nenhum lembrete encontrado.
+            </Text>
           ) : (
             lembretesFiltrados.map((item) => (
               <View key={item.id} style={styles.containerLembretes}>

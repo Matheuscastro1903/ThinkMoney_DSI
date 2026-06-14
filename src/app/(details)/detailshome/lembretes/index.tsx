@@ -63,6 +63,10 @@ export default function Lembretes() {
 
         {carregando ? (
           <ActivityIndicator color="#FFFFFF" style={{ marginTop: 40 }} />
+        ) : lembretes.length === 0 ? (
+          <Text style={styles.textoVazio}>
+            Nenhum lembrete registrado ainda.
+          </Text>
         ) : (
           lembretes.slice(0, 4).map((item) => (
             <TouchableOpacity
@@ -175,16 +179,16 @@ const styles = StyleSheet.create({
   },
   containerLembretes: {
     width: "92%",
-  backgroundColor: "#FFFFFF",
-  borderRadius: 14,
-  alignSelf: "center",
-  marginTop: 10,
-  flexDirection: "row",
-  alignItems: "center",
-  marginBottom: 10,
-  paddingHorizontal: 14,
-  paddingVertical: 14,
-  gap: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    alignSelf: "center",
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    gap: 10,
   },
   lembreteIcone: {
     width: 48,
@@ -194,24 +198,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  lembreteInfo: {flex: 1,
-  marginLeft: 4,
-  justifyContent: "center",
-  minWidth: 0,} ,
-  lembreteTitulo: {  fontSize: 14,
-  color: "#1D1252",
-  fontWeight: "700",
-  lineHeight: 20,
-  flexShrink: 1,  },
-  lembreteSubtitulo: { fontSize: 11,
-  color: "#94A3B8",
-  marginTop: 3,
-  lineHeight: 15,
-  flexShrink: 1,},
-  lembreteDireita: { alignItems: "flex-end",
-  width: 90,
-  justifyContent: "center",
-  flexShrink: 0, },
+  lembreteInfo: {
+    flex: 1,
+    marginLeft: 4,
+    justifyContent: "center",
+    minWidth: 0,
+  },
+  lembreteTitulo: {
+    fontSize: 14,
+    color: "#1D1252",
+    fontWeight: "700",
+    lineHeight: 20,
+    flexShrink: 1,
+  },
+  lembreteSubtitulo: {
+    fontSize: 11,
+    color: "#94A3B8",
+    marginTop: 3,
+    lineHeight: 15,
+    flexShrink: 1,
+  },
+  lembreteDireita: {
+    alignItems: "flex-end",
+    width: 90,
+    justifyContent: "center",
+    flexShrink: 0,
+  },
   lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "700" },
   lembreteValor: { fontSize: 16, lineHeight: 18 },
   badgePendente: {
@@ -265,6 +277,13 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 40,
     borderRadius: 25,
+  },
+  textoVazio: {
+    color: "#94A3B8",
+    textAlign: "center",
+    marginTop: 30,
+    marginBottom: 10,
+    fontSize: 14,
   },
   text4: { fontSize: 22, color: "#FFFFFF", paddingTop: 5, fontWeight: "bold" },
   text5: {
