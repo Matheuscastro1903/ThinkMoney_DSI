@@ -75,6 +75,7 @@ async function agendarNotificacoesLembretes(userId: string) {
     })
   }
 }
+*/
 
 export function useNotificacoesLembretes() {
   useEffect(() => {

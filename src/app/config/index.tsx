@@ -1,47 +1,47 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View, 
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "../../components/headerBack";
-import { useEffect, useState } from "react"
 
 
 // Informacoes firebase
-import { doc, getDoc } from 'firebase/firestore';
+import { avatares } from '@/src/components/auth/escolhaavantar';
 import { auth, db } from '@/src/services/firebaseConfig';
-import { avatares } from '@/src/components/auth/escolhaavantar'
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function App() {
   const router = useRouter();
   const [usuario, setUsuario] = useState<any>(null);
 
   useEffect(() => {
-          async function carregarDados() {
-          const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
-  
-          if (!uid) return;
-  
-          const docRef = doc(db, 'usuarios', uid);
-          const docSnap = await getDoc(docRef);
-  
-          if (docSnap.exists()) {
-              setUsuario(docSnap.data());
-          }
-          }
-  
-          carregarDados();
-      }, []);
-  
+    async function carregarDados() {
+      const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
+
+      if (!uid) return;
+
+      const docRef = doc(db, 'usuarios', uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUsuario(docSnap.data());
+      }
+    }
+
+    carregarDados();
+  }, []);
+
 
   const avatarKey = (usuario?.avatar || 1) as keyof typeof avatares;
-  
+
   let dataFormatada = "";
   if (usuario?.datanascimento) {
     if (typeof usuario.datanascimento === "string") {
@@ -58,12 +58,16 @@ export default function App() {
         <View style={styles.safeArea}>
           <View style={styles.container2}>
             <Image
-              source={avatares[avatarKey]} 
+              source={avatares[avatarKey]}
               style={styles.avatar}
             />
             <Text style={styles.name}>{usuario?.nome}</Text>
             <Text style={styles.email}>{usuario?.email}</Text>
-            <Text style={styles.address}>{usuario?.cidade}</Text>
+            <Text style={styles.address}>
+              {usuario?.endereco?.cidade}
+              {usuario?.endereco?.cidade && usuario?.endereco?.logradouro ? " - " : ""}
+              {usuario?.endereco?.logradouro}
+            </Text>
           </View>
 
           <View style={styles.container3}>
@@ -94,9 +98,12 @@ export default function App() {
             <View style={styles.row}>
               <View style={styles.rowLeft}>
                 <Ionicons name="location-outline" size={24} color="grey" />
-                <Text style={styles.rowLabel}>Endereco</Text>
+                <Text style={styles.rowLabel}>Endereço</Text>
               </View>
-              <Text style={styles.rowValue}>{usuario?.cidade}</Text>
+              <Text style={styles.rowValue}>
+                {usuario?.endereco?.logradouro}
+                {usuario?.endereco?.numero ? `, ${usuario?.endereco?.numero}` : ""}
+              </Text>
             </View>
 
             <View style={styles.row}>
