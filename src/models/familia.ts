@@ -1,9 +1,8 @@
 import { FamiliaProps } from "../types/familia";
-import { GastoProps } from "../types/gasto";
-import { LembreteProps } from "../types/lembrete";
 import { Meta } from "./meta";
 import { Usuario } from "./usuario";
 import { Gasto } from "./gasto";
+import { Lembrete } from "./Lembrete";
 
 export class Familia implements FamiliaProps {
     constructor(
@@ -12,9 +11,9 @@ export class Familia implements FamiliaProps {
         public codigo_convite: string,
         public admin: Usuario,
         public membros: Usuario[],
-        public lembretes: LembreteProps[],
+        public lembretes: Lembrete[],
         public metas: Meta[],
-        public gastos: GastoProps[]
+        public gastos: Gasto[]
     ) {}
 
     static fromJson(id: string, dadosFamilia: any, dadosMetas: Meta[], dadosGastos: Gasto[] = []): Familia {

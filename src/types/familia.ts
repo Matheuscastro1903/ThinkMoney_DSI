@@ -1,8 +1,7 @@
-import { GastoProps } from "./gasto";
-import { LembreteProps } from "./lembrete";
 import { Meta } from "../models/meta";
 import { Usuario } from "../models/usuario";
-import { UsuarioFirestore } from "./usuario";
+import { Gasto } from "../models/gasto";
+import { Lembrete } from "../models/Lembrete";
 
 export interface FamiliaProps {
     id: string
@@ -10,9 +9,7 @@ export interface FamiliaProps {
     codigo_convite: string // formato do código: THKM-X7R2-89
     admin: Usuario
     membros: Usuario[]
-
-    // Em breve esses campos abaixo vão ter seus tipos substituiídos por models.
-    lembretes: LembreteProps[]
+    lembretes: Lembrete[]
     metas: Meta[]
-    gastos: GastoProps[]
+    gastos: Gasto[]
 };
