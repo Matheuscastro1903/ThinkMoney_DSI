@@ -61,6 +61,16 @@ export class LembretesController {
     try {
       if (!id) return { sucesso: false, mensagem: 'ID do lembrete inválido.' }
 
+      if (form.vencimento) {
+        const hoje = new Date()
+        hoje.setHours(0, 0, 0, 0)
+        const vencimento = new Date(form.vencimento)
+        vencimento.setHours(0, 0, 0, 0)
+        if (vencimento < hoje) {
+          return { sucesso: false, mensagem: 'A data de vencimento não pode ser no passado.' }
+        }
+      }
+
       const dados: Record<string, any> = {}
       if (form.nomeGasto) dados.nomeGasto = form.nomeGasto.trim()
       if (form.categoria) dados.categoria = form.categoria
