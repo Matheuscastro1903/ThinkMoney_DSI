@@ -6,10 +6,18 @@ interface InputDateProps {
     label: string;
     icon: any;
     onChange?: (data: Date) => void;
+    value?: string;
 }
 
-export default function InputDateLembretes({ label, icon, onChange }: InputDateProps) {
-    const [textoExibido, setTextoExibido] = useState('');
+export default function InputDateLembretes({ label, icon, onChange, value }: InputDateProps) {
+    const [textoExibido, setTextoExibido] = useState(() => {
+        if (!value) return '';
+        const parts = value.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return value;
+    });
 
     function aoDigitar(masked: string, unmasked: string) {
         setTextoExibido(masked);

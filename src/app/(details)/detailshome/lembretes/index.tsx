@@ -43,6 +43,8 @@ export default function Lembretes() {
         titulo: item.nomeGasto,
         categoria: item.categoria,
         valor: item.valor.toString(),
+        vencimento: item.vencimento,
+        descricao: item.descricao || "",
       },
     });
   };
