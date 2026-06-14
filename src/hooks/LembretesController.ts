@@ -24,6 +24,14 @@ export class LembretesController {
         return { sucesso: false, mensagem: 'Preencha todos os campos obrigatórios.' }
       }
 
+      const hoje = new Date()
+      hoje.setHours(0, 0, 0, 0)
+      const vencimento = new Date(form.vencimento)
+      vencimento.setHours(0, 0, 0, 0)
+      if (vencimento < hoje) {
+        return { sucesso: false, mensagem: 'A data de vencimento não pode ser no passado.' }
+      }
+
       const lembrete = new Lembrete(
         form.nomeGasto.trim(),
         form.categoria,
