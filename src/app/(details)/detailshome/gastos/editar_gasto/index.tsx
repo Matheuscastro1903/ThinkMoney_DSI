@@ -15,9 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 import InputTitle from "@/src/components/details/gastos/inputtitle2/page";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
-import InputEnderecoGasto, {
-  Endereco,
-} from "@/src/components/details/gastos/inputendereco/page";
+import InputEnderecoGasto from "@/src/components/details/gastos/inputendereco/page";
+import { EnderecoProps } from "@/src/types/endereco";
+import { Endereco } from "../../../../../models/endereco";
 import InputDate from "@/src/components/auth/inputdata";
 import InputFixo from "@/src/components/details/gastos/inputfixo/page";
 
@@ -27,23 +27,7 @@ import {
 } from "../../../../../services/gastosService";
 import { geocodificarEndereco } from "../../../../../services/geocodingService";
 import { auth } from "../../../../../services/firebaseConfig";
-
-interface GastoCompleto {
-  id: string;
-  descricao: string;
-  categoria: string;
-  valor: number;
-  data: string;
-  fixo: boolean;
-  endereco?: {
-    titulo?: string;
-    logradouro?: string;
-    numero?: string;
-    bairro?: string;
-    cidade?: string;
-    cep?: string;
-  };
-}
+import { Gasto } from "@/src/models/gasto";
 
 function parseValor(texto: string): number {
   const limpo = texto
@@ -63,20 +47,22 @@ function valorParaTexto(valor: number): string {
 // Wrapper funcional para injetar os hooks useRouter e useLocalSearchParams como props
 export default function EditarGastoWrapper() {
   const router = useRouter();
-  const { gasto } = useLocalSearchParams<{ gasto: string }>();
-  return <EditarGasto router={router} gastoJson={gasto as string} />;
+  const params = useLocalSearchParams<{ gasto: string; context?: string; familiaId?: string }>();
+  return <EditarGasto router={router} gastoJson={params.gasto as string} context={params.context} familiaId={params.familiaId} />;
 }
 
 interface Props {
   router: Router;
   gastoJson: string;
+  context?: string;
+  familiaId?: string;
 }
 
 interface State {
   title: string;
   tituloEndereco: string;
   inputValor: string;
-  inputEndereco: Endereco;
+  inputEndereco: EnderecoProps;
   inputData: Date;
   categoriaSelecionada: string | undefined;
   fixo: boolean;
@@ -86,7 +72,7 @@ interface State {
 }
 
 class EditarGasto extends Component<Props, State> {
-  private gastoOriginal: GastoCompleto | null;
+  private gastoOriginal: Gasto | null;
 
   constructor(props: Props) {
     super(props);
@@ -99,7 +85,7 @@ class EditarGasto extends Component<Props, State> {
 
     const g = this.gastoOriginal;
     this.state = {
-      title: g?.descricao ?? "",
+      title: g?.titulo ?? "",
       tituloEndereco: g?.endereco?.titulo ?? "",
       inputValor: g ? valorParaTexto(g.valor) : "",
       inputEndereco: {
@@ -125,8 +111,9 @@ class EditarGasto extends Component<Props, State> {
     if (!g) return false;
     const { title, tituloEndereco, inputValor, categoriaSelecionada, fixo, inputData, inputEndereco } = this.state;
     const valorNumerico = parseValor(inputValor);
+    const tituloOriginal = g.titulo ?? "";
     return (
-      title !== g.descricao ||
+      title !== tituloOriginal ||
       tituloEndereco !== (g.endereco?.titulo ?? "") ||
       valorNumerico !== g.valor ||
       categoriaSelecionada !== g.categoria ||
@@ -192,19 +179,30 @@ class EditarGasto extends Component<Props, State> {
           )
         : null;
 
-      await atualizarGasto(user.uid, g.id, {
-        valor: valorNumerico,
-        data: inputData,
-        descricao: title,
-        categoria: categoriaSelecionada,
+      const novoGasto = new Gasto(
+        title,
+        categoriaSelecionada,
+        valorNumerico,
+        inputData,
         fixo,
-        endereco: {
-          titulo: tituloEndereco,
-          ...inputEndereco,
-          latitude: coordenadas?.latitude ?? (g.endereco as any)?.latitude,
-          longitude: coordenadas?.longitude ?? (g.endereco as any)?.longitude,
-        },
-      });
+        undefined,
+        g.status,
+        new Endereco(
+          inputEndereco.logradouro,
+          inputEndereco.numero,
+          inputEndereco.bairro,
+          inputEndereco.cidade,
+          inputEndereco.cep,
+          tituloEndereco,
+          coordenadas?.latitude ?? (g.endereco as any)?.latitude,
+          coordenadas?.longitude ?? (g.endereco as any)?.longitude
+        ),
+        g.criador // Mantém o criador original
+      );
+
+      const { context, familiaId } = this.props;
+
+      await atualizarGasto(user.uid, g.id as string, novoGasto, context === 'familia' ? familiaId : undefined);
 
       Alert.alert("Sucesso", "Gasto atualizado!", [
         { text: "OK", onPress: () => this.props.router.back() },
@@ -235,7 +233,10 @@ class EditarGasto extends Component<Props, State> {
 
             try {
               this.setState({ excluindo: true });
-              await excluirGasto(user.uid, g.id);
+              
+              const { context, familiaId } = this.props;
+              await excluirGasto(user.uid, g.id as string, context === 'familia' ? familiaId : undefined);
+              
               this.props.router.back();
             } catch (error) {
               console.error(error);
@@ -414,13 +415,15 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 8,
     marginTop: 25,
-    marginRight: 10,
+    width: '100%',
   },
   categoriasBotoes: {
     flexDirection: "row",
+    flexWrap: "wrap",
     marginTop: 8,
     width: "100%",
     justifyContent: "flex-start",
+    gap: 8,
   },
   categoriaBox: {
     paddingVertical: 6,
@@ -428,7 +431,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 70,
     alignItems: "center",
-    marginRight: 8,
   },
   categoriaIcon: { marginBottom: 6 },
   categoriaText: {

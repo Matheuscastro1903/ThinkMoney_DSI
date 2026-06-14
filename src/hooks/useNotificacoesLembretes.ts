@@ -1,6 +1,3 @@
-import { useEffect } from 'react'
-import * as Notifications from 'expo-notifications'
-import { Platform } from 'react-native'
 import { auth } from '@/src/services/firebaseConfig'
 import { LembretesController } from '@/src/hooks/LembretesController'
 
@@ -74,12 +71,14 @@ async function agendarNotificacoesLembretes(userId: string) {
     })
   }
 }
+*/
 
 export function useNotificacoesLembretes() {
   useEffect(() => {
     const usuario = auth.currentUser
     if (!usuario) return
 
-    agendarNotificacoesLembretes(usuario.uid)
+    // agendarNotificacoesLembretes(usuario.uid)
+    console.warn("Notificações de lembrete desativadas temporariamente no Expo Go.")
   }, [])
 }

@@ -8,7 +8,8 @@ import InputRenda from '@/src/components/auth/inputrenda';
 
 // Informacoes firebase
 import { auth, db } from '@/src/services/firebaseConfig';
-import { buscarGastos, Gasto } from '@/src/services/gastosService';
+import { buscarGastos } from '@/src/services/gastosService';
+import { Gasto } from '@/src/models/gasto';
 import { metasService } from '@/src/services/metasService';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -147,8 +148,10 @@ export default function Home() {
                             <Ionicons name="refresh" size={20} color="#FFFFFF" />
                             <Text style={{fontWeight: "bold", fontSize: 12, color: "white", textAlign: "center", marginTop: 4}}>Atualizar Renda Disponível</Text>
                         </View>
-                        
+                      
                     </TouchableOpacity>
+
+                    
                     <Modal
                         visible={modalVisible}
                         animationType="slide"
@@ -205,7 +208,10 @@ export default function Home() {
                             </View>
                         </View>
                     </Modal>
-                </View>
+                </View>  
+                
+               
+
                 <View style={styles.linhaDegraficos}>
                     
 
@@ -254,6 +260,13 @@ export default function Home() {
                         Visualizar gastos
                     </Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList' as any)}>
+                    <Ionicons name="basket" size={22} color="#1D1252" />
+                    <Text style={styles.text5}>
+                        Visualizar Listas
+                    </Text>
+                </TouchableOpacity>
                 <View style={styles.linhaBotao}>
                     <Link href="/(details)/detailshome/metas" asChild>
                         <TouchableOpacity style={styles.metasPessoais}>
@@ -278,7 +291,7 @@ export default function Home() {
                                 <Ionicons name={icones[gasto.categoria?.toLowerCase()] ?? "cart-outline"} size={20} color="#1D1252" />
                             </View>
                             <View style={{ flex: 1, marginLeft: 12 }}>
-                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.descricao}</Text>
+                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.titulo}</Text>
                                 <Text style={styles.textCategoria}>{capitalizarCategoria(gasto.categoria)}</Text>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
@@ -301,6 +314,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1D1252',
+        alignItems:'center'
     },
     saldo: {
         width: '90%',

@@ -1,10 +1,18 @@
+import HeaderBack from "@/src/components/headerBack";
+import LayoutNavBar from "@/src/components/layoutnavbar";
+import { auth } from "@/src/services/firebaseConfig";
+import { LembretesService } from "@/src/services/lembretesService";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import LayoutNavBar from "@/src/components/layoutnavbar";
 import HeaderBack from "@/src/components/headerBack";
@@ -75,37 +83,37 @@ export default function Lembretes() {
                 />
               </View>
               <View style={styles.lembreteInfo}>
-                  <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
-                  <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
-                    {item.categoria} • VENCE {item.vencimento}
-                  </Text>
+                <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
+                <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
+                  {item.categoria} • VENCE {item.vencimento}
+                </Text>
               </View>
-                <View style={styles.lembreteDireita}>
-                  <Text style={styles.lembreteMoeda} numberOfLines={1}>
-                    R${" "}
-                    <Text style={styles.lembreteValor} numberOfLines={1}>
-                      {item.valor.toFixed(2).replace(".", ",")}
-                    </Text>
+              <View style={styles.lembreteDireita}>
+                <Text style={styles.lembreteMoeda} numberOfLines={1}>
+                  R${" "}
+                  <Text style={styles.lembreteValor} numberOfLines={1}>
+                    {item.valor.toFixed(2).replace(".", ",")}
                   </Text>
-                  <View
+                </Text>
+                <View
+                  style={
+                    item.status === "PAGO"
+                      ? styles.badgePago
+                      : styles.badgePendente
+                  }
+                >
+                  <Text
                     style={
                       item.status === "PAGO"
-                        ? styles.badgePago
-                        : styles.badgePendente
+                        ? styles.badgeTextPago
+                        : styles.badgeTextPendente
                     }
+                    numberOfLines={1}
                   >
-                    <Text
-                      style={
-                        item.status === "PAGO"
-                          ? styles.badgeTextPago
-                          : styles.badgeTextPendente
-                      }
-                      numberOfLines={1}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
+                    {item.status}
+                  </Text>
                 </View>
+              </View>
             </TouchableOpacity>
           ))
         )}
@@ -185,7 +193,7 @@ const styles = StyleSheet.create({
   lembreteIcone: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
@@ -215,7 +223,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 10,
-    marginTop: 6,
+    marginTop: 4,
   },
   badgeTextPendente: { color: "#B91C1C", fontSize: 10, fontWeight: "700" },
   badgePago: {

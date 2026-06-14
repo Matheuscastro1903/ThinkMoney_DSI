@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -9,13 +10,13 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
 import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
 import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
+import InputValor from "@/src/components/details/gastos/inputvalor/page";
 import { auth } from "@/src/services/firebaseConfig";
 import { LembretesController } from "@/src/hooks/LembretesController";
 
@@ -89,14 +90,14 @@ export default function TelaCreateLembrete() {
               onChange={setEscolhaGastos}
             />
 
-            <InputTexto
+            <InputValor
               label="Valor do Gasto"
               placeholder="Ex: 67,00"
               atualizando={setValorGasto}
               value={valorGasto}
+              labelColor="#ffffff"
               width={300}
               height={56}
-              multline={false}
             />
 
             <InputDateLembretes

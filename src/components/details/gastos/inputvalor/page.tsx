@@ -9,11 +9,14 @@ interface campoInputRendaProps {
     icon?: any,
     iconVisibilidade?: any,
     value?: string,
-    erro?: string | null 
+    erro?: string | null,
+    labelColor?: string,
+    height?: number,
+    width?: number | string
 }
 
 
-export default function InputValor({ label, placeholder, atualizando, value, erro}: campoInputRendaProps) {
+export default function InputValor({ label, placeholder, atualizando, value, erro, labelColor, height = 40, width = '100%' }: campoInputRendaProps) {
 
     //const [protegido, setProtegido] = useState(true);
 
@@ -42,11 +45,11 @@ export default function InputValor({ label, placeholder, atualizando, value, err
     const temErro = !!erro;
 
     return (
-        <View style={styles.containerText}>
+        <View style={[styles.containerText, { width: width as any }]}>
 
-            <Text style={styles.label}>{label}</Text>
+            <Text style={[styles.label, labelColor ? { color: labelColor } : {}]}>{label}</Text>
 
-            <View style={styles.input}>
+            <View style={[styles.input, { height }]}>
 
                 <Ionicons name="cash-outline" size={20} color="#888" />
 
@@ -84,7 +87,8 @@ const styles = StyleSheet.create({
     containerText: {
         justifyContent: 'center',
         alignItems: 'flex-start',
-        margin: 10,
+        marginVertical: 10,
+        width: '100%',
         gap: 8,
     },
 

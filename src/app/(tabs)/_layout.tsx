@@ -1,24 +1,27 @@
 import { View, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Slot } from "expo-router"; //slot— renderiza a tela atual automaticamente
+import { Slot, usePathname } from "expo-router"; //slot— renderiza a tela atual automaticamente
 import NavBar from "@/src/components/tabs/navbar";
 import Header from "@/src/components/Header";
 import { useNotificacoesLembretes } from "@/src/hooks/useNotificacoesLembretes";
 
 export default function Layout() {
     useNotificacoesLembretes();
+    const pathname = usePathname()
+    const hideChrome = pathname.includes("editar_meta")
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={[styles.safeArea, hideChrome && { backgroundColor: "white"}]}>
 
             <View style={styles.container}>
                 {/*header fixo em todas as telas */}
-                <Header></Header>
+                {!hideChrome && <Header />}
+                {/*<Header></Header>*/}
                 {/*slot é o equivalente ao {children} do Next — renderiza a tela ativa*/}
                 <Slot />
-
+                {!hideChrome && <NavBar />}
                 {/*footer fixo em todas as telas */}
-                <NavBar></NavBar>
+                {/*<NavBar></NavBar>*/}
 
             </View>
 
@@ -34,5 +37,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
+        
     },
 })

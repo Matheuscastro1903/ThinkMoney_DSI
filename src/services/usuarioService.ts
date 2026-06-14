@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteField, Timestamp } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 import { UsuarioFirestore, UsuarioProps } from '../types/usuario'
 import { Usuario } from '../models/usuario'
@@ -26,6 +26,22 @@ class UsuarioService {
         } else {
             console.log("Usuário não encontrado")
             return null
+        }
+    }
+
+    /**
+     * Sincroniza o vínculo do usuário com a família no Firestore.
+     * Chamado após criarFamilia, entrarEmFamilia, sairDaFamilia e excluirFamilia.
+     * Usa updateDoc para alterar apenas esse campo, sem sobrescrever o restante do perfil.
+     * @param familiaId ID da família ou null para remover o vínculo.
+     */
+    async atualizarFamiliaId(uid: string, familiaId: string | null): Promise<void> {
+        const docRef = doc(db, 'usuarios', uid)
+        if (familiaId === null) {
+            // Remove o campo do documento (usuário sem família)
+            await updateDoc(docRef, { familiaId: deleteField() })
+        } else {
+            await updateDoc(docRef, { familiaId })
         }
     }
 }

@@ -12,33 +12,26 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-export interface EnderecoGasto {
-  titulo?: string;
-  logradouro: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  cep: string;
-  latitude?: number;
-  longitude?: number;
-}
+import { Gasto } from "../models/gasto";
 
-export interface Gasto {
-  valor: number;
-  data: Date; // "YYYY-MM-DD"
-  descricao: string;
-  categoria: string;
-  fixo: boolean; // true = fixo | false = variável
-  endereco?: EnderecoGasto;
-}
+const getGastosCollection = (userId: string, familiaId?: string) =>
+  familiaId
+    ? collection(db, "familias", familiaId, "gastos")
+    : collection(db, "usuarios", userId, "gastos");
+
+const getGastoDoc = (userId: string, gastoId: string, familiaId?: string) =>
+  familiaId
+    ? doc(db, "familias", familiaId, "gastos", gastoId)
+    : doc(db, "usuarios", userId, "gastos", gastoId);
 
 // Criar gasto
 export async function criarGasto(
   userId: string,
-  dados: Gasto,
+  gasto: Gasto,
+  familiaId?: string
 ): Promise<string> {
-  const ref = await addDoc(collection(db, "usuarios", userId, "gastos"), {
-    ...dados,
+  const ref = await addDoc(getGastosCollection(userId, familiaId), {
+    ...gasto.toJson(),
     criadoEm: Timestamp.now(),
   });
   return ref.id;
@@ -47,41 +40,48 @@ export async function criarGasto(
 // Buscar todos os gastos
 export async function buscarGastos(
   userId: string,
-): Promise<(Gasto & { id: string })[]> {
+  familiaId?: string
+): Promise<Gasto[]> {
   const q = query(
-    collection(db, "usuarios", userId, "gastos"),
+    getGastosCollection(userId, familiaId),
     orderBy("criadoEm", "desc"),
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Gasto) }));
+  return snapshot.docs.map((d) => Gasto.fromJson(d.id, d.data()));
 }
 
 // Buscar só os fixos ou só os variáveis
-export async function buscarGastosPorTipo(userId: string, fixo: boolean) {
+export async function buscarGastosPorTipo(
+  userId: string, 
+  fixo: boolean,
+  familiaId?: string
+): Promise<Gasto[]> {
   const q = query(
-    collection(db, "usuarios", userId, "gastos"),
+    getGastosCollection(userId, familiaId),
     where("fixo", "==", fixo),
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Gasto) }));
+  return snapshot.docs.map((d) => Gasto.fromJson(d.id, d.data()));
 }
 
 // Excluir gasto
 export async function excluirGasto(
   userId: string,
   gastoId: string,
+  familiaId?: string
 ): Promise<void> {
-  await deleteDoc(doc(db, "usuarios", userId, "gastos", gastoId));
+  await deleteDoc(getGastoDoc(userId, gastoId, familiaId));
 }
 
-// atualizar gasto
+// Atualizar gasto
 export async function atualizarGasto(
   userId: string,
   gastoId: string,
-  dados: Partial<Gasto>,
+  gasto: Gasto,
+  familiaId?: string
 ): Promise<void> {
-  await updateDoc(doc(db, "usuarios", userId, "gastos", gastoId), {
-    ...dados,
+  await updateDoc(getGastoDoc(userId, gastoId, familiaId), {
+    ...gasto.toJson(),
     atualizadoEm: Timestamp.now(),
   });
 }
