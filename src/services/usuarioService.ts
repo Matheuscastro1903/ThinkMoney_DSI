@@ -7,13 +7,24 @@ class UsuarioService {
     async salvarUsuario(uid: string, dados: Omit<UsuarioProps, 'senha'> | Usuario): Promise<void> {
         const docRef = doc(db, 'usuarios', uid)
         if (dados instanceof Usuario) {
-            await setDoc(docRef, dados.toFirestore())
+            const dataToSave = dados.toFirestore();
+            if (dataToSave.endereco && typeof (dataToSave.endereco as any).toJson === 'function') {
+                dataToSave.endereco = (dataToSave.endereco as any).toJson();
+            }
+            await setDoc(docRef, dataToSave)
             return
         }
-        await setDoc(docRef, {
+        
+        const dataToSave = {
             ...dados,
             criadoEm: new Date(),
-        } as UsuarioFirestore)
+        } as any;
+
+        if (dataToSave.endereco && typeof dataToSave.endereco.toJson === 'function') {
+            dataToSave.endereco = dataToSave.endereco.toJson();
+        }
+
+        await setDoc(docRef, dataToSave)
     }
 
     async buscarDadosUsuario(uid: string): Promise<Usuario | null> {
