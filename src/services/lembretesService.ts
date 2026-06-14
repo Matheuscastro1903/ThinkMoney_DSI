@@ -1,35 +1,28 @@
 import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp, updateDoc } from 'firebase/firestore'
 import { db } from './firebaseConfig'
-
-interface Lembrete {
-  nomeGasto: string
-  categoria: string
-  vencimento: string   // "YYYY-MM-DD"
-  valor: number
-  status: 'PENDENTE' | 'PAGO'
-}
+import { Lembrete } from '@/src/models/Lembrete'
 
 export class LembretesService {
-  constructor(private userId:string) {}
+  constructor(private userId: string) {}
 
-  private col (){
+  private col() {
     return collection(db, 'usuarios', this.userId, 'lembretes')
   }
 
-  async criarLembrete(lembrete: Lembrete) {
-    await addDoc(this.col(), { ...lembrete, criadoEm: Timestamp.now() })
+  async criarLembrete(dados: object) {
+    await addDoc(this.col(), { ...dados, criadoEm: Timestamp.now() })
   }
 
-  async buscarLembretes() {
-    const snapshot= await getDocs(query(this.col(), orderBy('vencimento', 'asc')))
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() as Lembrete }))
+  async buscarLembretes(): Promise<Lembrete[]> {
+    const snapshot = await getDocs(query(this.col(), orderBy('vencimento', 'asc')))
+    return snapshot.docs.map(d => Lembrete.fromFirestore(d.id, d.data()))
   }
 
-  async atualizar(id:string, dados: Partial<Lembrete>) {
-    await updateDoc(doc(db, 'usuarios', this.userId, 'lembretes', id), dados)
+  async atualizar(id: string, dados: object) {
+    await updateDoc(doc(db, 'usuarios', this.userId, 'lembretes', id), dados as any)
   }
 
-  async deletar(id:string) {
+  async deletar(id: string) {
     await deleteDoc(doc(db, 'usuarios', this.userId, 'lembretes', id))
   }
 }

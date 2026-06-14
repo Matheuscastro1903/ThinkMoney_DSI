@@ -21,7 +21,7 @@ import InputDateLembretes from "@/src/components/details/lembretes/inputDataLemb
 import HeaderBack from "@/src/components/headerBack";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
+import { LembretesController } from "@/src/hooks/LembretesController";
 
 export default function TelaUpdateLembrete() {
   const router = useRouter();
@@ -51,24 +51,19 @@ export default function TelaUpdateLembrete() {
     const id = params.id as string;
     if (!user || !id) return;
 
-    if (!inputNomeGasto || !escolhaGastos || !valorGasto) {
-      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+    const resultado = await new LembretesController(user.uid).atualizar(id, {
+      nomeGasto: inputNomeGasto,
+      categoria: escolhaGastos,
+      valor: valorGasto,
+      vencimento: data,
+      descricao,
+    });
+
+    if (!resultado.sucesso) {
+      Alert.alert("Erro", resultado.mensagem);
       return;
     }
 
-    setCarregando(true);
-    const valorNumerico = parseFloat(valorGasto.replace(/\./g, "").replace(",", "."));
-    
-    const service = new LembretesService(user.uid)
-    await service.atualizar(id, {
-      nomeGasto: inputNomeGasto,
-      categoria: escolhaGastos,
-      valor: valorNumerico,
-      ...(data ? { vencimento: data.toISOString().split("T")[0] } : {}),
-      ...(descricao ? { descricao } : {}),
-    });
-
-    setCarregando(false);
     router.back();
   }
 
@@ -83,13 +78,16 @@ export default function TelaUpdateLembrete() {
         text: "Deletar",
         style: "destructive",
         onPress: async () => {
-          await new LembretesService(user.uid).deletar(id);
+          const resultado = await new LembretesController(user.uid).deletar(id);
+          if (!resultado.sucesso) {
+            Alert.alert("Erro", resultado.mensagem);
+            return;
+          }
           router.back();
         },
       },
     ]);
   }
-
 
   return (
     <SafeAreaView style={styles.container}>

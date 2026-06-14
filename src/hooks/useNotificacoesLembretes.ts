@@ -1,13 +1,5 @@
 import { auth } from '@/src/services/firebaseConfig'
-import { LembretesService } from '@/src/services/lembretesService'
-// import * as Notifications from 'expo-notifications' // Removido para evitar crash no Expo Go SDK 53
-import { useEffect } from 'react'
-import { Platform } from 'react-native'
-
-/* 
-  Notificações push remotas não são suportadas no Expo Go SDK 53. 
-  Comentado temporariamente para não quebrar a execução do aplicativo.
-  Descomente quando gerar um build nativo (APK/AAB).
+import { LembretesController } from '@/src/hooks/LembretesController'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -33,7 +25,6 @@ async function agendarNotificacoesLembretes(userId: string) {
   const temPermissao = await solicitarPermissao()
   if (!temPermissao) return
 
-  // Cancela notificações antigas de lembretes antes de reagendar
   const agendadas = await Notifications.getAllScheduledNotificationsAsync()
   for (const n of agendadas) {
     if (n.content.data?.tipo === 'lembrete') {
@@ -41,8 +32,8 @@ async function agendarNotificacoesLembretes(userId: string) {
     }
   }
 
-  const service = new LembretesService(userId)
-  const lembretes = await service.buscarLembretes()
+  const { sucesso, dados: lembretes } = await new LembretesController(userId).buscar()
+  if (!sucesso) return
 
   const hoje = new Date()
   hoje.setHours(0, 0, 0, 0)

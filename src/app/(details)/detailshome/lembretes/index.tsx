@@ -14,15 +14,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-type Lembrete = {
-  id: string;
-  nomeGasto: string;
-  categoria: string;
-  vencimento: string;
-  valor: number;
-  status: "PENDENTE" | "PAGO";
-};
+import LayoutNavBar from "@/src/components/layoutnavbar";
+import HeaderBack from "@/src/components/headerBack";
+import React, { useCallback, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter, Link, useFocusEffect } from "expo-router";
+import { auth } from "@/src/services/firebaseConfig";
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
 
 export default function Lembretes() {
   const router = useRouter();
@@ -34,8 +34,8 @@ export default function Lembretes() {
       const user = auth.currentUser;
       if (!user) return;
       setCarregando(true);
-      new LembretesService(user.uid).buscarLembretes().then((dados) => {
-        setLembretes(dados as Lembrete[]);
+      new LembretesController(user.uid).buscar().then(({ dados }) => {
+        setLembretes(dados);
         setCarregando(false);
       });
     }, []),
@@ -178,18 +178,17 @@ const styles = StyleSheet.create({
     paddingLeft: 1,
   },
   containerLembretes: {
-    height: 72,
-    width: "90%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    alignSelf: "center",
-    alignItems: "center",
-    marginTop: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-    paddingHorizontal: 16,
-    gap: 12,
+    width: "92%",
+  backgroundColor: "#FFFFFF",
+  borderRadius: 14,
+  alignSelf: "center",
+  marginTop: 10,
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 10,
+  paddingHorizontal: 14,
+  paddingVertical: 14,
+  gap: 10,
   },
   lembreteIcone: {
     width: 48,
@@ -199,33 +198,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  lembreteInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  lembreteTitulo: {
-    fontSize: 16,
-    color: "#1D1252",
-    fontWeight: "bold",
-  },
-  lembreteSubtitulo: {
-    fontSize: 12,
-    color: "#94A3B8",
-    marginTop: 2,
-  },
-  lembreteDireita: {
-    alignItems: "flex-end",
-  },
-  lembreteMoeda: {
-    fontSize: 14,
-    color: "#1D1252",
-    fontWeight: "bold",
-  },
-  lembreteValor: {
-    fontSize: 14,
-    color: "#1D1252",
-    fontWeight: "bold",
-  },
+  lembreteInfo: {flex: 1,
+  marginLeft: 4,
+  justifyContent: "center",
+  minWidth: 0,} ,
+  lembreteTitulo: {  fontSize: 14,
+  color: "#1D1252",
+  fontWeight: "700",
+  lineHeight: 20,
+  flexShrink: 1,  },
+  lembreteSubtitulo: { fontSize: 11,
+  color: "#94A3B8",
+  marginTop: 3,
+  lineHeight: 15,
+  flexShrink: 1,},
+  lembreteDireita: { alignItems: "flex-end",
+  width: 90,
+  justifyContent: "center",
+  flexShrink: 0, },
+  lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "700" },
+  lembreteValor: { fontSize: 16, lineHeight: 18 },
   badgePendente: {
     backgroundColor: "#FEE2E2",
     paddingVertical: 4,
