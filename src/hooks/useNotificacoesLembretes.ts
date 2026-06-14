@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications'
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
 
-/*
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -81,7 +81,6 @@ export function useNotificacoesLembretes() {
     const usuario = auth.currentUser
     if (!usuario) return
 
-    // agendarNotificacoesLembretes(usuario.uid)
-    console.warn("Notificações de lembrete desativadas temporariamente no Expo Go.")
+    agendarNotificacoesLembretes(usuario.uid)
   }, [])
 }
