@@ -20,7 +20,15 @@ export default function InputValor({ label, placeholder, atualizando, value, err
 
     //const [protegido, setProtegido] = useState(true);
 
-    const [exibicao, setExibicao] = useState("")
+    const [exibicao, setExibicao] = useState(() => {
+        if (!value) return "";
+        const numericValue = parseFloat(value.toString().replace(',', '.'));
+        if (isNaN(numericValue)) return "";
+        const digits = Math.round(numericValue * 100).toString();
+        const apenasNumeros = digits.replace(/\D/g, '');
+        const val = (parseInt(apenasNumeros) / 100).toFixed(2);
+        return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    });
     function formatarMoeda(texto: string): string {
         // Remove tudo que não for número
         const apenasNumeros = texto.replace(/\D/g, '');
@@ -39,7 +47,7 @@ export default function InputValor({ label, placeholder, atualizando, value, err
         const formatado = formatarMoeda(texto);
         setExibicao(formatado);
         if (typeof atualizando === 'function') {
-            atualizando(digitos);
+            atualizando(formatado);
         }
     }
 

@@ -57,6 +57,8 @@ export default function VerTodosLembretes() {
         titulo: item.nomeGasto,
         categoria: item.categoria,
         valor: item.valor.toString(),
+        vencimento: item.vencimento,
+        descricao: item.descricao || "",
       },
     });
   };
@@ -77,7 +79,7 @@ export default function VerTodosLembretes() {
 
     const novoStatus = resultado.mensagem as 'PENDENTE' | 'PAGO';
     setLembretes((prev) =>
-      prev.map((l) => (l.id === item.id ? { ...l, status: novoStatus } : l)),
+      prev.map((l) => (l.id === item.id ? new Lembrete(l.nomeGasto, l.categoria, l.vencimento, l.valor, novoStatus, l.descricao, l.id, l.criadoEm) : l)),
     );
   }
 

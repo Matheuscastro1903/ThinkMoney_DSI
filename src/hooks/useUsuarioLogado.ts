@@ -45,7 +45,7 @@ export function useUsuarioLogado() {
         usuario,
         // familiaId é a chave que conecta o usuário ao documento da família.
         // null = usuário não pertence a nenhuma família ainda.
-        familiaId: usuario?.familiaId ?? null,
+        familiaId: usuario?.familia?.id ?? null,
         isLoading,
     }
 }
