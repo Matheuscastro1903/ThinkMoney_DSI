@@ -1,7 +1,7 @@
 //import { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text} from 'react-native'
+import { View, TextInput, StyleSheet, Text} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-
+import { useState } from "react"
 interface campoInputRendaProps {
     label: string,
     placeholder: string,
@@ -30,13 +30,12 @@ export default function InputRenda({ label, placeholder, atualizando, value, err
         // Resultado: "1.234,56"
     }
 
+    const [exibicao, setExibicao ] = useState("")
     function handleChange(texto: string) {
         const formatado = formatarMoeda(texto);
-        if (typeof atualizando === 'function') {
-            atualizando(formatado);
-        } else {
-            console.warn('InputRenda: prop "atualizando" is not a function', atualizando);
-        }
+        setExibicao(formatado)
+        const digitos = texto.replace(/\D/g, "")
+        atualizando(digitos)
     }
 
     const temErro = !!erro;
@@ -61,12 +60,12 @@ export default function InputRenda({ label, placeholder, atualizando, value, err
                     onChangeText={handleChange}
                     keyboardType= "numeric"
                   
-                    maxLength={15}        // limita tamanho
+                    //maxLength={15}        // limita tamanho
                     returnKeyType="done"  //  botão "OK" no teclado
                     // MUDANÇA 6: secureTextEntry controla se a senha fica visível ou oculta
                     // "protegido = true" → esconde | "protegido = false" → mostra
                     
-                    value={value}
+                    value={exibicao}
                 />
 
                 
