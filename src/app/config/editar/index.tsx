@@ -80,11 +80,11 @@ export default function EditarConta() {
           setInputEmail(dados.email ?? "");
           setInputTelefone(dados.telefone ?? "");
           setInputEndereco({
-            logradouro: dados.logradouro ?? "",
-            numero: dados.numero ?? "",
-            bairro: dados.bairro ?? "",
-            cidade: dados.cidade ?? "",
-            cep: dados.cep ?? "",
+            logradouro: dados.endereco?.logradouro ?? dados.logradouro ?? "",
+            numero: dados.endereco?.numero ?? dados.numero ?? "",
+            bairro: dados.endereco?.bairro ?? dados.bairro ?? "",
+            cidade: dados.endereco?.cidade ?? dados.cidade ?? "",
+            cep: dados.endereco?.cep ?? dados.cep ?? "",
           });
         }
       }
@@ -148,11 +148,13 @@ export default function EditarConta() {
         email: inputEmail.trim(),
         telefone: inputTelefone,
         datanascimento: inputData,
-        logradouro: inputEndereco.logradouro,
-        numero: inputEndereco.numero,
-        bairro: inputEndereco.bairro,
-        cidade: inputEndereco.cidade,
-        cep: inputEndereco.cep,
+        endereco: {
+          logradouro: inputEndereco.logradouro,
+          numero: inputEndereco.numero,
+          bairro: inputEndereco.bairro,
+          cidade: inputEndereco.cidade,
+          cep: inputEndereco.cep,
+        },
         avatar: avatarEscolhido
       });
 
