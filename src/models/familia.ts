@@ -23,7 +23,7 @@ export class Familia implements FamiliaProps {
             dadosFamilia.codigo_convite,
             Usuario.fromFirestore(dadosFamilia.admin),
             (dadosFamilia.membros || []).map((m: any) => Usuario.fromFirestore(m)),
-            dadosFamilia.lembretes || [],
+            (dadosFamilia.lembretes || []).map((l: any) => Lembrete.fromFirestore(l.id || '', l)),
             dadosMetas || [],
             dadosGastos
         );

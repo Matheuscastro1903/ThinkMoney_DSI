@@ -16,6 +16,7 @@ export interface UsuarioProps {
     endereco: Endereco;
     avatar: number;
     familia?: Familia;
+    familiaId?: string;
     gastos?: Gasto[];
     metas?: Meta[];
     lembretes?: Lembrete[];
@@ -23,4 +24,5 @@ export interface UsuarioProps {
 
 export type UsuarioFirestore = Omit<UsuarioProps, "senha"> & {
     criadoEm: Date;
+    familiaId?: string;
 };
