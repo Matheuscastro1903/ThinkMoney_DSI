@@ -41,6 +41,7 @@ export default function App() {
 
 
   const avatarKey = (usuario?.avatar || 1) as keyof typeof avatares;
+  const endereco = usuario?.endereco || usuario || {};
 
   let dataFormatada = "";
   if (usuario?.datanascimento) {
@@ -64,9 +65,9 @@ export default function App() {
             <Text style={styles.name}>{usuario?.nome}</Text>
             <Text style={styles.email}>{usuario?.email}</Text>
             <Text style={styles.address}>
-              {usuario?.endereco?.cidade}
-              {usuario?.endereco?.cidade && usuario?.endereco?.logradouro ? " - " : ""}
-              {usuario?.endereco?.logradouro}
+              {endereco?.cidade}
+              {endereco?.cidade && endereco?.logradouro ? " - " : ""}
+              {endereco?.logradouro}
             </Text>
           </View>
 
@@ -101,8 +102,8 @@ export default function App() {
                 <Text style={styles.rowLabel}>Endereço</Text>
               </View>
               <Text style={styles.rowValue}>
-                {usuario?.endereco?.logradouro}
-                {usuario?.endereco?.numero ? `, ${usuario?.endereco?.numero}` : ""}
+                {endereco?.logradouro}
+                {endereco?.numero ? `, ${endereco?.numero}` : ""}
               </Text>
             </View>
 

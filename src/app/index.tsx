@@ -20,11 +20,6 @@ export default function telaInical(){
             <TouchableOpacity style={styles.button} onPress={() => router.push('/(auth)/login')}>
                 <Ionicons name="arrow-forward" size={32} color="white" />
             </TouchableOpacity>
-
-            
-            
-      
-           
             
         </View>
     )
