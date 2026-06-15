@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -7,9 +7,11 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { buscarGastos, atualizarGasto, Gasto } from "../../../services/gastosService";
+import { buscarGastos, atualizarGasto } from "../../../services/gastosService";
+import { Gasto } from "@/src/models/gasto";
 import { geocodificarEndereco } from "../../../services/geocodingService";
 import { auth } from "../../../services/firebaseConfig";
 
@@ -82,14 +84,15 @@ export default function Mapa() {
 
           if (!coords) continue;
 
-          const gastoAtualizado = { ...g, endereco: { ...g.endereco!, ...coords } };
-          lista[i] = gastoAtualizado;
+          g.endereco!.latitude = coords.latitude;
+          g.endereco!.longitude = coords.longitude;
+          lista[i] = g;
 
           // Atualiza os marcadores progressivamente
           setGastos([...lista]);
 
           // Persiste no Firebase para não geocodificar novamente
-          atualizarGasto(uid, g.id, { endereco: gastoAtualizado.endereco }).catch(console.error);
+          atualizarGasto(uid, g.id as string, g).catch(console.error);
         }
 
         // Centraliza o mapa para englobar todos os pins
@@ -134,7 +137,7 @@ export default function Mapa() {
                 latitude: g.endereco!.latitude!,
                 longitude: g.endereco!.longitude!,
               }}
-              title={g.endereco?.titulo || g.descricao}
+              title={g.endereco?.titulo || g.titulo}
               description={`${formatarValor(g.valor)} • ${g.categoria}`}
             />
           ))}
@@ -152,14 +155,29 @@ export default function Mapa() {
         ) : gastos.length === 0 ? (
           <Text style={styles.vazio}>Nenhum gasto registrado ainda.</Text>
         ) : (
-          gastos.slice(0, 5).map((g, i) => (
+          gastos.slice(0, 5).map((g) => (
             <TransactionItem
               key={g.id}
-              name={g.descricao}
+              name={g.titulo}
               info={`${g.endereco?.cidade || "—"} • ${formatarData(g.data)}`}
               amount={`- ${formatarValor(g.valor)}`}
               card={g.categoria}
-              light={i % 2 === 0}
+              light={true}
+              onPress={() => {
+                if (g.endereco?.latitude != null && g.endereco?.longitude != null) {
+                  mapRef.current?.animateToRegion(
+                    {
+                      latitude: g.endereco.latitude,
+                      longitude: g.endereco.longitude,
+                      latitudeDelta: 0.01, // Zoom de aproximação
+                      longitudeDelta: 0.01,
+                    },
+                    1000
+                  );
+                } else {
+                  Alert.alert("Localização indisponível", "Este gasto não possui um endereço associado no mapa.");
+                }
+              }}
             />
           ))
         )}
@@ -174,11 +192,12 @@ type Props = {
   amount: string;
   card: string;
   light?: boolean;
+  onPress?: () => void;
 };
 
-function TransactionItem({ name, info, amount, card, light }: Props) {
+function TransactionItem({ name, info, amount, card, light, onPress }: Props) {
   return (
-    <View style={[styles.item, light && styles.itemLight]}>
+    <TouchableOpacity onPress={onPress} activeOpacity={onPress ? 0.7 : 1} style={[styles.item, light && styles.itemLight]}>
       <View style={styles.itemLeft}>
         <Text style={[styles.itemName, light && styles.textDark]}>{name}</Text>
         <Text style={styles.itemInfo}>{info}</Text>
@@ -187,7 +206,7 @@ function TransactionItem({ name, info, amount, card, light }: Props) {
         <Text style={[styles.itemAmount, light && styles.textDark]}>{amount}</Text>
         <Text style={styles.itemCard}>{card}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

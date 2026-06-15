@@ -1,3 +1,4 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -7,23 +8,26 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
 
-import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import ButtonDeletarLembretes from "@/src/components/details/lembretes/buttondell/page";
 import ButtonConfirmar from "@/src/components/details/lembretes/buttonlembretes/page";
 import SelectField from "@/src/components/details/lembretes/campoescolha/page";
 import InputTexto from "@/src/components/details/lembretes/campoinput/page.";
+import InputDateLembretes from "@/src/components/details/lembretes/inputDataLembretes/page";
 import HeaderBack from "@/src/components/headerBack";
+import InputValor from "@/src/components/details/gastos/inputvalor/page";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
+import { LembretesController } from "@/src/hooks/LembretesController";
 
 export default function TelaUpdateLembrete() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
+  const [carregando, setCarregando] = useState(false);
   const [inputNomeGasto, setInputNomeGasto] = useState(
     (params.titulo as string) || "",
   );
@@ -47,14 +51,18 @@ export default function TelaUpdateLembrete() {
     const id = params.id as string;
     if (!user || !id) return;
 
-    const service = new LembretesService(user.uid)
-    await service.atualizar(id, {
+    const resultado = await new LembretesController(user.uid).atualizar(id, {
       nomeGasto: inputNomeGasto,
       categoria: escolhaGastos,
-      valor: parseFloat(valorGasto.replace(",", ".")),
-      ...(data ? { vencimento: data.toISOString().split("T")[0] } : {}),
-      ...(descricao ? { descricao } : {}),
+      valor: valorGasto,
+      vencimento: data,
+      descricao,
     });
+
+    if (!resultado.sucesso) {
+      Alert.alert("Erro", resultado.mensagem);
+      return;
+    }
 
     router.back();
   }
@@ -70,13 +78,16 @@ export default function TelaUpdateLembrete() {
         text: "Deletar",
         style: "destructive",
         onPress: async () => {
-          await new LembretesService(user.uid).deletar(id);
+          const resultado = await new LembretesController(user.uid).deletar(id);
+          if (!resultado.sucesso) {
+            Alert.alert("Erro", resultado.mensagem);
+            return;
+          }
           router.back();
         },
       },
     ]);
   }
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,13 +102,13 @@ export default function TelaUpdateLembrete() {
           <HeaderBack />
 
           <View style={styles.header}>
-            <Text style={styles.title}>Refine seus</Text>
-            <Text style={styles.title}>compromissos</Text>
+            <Text style={styles.title}>Atualizar lembrete</Text>
           </View>
 
           <View style={styles.form}>
             <InputTexto
               label="Nome do gasto"
+              placeholder="Ex: Aluguel"
               atualizando={setInputNomeGasto}
               value={inputNomeGasto}
               width={300}
@@ -112,19 +123,21 @@ export default function TelaUpdateLembrete() {
               options={opcoesGastos}
             />
 
-            <InputTexto
+            <InputValor
               label="Valor do Gasto"
+              placeholder="Ex: 67,00"
               atualizando={setValorGasto}
               value={valorGasto}
+              labelColor="#ffffff"
               width={300}
               height={56}
-              multline={false}
             />
 
             <InputDateLembretes
               label="Escolha a data:"
               icon={require("../../../../../assets/icons/iconedata.svg")}
               onChange={setData}
+              value={params.vencimento as string}
             />
 
             <InputTexto

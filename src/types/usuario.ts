@@ -1,4 +1,8 @@
-import { Timestamp } from 'firebase/firestore'
+import { Endereco } from '@/src/models/endereco';
+import { Familia } from '@/src/models/familia';
+import { Gasto } from '@/src/models/gasto';
+import { Meta } from '@/src/models/meta';
+import { Lembrete } from '@/src/models/Lembrete';
 
 export interface UsuarioProps {
     nome: string;
@@ -9,19 +13,14 @@ export interface UsuarioProps {
     renda: string;
     telefone: string;
     profissao: string;
-    logradouro: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
-    cep: string;
+    endereco: Endereco;
     avatar: number;
-    // Adições futuras:
-    // familiaId?: string;
-    // gastos?: Gastos[]
-    // metas?: Metas[]
-    // lembretes?: Lembretes[]
+    familia?: Familia;
+    gastos?: Gasto[];
+    metas?: Meta[];
+    lembretes?: Lembrete[];
 }
 
 export type UsuarioFirestore = Omit<UsuarioProps, "senha"> & {
-    criadoEm: Timestamp;
+    criadoEm: Date;
 };

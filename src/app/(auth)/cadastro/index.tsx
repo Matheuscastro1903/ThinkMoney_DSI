@@ -29,6 +29,7 @@ import InputBairro from "@/src/components/auth/inputbairro";
 import InputCidade from "@/src/components/auth/inputcidade";
 import InputCep from "@/src/components/auth/inputcep";
 import { UsuarioProps } from "@/src/types/usuario";
+import { Endereco } from "@/src/models/endereco";
 
 export default function Cadastro() {
   const [avatarEscolhido, setAvatarEscolhido] = useState(1);
@@ -151,11 +152,7 @@ export default function Cadastro() {
         renda: inputRenda,
         telefone: inputTelefone,
         profissao: inputProfissao,
-        logradouro: inputLogradouro,
-        numero: inputNumero,
-        bairro: inputBairro,
-        cidade: inputCidade,
-        cep: inputCep,
+        endereco: new Endereco(inputLogradouro, inputNumero, inputBairro, inputCidade, inputCep),
         avatar: avatarEscolhido
       };
       await authService.cadastrarUsuario(dadosUsuario);
@@ -180,14 +177,8 @@ export default function Cadastro() {
   function validarRenda(valor: string): string | null {
     const apenasNumeros = valor.replace(/\D/g, "");
 
-    if (!apenasNumeros || apenasNumeros === "000") {
+    if (!apenasNumeros || parseInt(apenasNumeros) <= 0) {
       return "Informe um valor válido";
-    }
-
-    const numero = parseInt(apenasNumeros) / 100;
-
-    if (numero > 999999.99) {
-      return "Valor muito alto";
     }
 
     return null;

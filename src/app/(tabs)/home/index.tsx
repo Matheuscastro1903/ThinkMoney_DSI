@@ -8,7 +8,8 @@ import InputRenda from '@/src/components/auth/inputrenda';
 
 // Informacoes firebase
 import { auth, db } from '@/src/services/firebaseConfig';
-import { buscarGastos, Gasto } from '@/src/services/gastosService';
+import { buscarGastos } from '@/src/services/gastosService';
+import { Gasto } from '@/src/models/gasto';
 import { metasService } from '@/src/services/metasService';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -53,7 +54,6 @@ export default function Home() {
     const [salvandoRenda, setSalvandoRenda] = useState(false);
 
     const [usuario, setUsuario] = useState<any>(null);
-    const [entradasHoje, setEntradasHoje] = useState<number>(0);
     const [gastos, setGastos] = useState<(Gasto & { id: string })[]>([]);
     const [metas, setMetas] = useState<any[]>([]);
 
@@ -69,9 +69,6 @@ export default function Home() {
             if (docSnap.exists()) {
                 setUsuario(docSnap.data());
             }
-
-            const entradas = await metasService.buscarContribuicoesDoDia(uid);
-            setEntradasHoje(entradas);
 
             try {
                 const listaGastos = await buscarGastos(uid);
@@ -103,6 +100,15 @@ export default function Home() {
         .filter(gasto => {
             const dataGasto = toDate(gasto.data);
             return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual;
+        })
+        .reduce((acc, gasto) => acc + gasto.valor, 0);
+
+    const gastosHoje = gastos
+        .filter(gasto => {
+            const dataGasto = toDate(gasto.data);
+            return dataGasto.getDate() === dataAtual.getDate() && 
+                   dataGasto.getMonth() === mesAtual && 
+                   dataGasto.getFullYear() === anoAtual;
         })
         .reduce((acc, gasto) => acc + gasto.valor, 0);
 
@@ -139,16 +145,27 @@ export default function Home() {
                     </View>
                     <Text style={styles.text2}>{isBalanceVisible ? formatarValor(saldoDisponivel) : "R$ •••••"}</Text>
                     <View style={styles.saldoFooter}>
-                        <Feather name="arrow-up-right" size={16} color="#34D399" />
-                        <Text style={styles.saldoTrend}>R$ {entradasHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} entraram hoje</Text>
+                        {gastosHoje > 0 ? (
+                            <>
+                                <Feather name="arrow-down-right" size={16} color="#EF4444" />
+                                <Text style={styles.saldoTrend}>R$ {gastosHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gastos hoje</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Feather name="check-circle" size={16} color="#34D399" />
+                                <Text style={styles.saldoTrend}>Nenhum gasto hoje</Text>
+                            </>
+                        )}
                     </View>
                     <TouchableOpacity style={styles.botaoAtualizarRenda} onPress={() => setModalVisible(true)}>
                         <View style={styles.itensBotaoAtualizar}>
                             <Ionicons name="refresh" size={20} color="#FFFFFF" />
                             <Text style={{fontWeight: "bold", fontSize: 12, color: "white", textAlign: "center", marginTop: 4}}>Atualizar Renda Disponível</Text>
                         </View>
-                        
+                      
                     </TouchableOpacity>
+
+                    
                     <Modal
                         visible={modalVisible}
                         animationType="slide"
@@ -205,7 +222,10 @@ export default function Home() {
                             </View>
                         </View>
                     </Modal>
-                </View>
+                </View>  
+                
+               
+
                 <View style={styles.linhaDegraficos}>
                     
 
@@ -254,6 +274,13 @@ export default function Home() {
                         Visualizar gastos
                     </Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.registrarNovoGasto} onPress={() => router.push('/(details)/detailshome/buyList' as any)}>
+                    <Ionicons name="basket" size={22} color="#1D1252" />
+                    <Text style={styles.text5}>
+                        Visualizar Listas
+                    </Text>
+                </TouchableOpacity>
                 <View style={styles.linhaBotao}>
                     <Link href="/(details)/detailshome/metas" asChild>
                         <TouchableOpacity style={styles.metasPessoais}>
@@ -278,7 +305,7 @@ export default function Home() {
                                 <Ionicons name={icones[gasto.categoria?.toLowerCase()] ?? "cart-outline"} size={20} color="#1D1252" />
                             </View>
                             <View style={{ flex: 1, marginLeft: 12 }}>
-                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.descricao}</Text>
+                                <Text style={styles.textHistorico} numberOfLines={1}>{gasto.titulo}</Text>
                                 <Text style={styles.textCategoria}>{capitalizarCategoria(gasto.categoria)}</Text>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
@@ -301,6 +328,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1D1252',
+        alignItems:'center'
     },
     saldo: {
         width: '90%',

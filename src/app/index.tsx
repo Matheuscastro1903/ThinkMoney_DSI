@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { Link } from "expo-router";
+import { router } from "expo-router";
 
 //importando biblioteca de icons
 import { Ionicons } from '@expo/vector-icons';
@@ -17,22 +17,9 @@ export default function telaInical(){
 
             <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
             
-            <Link href={'/(auth)/login'} asChild>
-
-                          <TouchableOpacity style={styles.button}>
-                              <Ionicons name="arrow-forward" size={32} color="white" />
-                          </TouchableOpacity>
-            </Link>
-
-            {/* botao para teste das telas novas  */}
-            {/*
-            <Link href={'/(tabs)/home'} asChild>
-
-                          <TouchableOpacity style={styles.button}>
-                              <Ionicons name="arrow-forward" size={32} color="white" />
-                          </TouchableOpacity>
-            </Link>
-           */}
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/(auth)/login')}>
+                <Ionicons name="arrow-forward" size={32} color="white" />
+            </TouchableOpacity>
             
         </View>
     )

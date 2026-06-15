@@ -1,28 +1,22 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import LayoutNavBar from "@/src/components/layoutnavbar";
 import HeaderBack from "@/src/components/headerBack";
-import React, { useCallback, useState } from "react";
+import LayoutNavBar from "@/src/components/layoutnavbar";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, Link, useFocusEffect } from "expo-router";
 import { auth } from "@/src/services/firebaseConfig";
-import { LembretesService } from "@/src/services/lembretesService";
-
-type Lembrete = {
-  id: string;
-  nomeGasto: string;
-  categoria: string;
-  vencimento: string;
-  valor: number;
-  status: "PENDENTE" | "PAGO";
-};
+import { LembretesController } from "@/src/hooks/LembretesController";
+import { Lembrete } from "@/src/models/Lembrete";
 
 export default function Lembretes() {
   const router = useRouter();
@@ -34,8 +28,8 @@ export default function Lembretes() {
       const user = auth.currentUser;
       if (!user) return;
       setCarregando(true);
-      new LembretesService(user.uid).buscarLembretes().then((dados) => {
-        setLembretes(dados as Lembrete[]);
+      new LembretesController(user.uid).buscar().then(({ dados }) => {
+        setLembretes(dados);
         setCarregando(false);
       });
     }, []),
@@ -49,6 +43,8 @@ export default function Lembretes() {
         titulo: item.nomeGasto,
         categoria: item.categoria,
         valor: item.valor.toString(),
+        vencimento: item.vencimento,
+        descricao: item.descricao || "",
       },
     });
   };
@@ -67,6 +63,10 @@ export default function Lembretes() {
 
         {carregando ? (
           <ActivityIndicator color="#FFFFFF" style={{ marginTop: 40 }} />
+        ) : lembretes.length === 0 ? (
+          <Text style={styles.textoVazio}>
+            Nenhum lembrete registrado ainda.
+          </Text>
         ) : (
           lembretes.slice(0, 4).map((item) => (
             <TouchableOpacity
@@ -83,37 +83,37 @@ export default function Lembretes() {
                 />
               </View>
               <View style={styles.lembreteInfo}>
-                  <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
-                  <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
-                    {item.categoria} • VENCE {item.vencimento}
-                  </Text>
+                <Text style={styles.lembreteTitulo} numberOfLines={1} ellipsizeMode="tail">{item.nomeGasto}</Text>
+                <Text style={styles.lembreteSubtitulo} numberOfLines={1} ellipsizeMode="tail">
+                  {item.categoria} • VENCE {item.vencimento}
+                </Text>
               </View>
-                <View style={styles.lembreteDireita}>
-                  <Text style={styles.lembreteMoeda} numberOfLines={1}>
-                    R${" "}
-                    <Text style={styles.lembreteValor} numberOfLines={1}>
-                      {item.valor.toFixed(2).replace(".", ",")}
-                    </Text>
+              <View style={styles.lembreteDireita}>
+                <Text style={styles.lembreteMoeda} numberOfLines={1}>
+                  R${" "}
+                  <Text style={styles.lembreteValor} numberOfLines={1}>
+                    {item.valor.toFixed(2).replace(".", ",")}
                   </Text>
-                  <View
+                </Text>
+                <View
+                  style={
+                    item.status === "PAGO"
+                      ? styles.badgePago
+                      : styles.badgePendente
+                  }
+                >
+                  <Text
                     style={
                       item.status === "PAGO"
-                        ? styles.badgePago
-                        : styles.badgePendente
+                        ? styles.badgeTextPago
+                        : styles.badgeTextPendente
                     }
+                    numberOfLines={1}
                   >
-                    <Text
-                      style={
-                        item.status === "PAGO"
-                          ? styles.badgeTextPago
-                          : styles.badgeTextPendente
-                      }
-                      numberOfLines={1}
-                    >
-                      {item.status}
-                    </Text>
-                  </View>
+                    {item.status}
+                  </Text>
                 </View>
+              </View>
             </TouchableOpacity>
           ))
         )}
@@ -179,43 +179,51 @@ const styles = StyleSheet.create({
   },
   containerLembretes: {
     width: "92%",
-  backgroundColor: "#FFFFFF",
-  borderRadius: 14,
-  alignSelf: "center",
-  marginTop: 10,
-  flexDirection: "row",
-  alignItems: "center",        // era justify-content: space-between
-  marginBottom: 10,
-  paddingHorizontal: 14,
-  paddingVertical: 14,
-  gap: 10,    
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    alignSelf: "center",
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    gap: 10,
   },
   lembreteIcone: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 12,
     backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
   },
-  lembreteInfo: {flex: 1,                     // mantém o flex: 1
-  marginLeft: 4,               // era 12 (o gap já cuida do espaço)
-  justifyContent: "center",
-  minWidth: 0,} ,
-  lembreteTitulo: {  fontSize: 14,                // era 15
-  color: "#1D1252",
-  fontWeight: "700",
-  lineHeight: 20,
-  flexShrink: 1,  },
-  lembreteSubtitulo: { fontSize: 11,                // era 12
-  color: "#94A3B8",
-  marginTop: 3,
-  lineHeight: 15,
-  flexShrink: 1,},
-  lembreteDireita: { alignItems: "flex-end",
-  width: 90,                   // era 100
-  justifyContent: "center",
-  flexShrink: 0, },
+  lembreteInfo: {
+    flex: 1,
+    marginLeft: 4,
+    justifyContent: "center",
+    minWidth: 0,
+  },
+  lembreteTitulo: {
+    fontSize: 14,
+    color: "#1D1252",
+    fontWeight: "700",
+    lineHeight: 20,
+    flexShrink: 1,
+  },
+  lembreteSubtitulo: {
+    fontSize: 11,
+    color: "#94A3B8",
+    marginTop: 3,
+    lineHeight: 15,
+    flexShrink: 1,
+  },
+  lembreteDireita: {
+    alignItems: "flex-end",
+    width: 90,
+    justifyContent: "center",
+    flexShrink: 0,
+  },
   lembreteMoeda: { fontSize: 12, color: "#1D1252", fontWeight: "700" },
   lembreteValor: { fontSize: 16, lineHeight: 18 },
   badgePendente: {
@@ -223,7 +231,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 10,
-    marginTop: 6,
+    marginTop: 4,
   },
   badgeTextPendente: { color: "#B91C1C", fontSize: 10, fontWeight: "700" },
   badgePago: {
@@ -269,6 +277,13 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 40,
     borderRadius: 25,
+  },
+  textoVazio: {
+    color: "#94A3B8",
+    textAlign: "center",
+    marginTop: 30,
+    marginBottom: 10,
+    fontSize: 14,
   },
   text4: { fontSize: 22, color: "#FFFFFF", paddingTop: 5, fontWeight: "bold" },
   text5: {

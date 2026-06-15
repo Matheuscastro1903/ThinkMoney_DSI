@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteField } from 'firebase/firestore'
 import { db } from './firebaseConfig'
 import { UsuarioFirestore, UsuarioProps } from '../types/usuario'
 import { Usuario } from '../models/usuario'
@@ -7,13 +7,24 @@ class UsuarioService {
     async salvarUsuario(uid: string, dados: Omit<UsuarioProps, 'senha'> | Usuario): Promise<void> {
         const docRef = doc(db, 'usuarios', uid)
         if (dados instanceof Usuario) {
-            await setDoc(docRef, dados.toFirestore())
+            const dataToSave = dados.toFirestore();
+            if (dataToSave.endereco && typeof (dataToSave.endereco as any).toJson === 'function') {
+                dataToSave.endereco = (dataToSave.endereco as any).toJson();
+            }
+            await setDoc(docRef, dataToSave)
             return
         }
-        await setDoc(docRef, {
+        
+        const dataToSave = {
             ...dados,
-            criadoEm: Timestamp.now(),
-        } as UsuarioFirestore)
+            criadoEm: new Date(),
+        } as any;
+
+        if (dataToSave.endereco && typeof dataToSave.endereco.toJson === 'function') {
+            dataToSave.endereco = dataToSave.endereco.toJson();
+        }
+
+        await setDoc(docRef, dataToSave)
     }
 
     async buscarDadosUsuario(uid: string): Promise<Usuario | null> {
@@ -26,6 +37,22 @@ class UsuarioService {
         } else {
             console.log("Usuário não encontrado")
             return null
+        }
+    }
+
+    /**
+     * Sincroniza o vínculo do usuário com a família no Firestore.
+     * Chamado após criarFamilia, entrarEmFamilia, sairDaFamilia e excluirFamilia.
+     * Usa updateDoc para alterar apenas esse campo, sem sobrescrever o restante do perfil.
+     * @param familiaId ID da família ou null para remover o vínculo.
+     */
+    async atualizarFamiliaId(uid: string, familiaId: string | null): Promise<void> {
+        const docRef = doc(db, 'usuarios', uid)
+        if (familiaId === null) {
+            // Remove o campo do documento (usuário sem família)
+            await updateDoc(docRef, { familiaId: deleteField() })
+        } else {
+            await updateDoc(docRef, { familiaId })
         }
     }
 }

@@ -1,4 +1,4 @@
-//import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,44 +9,61 @@ interface campoInputRendaProps {
     icon?: any,
     iconVisibilidade?: any,
     value?: string,
-    erro?: string | null 
+    erro?: string | null,
+    labelColor?: string,
+    height?: number,
+    width?: number | string
 }
 
 
-export default function InputValor({ label, placeholder, atualizando, value, erro}: campoInputRendaProps) {
+export default function InputValor({ label, placeholder, atualizando, value, erro, labelColor, height = 40, width = '100%' }: campoInputRendaProps) {
 
     //const [protegido, setProtegido] = useState(true);
 
+    const [exibicao, setExibicao] = useState(() => {
+        if (!value) return "";
+        const numericValue = parseFloat(value.toString().replace(',', '.'));
+        if (isNaN(numericValue)) return "";
+        const digits = Math.round(numericValue * 100).toString();
+        const apenasNumeros = digits.replace(/\D/g, '');
+        const val = (parseInt(apenasNumeros) / 100).toFixed(2);
+        return val.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    });
     function formatarMoeda(texto: string): string {
-        // Remove tudo que não for número
         const apenasNumeros = texto.replace(/\D/g, '');
-        
         if (!apenasNumeros) return '';
-
-        // Converte para formato monetário (ex: 1234 → "12,34")
         const valor = (parseInt(apenasNumeros) / 100).toFixed(2);
-        
         return valor.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        // Resultado: "1.234,56"
     }
+
+    useEffect(() => {
+        if (value) {
+            const num = value.replace(/\D/g, "");
+            if (num) {
+                const formatado = formatarMoeda(num);
+                if (formatado !== exibicao) {
+                    setExibicao(formatado);
+                }
+            }
+        }
+    }, [value]);
 
     function handleChange(texto: string) {
         const formatado = formatarMoeda(texto);
+        setExibicao(formatado);
         if (typeof atualizando === 'function') {
             atualizando(formatado);
-        } else {
-            console.warn('InputValor: prop "atualizando" is not a function', atualizando);
         }
     }
 
     const temErro = !!erro;
 
     return (
-        <View style={styles.containerText}>
+        <View style={[styles.containerText, { width: width as any }]}>
 
-            <Text style={styles.label}>{label}</Text>
+            <Text style={[styles.label, labelColor ? { color: labelColor } : {}]}>{label}</Text>
 
-            <View style={styles.input}>
+            <View style={[styles.input, { height }]}>
 
                 <Ionicons name="cash-outline" size={20} color="#888" />
 
@@ -61,12 +78,12 @@ export default function InputValor({ label, placeholder, atualizando, value, err
                     onChangeText={handleChange}
                     keyboardType= "numeric"
                   
-                    maxLength={15}        // limita tamanho
+                    //maxLength={15}        // limita tamanho
                     returnKeyType="done"  //  botão "OK" no teclado
                     // MUDANÇA 6: secureTextEntry controla se a senha fica visível ou oculta
                     // "protegido = true" → esconde | "protegido = false" → mostra
                     
-                    value={value}
+                    value={exibicao}
                 />
 
                 
@@ -84,7 +101,8 @@ const styles = StyleSheet.create({
     containerText: {
         justifyContent: 'center',
         alignItems: 'flex-start',
-        margin: 10,
+        marginVertical: 10,
+        width: '100%',
         gap: 8,
     },
 
