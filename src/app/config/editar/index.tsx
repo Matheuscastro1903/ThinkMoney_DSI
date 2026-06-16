@@ -231,6 +231,7 @@ export default function EditarConta() {
               atualizando={(valor) => setInputNome(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputNome}
+              maxLength={40}
             />
 
             <InputLogin
@@ -239,6 +240,7 @@ export default function EditarConta() {
               atualizando={(valor) => setUserName(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputUserName}
+              maxLength={20}
             />
 
             <InputLogin
@@ -247,6 +249,7 @@ export default function EditarConta() {
               atualizando={(valor) => setInputEmail(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputEmail}
+              maxLength={50}
             />
 
             <InputSenha

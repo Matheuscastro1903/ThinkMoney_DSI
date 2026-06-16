@@ -14,7 +14,7 @@ import { Alert } from 'react-native'
  * usuário ↔ família consistente entre sessões.
  */
 export function useFamiliaAcoes() {
-    const { uid, usuario } = useUsuarioLogado()
+    const { uid, usuario, refreshUsuario } = useUsuarioLogado()
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -31,6 +31,7 @@ export function useFamiliaAcoes() {
         try {
             const resultado = await familiaService.criarFamilia(nome.trim(), usuario as Usuario)
             await usuarioService.atualizarFamiliaId(uid, resultado.id)
+            await refreshUsuario()
             return resultado
         } catch (err) {
             console.error('Erro ao criar família:', err)
