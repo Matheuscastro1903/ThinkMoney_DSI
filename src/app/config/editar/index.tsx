@@ -15,7 +15,8 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
-import InputEndereco, { Endereco, ErrosEndereco } from "../../../components/InputEndereco";
+import InputEndereco from "@/src/components/InputEndereco"
+import { useEndereco } from "@/src/hooks/useEndereco"
 //import InputTelefone from "../../../components/InputTelefone";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
@@ -40,13 +41,7 @@ export default function EditarConta() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputSenha, setInputSenha] = useState("");
   const [inputTelefone, setInputTelefone] = useState("");
-  const [inputEndereco, setInputEndereco] = useState({
-    logradouro: "",
-    numero: "",
-    bairro: "",
-    cidade: "",
-    cep: "",
-  });
+  const { cep, setCep, logradouro, setLogradouro, numero, setNumero, bairro, setBairro, cidade, setCidade, buscando, erroCep, inicializar } = useEndereco()
   const [erroTelefone, setErroTelefone] = useState<string | null>(null);
   const [errosEndereco, setErrosEndereco] = useState<ErrosEndereco>({});
 
@@ -79,13 +74,13 @@ export default function EditarConta() {
           setUserName(dados.username ?? "");
           setInputEmail(dados.email ?? "");
           setInputTelefone(dados.telefone ?? "");
-          setInputEndereco({
+          inicializar({
             logradouro: dados.endereco?.logradouro ?? dados.logradouro ?? "",
             numero: dados.endereco?.numero ?? dados.numero ?? "",
             bairro: dados.endereco?.bairro ?? dados.bairro ?? "",
             cidade: dados.endereco?.cidade ?? dados.cidade ?? "",
             cep: dados.endereco?.cep ?? dados.cep ?? "",
-          });
+          })
         }
       }
     }
@@ -120,17 +115,8 @@ export default function EditarConta() {
         return;
       }
 
-      // Valida endereço antes de salvar (campos opcionais — só valida se preenchido)
-      const errosEnd: ErrosEndereco = {
-        logradouro: validarLogradouro(inputEndereco.logradouro),
-        numero: validarNumero(inputEndereco.numero),
-        bairro: validarBairro(inputEndereco.bairro),
-        cidade: validarCidade(inputEndereco.cidade),
-        cep: validarCep(inputEndereco.cep),
-      };
-      const temErroEndereco = Object.values(errosEnd).some(Boolean);
-      if (temErroEndereco) {
-        setErrosEndereco(errosEnd);
+      if (erroCep) {
+        setMensagemErro("CEP inválido. Verifique o CEP informado.");
         setIsLoading(false);
         return;
       }
@@ -163,13 +149,7 @@ export default function EditarConta() {
         email: inputEmail.trim(),
         telefone: inputTelefone,
         datanascimento: inputData,
-        endereco: {
-          logradouro: inputEndereco.logradouro,
-          numero: inputEndereco.numero,
-          bairro: inputEndereco.bairro,
-          cidade: inputEndereco.cidade,
-          cep: inputEndereco.cep,
-        },
+        endereco: { logradouro, numero, bairro, cidade, cep },
         avatar: avatarEscolhido
       });
 
@@ -327,21 +307,18 @@ export default function EditarConta() {
               value={inputTelefone}
               atualizando={(valor) => {
                 setInputTelefone(valor);
-                setErroTelefone(null); // ✅ limpa ao digitar
+                setErroTelefone(null); 
               }}
               erro={erroTelefone}
             />
 
             <InputEndereco
-              inputEndereco={inputEndereco}
-              erros={errosEndereco}
-              atualizando={(patch: Partial<Endereco>) => {
-                setInputEndereco((prev) => ({ ...prev, ...patch }));
-                const campo = Object.keys(patch)[0] as keyof ErrosEndereco;
-                if (errosEndereco[campo]) {
-                  setErrosEndereco((prev) => ({ ...prev, [campo]: null }));
-                }
-              }}
+              cep={cep} setCep={setCep}
+              logradouro={logradouro} setLogradouro={setLogradouro}
+              numero={numero} setNumero={setNumero}
+              bairro={bairro} setBairro={setBairro}
+              cidade={cidade} setCidade={setCidade}
+              buscando={buscando} erroCep={erroCep}
             />
 
             <View style={styles.aviso}>
@@ -426,6 +403,6 @@ const styles = StyleSheet.create({
   width: "100%",
   paddingTop: 8,
   paddingLeft: 16,
-  marginBottom: -10, // ✅ reduz o espaço entre header e logo
+  marginBottom: -10, 
 },
 });

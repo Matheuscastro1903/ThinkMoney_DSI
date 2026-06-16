@@ -18,6 +18,32 @@ async function buscarNominatim(params: string): Promise<Coordenadas | null> {
   }
 }
 
+export interface EnderecoViaCep {
+  logradouro: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  cep: string;
+  erro?: boolean;
+
+}
+
+export async function buscarEnderecoPorCep(cep: string): Promise<EnderecoViaCep | null> {
+  const cepLimpo = cep.replace(/\D/g, '')
+  if (cepLimpo.length !== 8) return null 
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`)
+    if (!res.ok) return null 
+    const data: EnderecoViaCep = await res.json()
+    if (data.erro) return null
+    return data 
+  } catch {
+    return null 
+  }
+
+
+}
+
 export async function geocodificarEndereco(
   logradouro: string,
   numero: string,

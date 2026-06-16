@@ -23,11 +23,8 @@ import InputRenda from "@/src/components/auth/inputrenda";
 // Criação de componentes para inputs de endereço e mais informacoes pessoais
 import InputTelefone from "@/src/components/auth/inputtelefone";
 import InputProfissao from "@/src/components/auth/inputprofissao";
-import InputLogradouro from "@/src/components/auth/inputlogradouro";
-import InputNumero from "@/src/components/auth/inputnumero";
-import InputBairro from "@/src/components/auth/inputbairro";
-import InputCidade from "@/src/components/auth/inputcidade";
-import InputCep from "@/src/components/auth/inputcep";
+import InputEndereco from "@/src/components/InputEndereco"
+import { useEndereco } from "@/src/hooks/useEndereco"
 import { UsuarioProps } from "@/src/types/usuario";
 import { Endereco } from "@/src/models/endereco";
 
@@ -44,11 +41,7 @@ export default function Cadastro() {
 
   const [inputTelefone, setInputTelefone] = useState("");
   const [inputProfissao, setInputProfissao] = useState("");
-  const [inputLogradouro, setInputLogradouro] = useState("");
-  const [inputNumero, setInputNumero] = useState("");
-  const [inputBairro, setInputBairro] = useState("");
-  const [inputCidade, setInputCidade] = useState("");
-  const [inputCep, setInputCep] = useState("");
+  
 
   // Estados de erro
 
@@ -58,7 +51,6 @@ export default function Cadastro() {
   const [erroNumero, setErroNumero] = useState<string | null>(null);
   const [erroBairro, setErroBairro] = useState<string | null>(null);
   const [erroCidade, setErroCidade] = useState<string | null>(null);
-  const [erroCep, setErroCep] = useState<string | null>(null);
 
   const [erroRenda, setErroRenda] = useState<string | null>(null);
 
@@ -66,6 +58,8 @@ export default function Cadastro() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [mensagemErro, setMensagemErro] = useState("");
+
+  const { cep, setCep, logradouro, numero, setNumero, bairro, cidade, buscando, erroCep } = useEndereco()
 
   async function handleCadastro() {
     setMensagemErro("");
@@ -116,28 +110,25 @@ export default function Cadastro() {
 
     const erroProfissaoAtual = validarProfissao(inputProfissao);
     const erroTelefoneAtual = validarTelefone(inputTelefone);
-    const erroLogradouroAtual = validarLogradouro(inputLogradouro);
-    const erroNumeroAtual = validarNumero(inputNumero);
-    const erroBairroAtual = validarBairro(inputBairro);
-    const erroCidadeAtual = validarCidade(inputCidade);
-    const erroCepAtual = validarCep(inputCep);
 
-    if (
-      erroProfissaoAtual ||
-      erroTelefoneAtual ||
-      erroLogradouroAtual ||
-      erroNumeroAtual ||
-      erroBairroAtual ||
-      erroCidadeAtual ||
-      erroCepAtual
-    ) {
+    if (erroProfissaoAtual || erroTelefoneAtual) {
       setErroProfissao(erroProfissaoAtual);
       setErroTelefone(erroTelefoneAtual);
-      setErroLogradouro(erroLogradouroAtual);
-      setErroNumero(erroNumeroAtual);
-      setErroBairro(erroBairroAtual);
-      setErroCidade(erroCidadeAtual);
-      setErroCep(erroCepAtual);
+      return;
+    }
+
+    if (!cep || cep.length < 8) {
+      setMensagemErro("Preencha o CEP para continuar.");
+      return;
+    }
+
+    if (erroCep) {
+      setMensagemErro("CEP inválido. Verifique o CEP informado.");
+      return;
+    }
+
+    if (!numero.trim()) {
+      setMensagemErro("Informe o número do endereço.");
       return;
     }
 
@@ -152,7 +143,7 @@ export default function Cadastro() {
         renda: inputRenda,
         telefone: inputTelefone,
         profissao: inputProfissao,
-        endereco: new Endereco(inputLogradouro, inputNumero, inputBairro, inputCidade, inputCep),
+        endereco: new Endereco(logradouro, numero, bairro, cidade, cep),
         avatar: avatarEscolhido
       };
       await authService.cadastrarUsuario(dadosUsuario);
@@ -199,11 +190,7 @@ export default function Cadastro() {
     return null;
   }
 
-  function validarLogradouro(valor: string): string | null {
-    if (valor.trim().length === 0) return null;
-    if (valor.trim().length < 3) return "Informe um logradouro válido.";
-    return null;
-  }
+  
 
   function validarNumero(valor: string): string | null {
     if (valor.trim() === "") return null;
@@ -211,24 +198,6 @@ export default function Cadastro() {
     return null;
   }
 
-  function validarBairro(valor: string): string | null {
-    if (valor.trim().length === 0) return null;
-    if (valor.trim().length < 2) return "Informe um bairro válido.";
-    return null;
-  }
-
-  function validarCidade(valor: string): string | null {
-    if (valor.trim().length === 0) return null;
-    if (valor.trim().length < 2) return "Informe uma cidade válida.";
-    return null;
-  }
-
-  function validarCep(valor: string): string | null {
-    if (valor.trim().length === 0) return null;
-    const apenasNumeros = valor.replace(/\D/g, "");
-    if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
-    return null;
-  }
 
   // Funcao para definir um padrão correto para o telefone
   function mascaraTelefone(valor: string): string {
@@ -238,11 +207,7 @@ export default function Cadastro() {
     return nums.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
   }
 
-  // Funcao para definir um padrao correto para o cep
-  function mascaraCep(valor: string): string {
-    const nums = valor.replace(/\D/g, "").slice(0, 8);
-    return nums.replace(/(\d{5})(\d{0,3})/, "$1-$2");
-  }
+  
 
   return (
     // ADICIONADO: SafeAreaView por fora — respeita notch, câmera e barras do sistema
@@ -286,6 +251,7 @@ export default function Cadastro() {
                 atualizando={(valor) => setUserName(valor)}
                 icon={require("../../../assets/icons/iconeusuario.svg")}
                 value={inputUserName}
+                maxLength={20}
               />
 
               <InputLogin
@@ -354,72 +320,20 @@ export default function Cadastro() {
                 erro={erroTelefone}
               />
 
-              {/* Grid de endereço */}
-              <View style={styles.enderecoGrid}>
-                <View style={styles.enderecoLinha}>
-                  <View style={styles.campoLogradouro}>
-                    <InputLogradouro
-                      label="* Logradouro (opcional):"
-                      value={inputLogradouro}
-                      atualizando={(valor) => {
-                        setInputLogradouro(valor);
-                        setErroLogradouro(null);
-                      }}
-                      erro={erroLogradouro}
-                      style={{ flex: 1 }}
-                    />
-                  </View>
-                  <View style={styles.campoNumero}>
-                    <InputNumero
-                      label="* Nº (opcional):"
-                      value={inputNumero}
-                      atualizando={(valor) => {
-                        setInputNumero(valor);
-                        setErroNumero(null);
-                      }}
-                      erro={erroNumero}
-                      style={{ flex: 1 }}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.enderecoLinha}>
-                  <View style={styles.campoBairro}>
-                    <InputBairro
-                      label="* Bairro (opcional):"
-                      value={inputBairro}
-                      atualizando={(valor) => {
-                        setInputBairro(valor);
-                        setErroBairro(null);
-                      }}
-                      erro={erroBairro}
-                      style={{ flex: 1 }}
-                    />
-                  </View>
-                  <View style={styles.campoCidade}>
-                    <InputCidade
-                      label="* Cidade (opcional):"
-                      value={inputCidade}
-                      atualizando={(valor) => {
-                        setInputCidade(valor);
-                        setErroCidade(null);
-                      }}
-                      erro={erroCidade}
-                      style={{ flex: 1 }}
-                    />
-                  </View>
-                </View>
-
-                <InputCep
-                  label="* CEP (opcional):"
-                  value={inputCep}
-                  atualizando={(valor) => {
-                    setInputCep(valor);
-                    setErroCep(null);
-                  }}
-                  erro={erroCep}
-                />
-              </View>
+              <InputEndereco
+                cep={cep}
+                setCep={setCep}
+                logradouro={logradouro}
+                setLogradouro={() => {}}
+                numero={numero}
+                setNumero={setNumero}
+                bairro={bairro}
+                setBairro={() => {}}
+                cidade={cidade}
+                setCidade={() => {}}
+                buscando={buscando}
+                erroCep={erroCep}
+              />
             </View>
 
             <TouchableOpacity
@@ -583,28 +497,5 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     marginLeft: 4,
   },
-  enderecoGrid: {
-    width: "100%",
-  },
-
-  enderecoLinha: {
-    flexDirection: "row",
-    gap: 0, // gap controlado pelos próprios filhos via margin do InputLogin
-  },
-
-  campoLogradouro: {
-    flex: 3, // ocupa 75% da linha
-  },
-
-  campoNumero: {
-    flex: 2, // ocupa 25% da linha
-  },
-
-  campoBairro: {
-    flex: 1, // 50% da linha
-  },
-
-  campoCidade: {
-    flex: 1, // 50% da linha
-  },
+  
 });
