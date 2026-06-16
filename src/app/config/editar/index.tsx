@@ -15,7 +15,7 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
-import InputEndereco, { Endereco } from "../../../components/InputEndereco";
+import InputEndereco, { Endereco, ErrosEndereco } from "../../../components/InputEndereco";
 //import InputTelefone from "../../../components/InputTelefone";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
@@ -48,7 +48,7 @@ export default function EditarConta() {
     cep: "",
   });
   const [erroTelefone, setErroTelefone] = useState<string | null>(null);
-
+  const [errosEndereco, setErrosEndereco] = useState<ErrosEndereco>({});
 
   const [inputSenhaAtual, setInputSenhaAtual] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -116,6 +116,21 @@ export default function EditarConta() {
       const erroTelefoneAtual = validarTelefone(inputTelefone);
       if (erroTelefoneAtual) {
         setErroTelefone(erroTelefoneAtual);
+        setIsLoading(false);
+        return;
+      }
+
+      // Valida endereço antes de salvar (campos opcionais — só valida se preenchido)
+      const errosEnd: ErrosEndereco = {
+        logradouro: validarLogradouro(inputEndereco.logradouro),
+        numero: validarNumero(inputEndereco.numero),
+        bairro: validarBairro(inputEndereco.bairro),
+        cidade: validarCidade(inputEndereco.cidade),
+        cep: validarCep(inputEndereco.cep),
+      };
+      const temErroEndereco = Object.values(errosEnd).some(Boolean);
+      if (temErroEndereco) {
+        setErrosEndereco(errosEnd);
         setIsLoading(false);
         return;
       }
@@ -189,9 +204,41 @@ export default function EditarConta() {
   }
 
   function validarTelefone(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
       return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
+    return null;
+  }
+
+  function validarLogradouro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 3) return "Informe um logradouro válido.";
+    return null;
+  }
+
+  function validarNumero(valor: string): string | null {
+    if (valor.trim() === "") return null;
+    if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
+    return null;
+  }
+
+  function validarBairro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe um bairro válido.";
+    return null;
+  }
+
+  function validarCidade(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe uma cidade válida.";
+    return null;
+  }
+
+  function validarCep(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
     return null;
   }
 
@@ -284,9 +331,14 @@ export default function EditarConta() {
 
             <InputEndereco
               inputEndereco={inputEndereco}
-              atualizando={(patch: Partial<Endereco>) =>
-                setInputEndereco((prev) => ({ ...prev, ...patch }))
-              }
+              erros={errosEndereco}
+              atualizando={(patch: Partial<Endereco>) => {
+                setInputEndereco((prev) => ({ ...prev, ...patch }));
+                const campo = Object.keys(patch)[0] as keyof ErrosEndereco;
+                if (errosEndereco[campo]) {
+                  setErrosEndereco((prev) => ({ ...prev, [campo]: null }));
+                }
+              }}
             />
 
             <View style={styles.aviso}>
