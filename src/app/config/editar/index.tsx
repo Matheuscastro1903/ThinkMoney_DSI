@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -8,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import ThinkMoneyLogo from "../../../assets/images/thinkmoney_logo_4k.svg";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
@@ -237,10 +237,7 @@ export default function EditarConta() {
           keyboardShouldPersistTaps="handled"
         >
           
-          <Image
-            source={require("../../../assets/images/logothinkmoney.png")}
-            style={styles.logo}
-          />
+          <ThinkMoneyLogo width={120} height={120} />
 
           <View style={styles.main}>
             <View>

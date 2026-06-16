@@ -2,7 +2,6 @@ import authService from "@/src/services/authService";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ThinkMoneyLogo from "../../../assets/images/thinkmoney_logo_4k.svg";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
@@ -221,10 +221,7 @@ export default function Cadastro() {
           contentContainerStyle={styles.fundo}
           keyboardShouldPersistTaps="handled"
         >
-          <Image
-            source={require("../../../assets/images/logothinkmoney.png")}
-            style={styles.logo}
-          />
+          <ThinkMoneyLogo width={120} height={120} />
 
           <View style={styles.main}>
             <View>

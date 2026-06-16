@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import ThinkMoneyLogo from "../assets/images/thinkmoney_logo_4k.svg";
 
 import { router } from "expo-router";
 
@@ -10,10 +11,7 @@ export default function telaInical(){
     return(
         <View style={styles.main}>
 
-            <Image 
-                source={require('../assets/images/logothinkmoney.png')}
-                style={styles.logo} 
-            />
+            <ThinkMoneyLogo width={256} height={276} />
 
             <Text style={styles.fraseImpacto}>Comece hoje. Seu futuro agradece.</Text>
             

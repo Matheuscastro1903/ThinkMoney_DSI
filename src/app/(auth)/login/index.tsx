@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -9,7 +8,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native"; // ADICIONADO: ScrollView
+} from "react-native";
+import ThinkMoneyLogo from "../../../assets/images/thinkmoney_logo_4k.svg"; // ADICIONADO: ScrollView
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
@@ -110,10 +110,7 @@ export default function Login() {
           <View style={{ width: "100%", marginBottom: -40 }}>
             <HeaderBack />
           </View>
-          <Image
-            source={require("../../../assets/images/logothinkmoney.png")}
-            style={styles.logo}
-          />
+          <ThinkMoneyLogo width={120} height={120} />
           <View style={styles.main}>
             <View>
               <InputLogin
