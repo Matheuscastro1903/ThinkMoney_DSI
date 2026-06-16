@@ -120,7 +120,7 @@ export default function FamiliaEditar() {
             }
             activeOpacity={0.7}
           >
-            <Ionicons name="exit-outline" size={16} color="#E1FF00" />
+            <Ionicons name="exit-outline" size={16} color="#EF4444" />
             <Text style={styles.sairButtonText}>Sair da Família</Text>
           </TouchableOpacity>
         )}
@@ -296,10 +296,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     borderWidth: 1,
-    borderColor: "#E1FF00",
+    borderColor: "#EF4444",
   },
   sairButtonText: {
-    color: "#E1FF00",
+    color: "#EF4444",
     fontSize: 15,
     fontWeight: "bold",
   },
