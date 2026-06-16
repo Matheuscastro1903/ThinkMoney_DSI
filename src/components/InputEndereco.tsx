@@ -1,5 +1,13 @@
 import { View, TextInput, Text, StyleSheet, ActivityIndicator } from "react-native";
 
+export interface ErrosEndereco {
+    logradouro?: string | null;
+    numero?: string | null;
+    bairro?: string | null;
+    cidade?: string | null;
+    cep?: string | null;
+}
+
 interface InputEnderecoProps {
   cep: string;
   setCep: (v: string) => void;

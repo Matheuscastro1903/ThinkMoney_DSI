@@ -43,7 +43,7 @@ export default function EditarConta() {
   const [inputTelefone, setInputTelefone] = useState("");
   const { cep, setCep, logradouro, setLogradouro, numero, setNumero, bairro, setBairro, cidade, setCidade, buscando, erroCep, inicializar } = useEndereco()
   const [erroTelefone, setErroTelefone] = useState<string | null>(null);
-
+  const [errosEndereco, setErrosEndereco] = useState<ErrosEndereco>({});
 
   const [inputSenhaAtual, setInputSenhaAtual] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -184,9 +184,41 @@ export default function EditarConta() {
   }
 
   function validarTelefone(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
       return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
+    return null;
+  }
+
+  function validarLogradouro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 3) return "Informe um logradouro válido.";
+    return null;
+  }
+
+  function validarNumero(valor: string): string | null {
+    if (valor.trim() === "") return null;
+    if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
+    return null;
+  }
+
+  function validarBairro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe um bairro válido.";
+    return null;
+  }
+
+  function validarCidade(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe uma cidade válida.";
+    return null;
+  }
+
+  function validarCep(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
     return null;
   }
 
@@ -371,6 +403,6 @@ const styles = StyleSheet.create({
   width: "100%",
   paddingTop: 8,
   paddingLeft: 16,
-  marginBottom: -10, // ✅ reduz o espaço entre header e logo
+  marginBottom: -10, 
 },
 });

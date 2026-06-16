@@ -176,12 +176,14 @@ export default function Cadastro() {
   }
 
   function validarProfissao(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     if (valor.trim().length < 3) return "Informe uma profissão válida.";
     if (valor.trim().length > 50) return "Profissão muito longa.";
     return null;
   }
 
   function validarTelefone(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
       return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
@@ -191,7 +193,7 @@ export default function Cadastro() {
   
 
   function validarNumero(valor: string): string | null {
-    if (valor.trim() === "") return "Informe o número.";
+    if (valor.trim() === "") return null;
     if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
     return null;
   }
@@ -299,6 +301,7 @@ export default function Cadastro() {
 
               {/* ── Dados Profissionais ── */}
               <InputProfissao
+                label="* Profissão (opcional):"
                 value={inputProfissao}
                 atualizando={(valor) => {
                   setInputProfissao(valor);
@@ -308,6 +311,7 @@ export default function Cadastro() {
               />
 
               <InputTelefone
+                label="* Telefone (opcional):"
                 value={inputTelefone}
                 atualizando={(valor) => {
                   setInputTelefone(valor);
@@ -480,6 +484,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  camposOpcionais: {
+    fontSize: 12,
+    color: "#867DC1",
+    marginBottom: 4,
+  },
+
   erroInput: {
     color: "red",
     fontSize: 12,
