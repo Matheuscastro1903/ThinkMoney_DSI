@@ -8,9 +8,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import InputTitle from "@/src/components/details/gastos/inputtitle2/page";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
-import InputEnderecoGasto from "@/src/components/details/gastos/inputendereco/page";
-import { EnderecoProps } from "@/src/types/endereco";
+
 import { Endereco } from "../../../../../models/endereco";
+import InputEndereco from "@/src/components/InputEndereco";
+import { useEndereco } from "@/src/hooks/useEndereco";
 
 import InputDate from "@/src/components/auth/inputdata";
 import InputFixo from "@/src/components/details/gastos/inputfixo/page";
@@ -25,13 +26,11 @@ interface State {
   title: string;
   tituloEndereco: string;
   inputValor: string;
-  inputEndereco: EnderecoProps;
   inputData: Date;
   categoriaSelecionada: string;
   erroValor: string | null;
   salvando: boolean;
   erroTitle: string | null;
-  errosEndereco: { logradouro: string; numero: string; bairro: string; cidade: string };
   fixo: boolean;
   incluirEndereco: boolean;
 }
@@ -39,28 +38,26 @@ interface State {
 export default function CriarWithRouter(props: any) {
   const router = useRouter();
   const params = useLocalSearchParams<{ context?: string; familiaId?: string }>();
-  return <Criar {...props} router={router} context={params.context} familiaId={params.familiaId} />;
+  const endereco = useEndereco();
+  return <Criar {...props} router={router} context={params.context} familiaId={params.familiaId} endereco={endereco} />;
 }
 
-export class Criar extends Component<{ router?: any, context?: string, familiaId?: string }, State> {
+export class Criar extends Component<{ router?: any; context?: string; familiaId?: string; endereco?: ReturnType<typeof useEndereco> }, State> {
   state: State = {
     title: "",
     tituloEndereco: "",
     inputValor: "",
-    inputEndereco: { logradouro: "", numero: "", bairro: "", cidade: "", cep: "" },
     inputData: new Date(),
     categoriaSelecionada: "",
     erroValor: null,
     salvando: false,
     erroTitle: null,
-    errosEndereco: { logradouro: "", numero: "", bairro: "", cidade: "" },
     fixo: false,
     incluirEndereco: false,
   };
   
   validarCEP = () => {
-    const cep = this.state.inputEndereco.cep.replace(/\D/g, "");
-    return cep.length === 8;
+  return this.props.endereco?.cep?.length === 8;
   };
 
   parseValor = (texto: string): number => {
@@ -70,7 +67,7 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
 
   handleRegistrar = async () => {
     const {
-      title, categoriaSelecionada, inputValor, inputEndereco,
+      title, categoriaSelecionada, inputValor,
       inputData, tituloEndereco, fixo, incluirEndereco,
     } = this.state;
 
@@ -89,17 +86,19 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
     }
 
     if (incluirEndereco) {
-      const novosErros = {
-        logradouro: inputEndereco.logradouro.trim() ? "" : "Campo obrigatório",
-        numero:     inputEndereco.numero.trim()     ? "" : "Campo obrigatório",
-        bairro:     inputEndereco.bairro.trim()     ? "" : "Campo obrigatório",
-        cidade:     inputEndereco.cidade.trim()     ? "" : "Campo obrigatório",
-      };
-      this.setState({ errosEndereco: novosErros });
-      if (Object.values(novosErros).some((e) => e !== "")) return;
-
-      if (!this.validarCEP()) {
+      const e = this.props.endereco!;
+      if (!e.cep || e.cep.length < 8) {
         Alert.alert("Atenção", "CEP inválido. Informe um CEP com 8 dígitos.");
+        return;
+      }
+
+      if (e.erroCep) {
+        Alert.alert("Atenção", "CEP não encontrado. Verifique o CEP informado.");
+        return;
+      }
+      
+      if (!e.numero.trim()) {
+        Alert.alert("Atenção", "Informe o número do endereço.");
         return;
       }
     }
@@ -116,24 +115,9 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
       let enderecoObj = undefined;
 
       if (incluirEndereco) {
-        const coordenadas = await geocodificarEndereco(
-          inputEndereco.logradouro,
-          inputEndereco.numero,
-          inputEndereco.bairro,
-          inputEndereco.cidade,
-          inputEndereco.cep,
-        );
-
-        enderecoObj = new Endereco(
-          inputEndereco.logradouro,
-          inputEndereco.numero,
-          inputEndereco.bairro,
-          inputEndereco.cidade,
-          inputEndereco.cep,
-          tituloEndereco,
-          coordenadas?.latitude,
-          coordenadas?.longitude
-        );
+        const e = this.props.endereco!;
+        const coordenadas = await geocodificarEndereco(e.logradouro, e.numero, e.bairro, e.cidade, e.cep);
+        enderecoObj = new Endereco(e.logradouro, e.numero, e.bairro, e.cidade, e.cep, tituloEndereco, coordenadas?.latitude, coordenadas?.longitude);
       }
 
       const novoGasto = new Gasto(
@@ -171,7 +155,7 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
   render() {
     const {
       title, inputValor, salvando, erroTitle, erroValor,
-      fixo, inputEndereco, errosEndereco, tituloEndereco, categoriaSelecionada, incluirEndereco
+      fixo, tituloEndereco, categoriaSelecionada, incluirEndereco
     } = this.state;
 
     return (
@@ -369,28 +353,24 @@ export class Criar extends Component<{ router?: any, context?: string, familiaId
                     maxLength={50}
                   />
 
-                  <InputEnderecoGasto
-                    inputEndereco={inputEndereco}
-                    maxLenght={50}
-                    maxLengthCEP={8}
-                    erros={errosEndereco}
-                    atualizando={(patch) => {
-                      this.setState((prev) => ({
-                        inputEndereco: { ...prev.inputEndereco, ...patch },
-                        errosEndereco: {
-                          ...prev.errosEndereco,
-                          ...Object.fromEntries(Object.keys(patch).map((k) => [k, ""])),
-                        },
-                      }));
-                    }}
-                  />
+                  <InputEndereco
+                  cep={this.props.endereco!.cep}
+                  setCep={this.props.endereco!.setCep}
+                  logradouro={this.props.endereco!.logradouro}
+                  setLogradouro={this.props.endereco!.setLogradouro}
+                  numero={this.props.endereco!.numero}
+                  setNumero={this.props.endereco!.setNumero}
+                  bairro={this.props.endereco!.bairro}
+                  setBairro={this.props.endereco!.setBairro}
+                  cidade={this.props.endereco!.cidade}
+                  setCidade={this.props.endereco!.setCidade}
+                  buscando={this.props.endereco!.buscando}
+                  erroCep={this.props.endereco!.erroCep}
+                />
                 </>
               )}
             </View>
 
-            {incluirEndereco && this.validarCEP() && (
-              <Text style={styles.enderecoValidado}>Endereço validado</Text>
-            )}
 
             <TouchableOpacity
               style={[styles.register, salvando && { opacity: 0.6 }]}

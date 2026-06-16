@@ -15,7 +15,8 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
-import InputEndereco, { Endereco } from "../../../components/InputEndereco";
+import InputEndereco from "@/src/components/InputEndereco"
+import { useEndereco } from "@/src/hooks/useEndereco"
 //import InputTelefone from "../../../components/InputTelefone";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
@@ -40,13 +41,7 @@ export default function EditarConta() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputSenha, setInputSenha] = useState("");
   const [inputTelefone, setInputTelefone] = useState("");
-  const [inputEndereco, setInputEndereco] = useState({
-    logradouro: "",
-    numero: "",
-    bairro: "",
-    cidade: "",
-    cep: "",
-  });
+  const { cep, setCep, logradouro, setLogradouro, numero, setNumero, bairro, setBairro, cidade, setCidade, buscando, erroCep, inicializar } = useEndereco()
   const [erroTelefone, setErroTelefone] = useState<string | null>(null);
 
 
@@ -79,13 +74,13 @@ export default function EditarConta() {
           setUserName(dados.username ?? "");
           setInputEmail(dados.email ?? "");
           setInputTelefone(dados.telefone ?? "");
-          setInputEndereco({
+          inicializar({
             logradouro: dados.endereco?.logradouro ?? dados.logradouro ?? "",
             numero: dados.endereco?.numero ?? dados.numero ?? "",
             bairro: dados.endereco?.bairro ?? dados.bairro ?? "",
             cidade: dados.endereco?.cidade ?? dados.cidade ?? "",
             cep: dados.endereco?.cep ?? dados.cep ?? "",
-          });
+          })
         }
       }
     }
@@ -120,6 +115,12 @@ export default function EditarConta() {
         return;
       }
 
+      if (erroCep) {
+        setMensagemErro("CEP inválido. Verifique o CEP informado.");
+        setIsLoading(false);
+        return;
+      }
+
       const emailMudou = inputEmail.trim() !== auth.currentUser.email;
       const senhaMudou = inputSenha.trim().length > 0;
 
@@ -148,13 +149,7 @@ export default function EditarConta() {
         email: inputEmail.trim(),
         telefone: inputTelefone,
         datanascimento: inputData,
-        endereco: {
-          logradouro: inputEndereco.logradouro,
-          numero: inputEndereco.numero,
-          bairro: inputEndereco.bairro,
-          cidade: inputEndereco.cidade,
-          cep: inputEndereco.cep,
-        },
+        endereco: { logradouro, numero, bairro, cidade, cep },
         avatar: avatarEscolhido
       });
 
@@ -280,16 +275,18 @@ export default function EditarConta() {
               value={inputTelefone}
               atualizando={(valor) => {
                 setInputTelefone(valor);
-                setErroTelefone(null); // ✅ limpa ao digitar
+                setErroTelefone(null); 
               }}
               erro={erroTelefone}
             />
 
             <InputEndereco
-              inputEndereco={inputEndereco}
-              atualizando={(patch: Partial<Endereco>) =>
-                setInputEndereco((prev) => ({ ...prev, ...patch }))
-              }
+              cep={cep} setCep={setCep}
+              logradouro={logradouro} setLogradouro={setLogradouro}
+              numero={numero} setNumero={setNumero}
+              bairro={bairro} setBairro={setBairro}
+              cidade={cidade} setCidade={setCidade}
+              buscando={buscando} erroCep={erroCep}
             />
 
             <View style={styles.aviso}>
