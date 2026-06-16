@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import ThinkMoneyLogo from "../assets/images/thinkmoney_logo_4k.svg";
 import { avatares } from '@/src/components/auth/escolhaavantar'
 
 
@@ -26,10 +27,7 @@ export default function Header() {
   }, []);
   return (
     <View style={styles.header}>
-      <Image
-        source={require("../assets/images/logothink.png")}
-        style={styles.logo}
-      />
+      <ThinkMoneyLogo width={90} height={90} />
 
       <TouchableOpacity onPress={() => router.push("/config")}>
         <Image source={avatares[avatarId as keyof typeof avatares]} style={styles.avatar} />
@@ -50,10 +48,8 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
   logo: {
-    width: 68,
-    height: 59,
-    resizeMode: "contain",
-    transform: [{ scale: 3 }],
+    width: 60,
+    height: 60,
   },
   avatar: {
     width: 50,
