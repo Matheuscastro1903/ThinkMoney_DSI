@@ -7,9 +7,10 @@ interface campoInputProps{
     atualizando: (texto: string) => void;
     icon?:any
     value: string;
+    maxLength?: number;
 }
 
-export default function InputLogin({label, placeholder, atualizando, value}:campoInputProps){
+export default function InputLogin({label, placeholder, atualizando, value, maxLength}:campoInputProps){
     return(
         <View style={styles.containerText}>
                 <Text style={styles.label}>{label}</Text>
@@ -26,6 +27,7 @@ export default function InputLogin({label, placeholder, atualizando, value}:camp
                         onChangeText={atualizando} 
                         keyboardType="email-address"
                         autoCapitalize="none" //Evita que a primeira letra seja maiúscula
+                        maxLength={maxLength}
                 />
                 </View>
             </View>

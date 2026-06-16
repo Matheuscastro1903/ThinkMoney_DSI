@@ -56,7 +56,7 @@ export class Usuario implements Omit<UsuarioProps, 'senha'>{
         renda: this.renda,
         telefone: this.telefone,
         profissao: this.profissao,
-        endereco: this.endereco,
+        endereco: this.endereco.toJson() as any,
         avatar: this.avatar,
         criadoEm: this.criadoEm ?? new Date(),
         ...(this.familia !== undefined && { familia: this.familia }),

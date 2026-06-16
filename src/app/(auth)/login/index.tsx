@@ -122,6 +122,7 @@ export default function Login() {
                 atualizando={(valor) => setInputEmail(valor)}
                 icon={require("../../../assets/icons/iconeusuario.svg")}
                 value={inputEmail}
+                maxLength={50}
               />
               <InputSenha
                 label="Digite sua senha"
