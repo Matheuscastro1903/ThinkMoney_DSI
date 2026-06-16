@@ -185,12 +185,14 @@ export default function Cadastro() {
   }
 
   function validarProfissao(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     if (valor.trim().length < 3) return "Informe uma profissão válida.";
     if (valor.trim().length > 50) return "Profissão muito longa.";
     return null;
   }
 
   function validarTelefone(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
       return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
@@ -198,27 +200,31 @@ export default function Cadastro() {
   }
 
   function validarLogradouro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     if (valor.trim().length < 3) return "Informe um logradouro válido.";
     return null;
   }
 
   function validarNumero(valor: string): string | null {
-    if (valor.trim() === "") return "Informe o número.";
+    if (valor.trim() === "") return null;
     if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
     return null;
   }
 
   function validarBairro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     if (valor.trim().length < 2) return "Informe um bairro válido.";
     return null;
   }
 
   function validarCidade(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     if (valor.trim().length < 2) return "Informe uma cidade válida.";
     return null;
   }
 
   function validarCep(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
     return null;
@@ -329,6 +335,7 @@ export default function Cadastro() {
 
               {/* ── Dados Profissionais ── */}
               <InputProfissao
+                label="* Profissão (opcional):"
                 value={inputProfissao}
                 atualizando={(valor) => {
                   setInputProfissao(valor);
@@ -338,6 +345,7 @@ export default function Cadastro() {
               />
 
               <InputTelefone
+                label="* Telefone (opcional):"
                 value={inputTelefone}
                 atualizando={(valor) => {
                   setInputTelefone(valor);
@@ -351,6 +359,7 @@ export default function Cadastro() {
                 <View style={styles.enderecoLinha}>
                   <View style={styles.campoLogradouro}>
                     <InputLogradouro
+                      label="* Logradouro (opcional):"
                       value={inputLogradouro}
                       atualizando={(valor) => {
                         setInputLogradouro(valor);
@@ -362,6 +371,7 @@ export default function Cadastro() {
                   </View>
                   <View style={styles.campoNumero}>
                     <InputNumero
+                      label="* Nº (opcional):"
                       value={inputNumero}
                       atualizando={(valor) => {
                         setInputNumero(valor);
@@ -376,6 +386,7 @@ export default function Cadastro() {
                 <View style={styles.enderecoLinha}>
                   <View style={styles.campoBairro}>
                     <InputBairro
+                      label="* Bairro (opcional):"
                       value={inputBairro}
                       atualizando={(valor) => {
                         setInputBairro(valor);
@@ -387,6 +398,7 @@ export default function Cadastro() {
                   </View>
                   <View style={styles.campoCidade}>
                     <InputCidade
+                      label="* Cidade (opcional):"
                       value={inputCidade}
                       atualizando={(valor) => {
                         setInputCidade(valor);
@@ -399,6 +411,7 @@ export default function Cadastro() {
                 </View>
 
                 <InputCep
+                  label="* CEP (opcional):"
                   value={inputCep}
                   atualizando={(valor) => {
                     setInputCep(valor);
@@ -557,6 +570,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  camposOpcionais: {
+    fontSize: 12,
+    color: "#867DC1",
+    marginBottom: 4,
+  },
+
   erroInput: {
     color: "red",
     fontSize: 12,
