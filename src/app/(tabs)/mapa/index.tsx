@@ -10,6 +10,8 @@ import {
   Alert,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { buscarGastos, atualizarGasto } from "../../../services/gastosService";
 import { Gasto } from "@/src/models/gasto";
 import { geocodificarEndereco } from "../../../services/geocodingService";
@@ -126,27 +128,55 @@ export default function Mapa() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>Mapa de gastos</Text>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <View>
+            <Text style={styles.title}>Mapa de Gastos</Text>
+            <Text style={styles.subtitle}>Explore seus gastos pelo mundo</Text>
+          </View>
+          <LinearGradient
+            colors={["rgba(167, 139, 250, 0.2)", "rgba(167, 139, 250, 0.05)"]}
+            style={styles.iconContainer}
+          >
+            <Ionicons name="map-outline" size={24} color="#A78BFA" />
+          </LinearGradient>
+        </View>
 
-        <MapView ref={mapRef} style={styles.map} initialRegion={REGIAO_PADRAO}>
-          {gastosComCoordenadas.map((g) => (
-            <Marker
-              key={g.id}
-              coordinate={{
-                latitude: g.endereco!.latitude!,
-                longitude: g.endereco!.longitude!,
-              }}
-              title={g.endereco?.titulo || g.titulo}
-              description={`${formatarValor(g.valor)} • ${g.categoria}`}
-            />
-          ))}
-        </MapView>
+        <View style={styles.mapWrapper}>
+          <MapView 
+            ref={mapRef} 
+            style={styles.map} 
+            initialRegion={REGIAO_PADRAO}
+            userInterfaceStyle="dark"
+            showsUserLocation={true}
+          >
+            {gastosComCoordenadas.map((g) => (
+              <Marker
+                key={g.id}
+                coordinate={{
+                  latitude: g.endereco!.latitude!,
+                  longitude: g.endereco!.longitude!,
+                }}
+                title={g.endereco?.titulo || g.titulo}
+                description={`${formatarValor(g.valor)} • ${g.categoria}`}
+              >
+                <View style={styles.customMarker}>
+                  <Ionicons name="location" size={36} color="#F43F5E" />
+                </View>
+              </Marker>
+            ))}
+          </MapView>
+        </View>
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Registro de Transações</Text>
-          <TouchableOpacity onPress={() => router.push("/(details)/detailsmapa/visualizar-gastos")}>
+          <TouchableOpacity 
+            style={styles.seeAllButton}
+            onPress={() => router.push("/(details)/detailsmapa/visualizar-gastos")}
+            activeOpacity={0.7}
+          >
             <Text style={styles.seeAll}>Ver tudo</Text>
+            <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
           </TouchableOpacity>
         </View>
 
@@ -219,33 +249,84 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 100,
   },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+    marginTop: 10,
+  },
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontWeight: "800",
     color: "#fff",
-    marginBottom: 20,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#94A3B8",
+    marginTop: 4,
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(167, 139, 250, 0.3)",
+  },
+  mapWrapper: {
+    height: 280,
+    borderRadius: 24,
+    marginBottom: 32,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
   },
   map: {
-    height: 260,
-    borderRadius: 20,
-    marginBottom: 28,
-    overflow: "hidden",
+    flex: 1,
+  },
+  customMarker: {
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#F43F5E",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 5,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
+    letterSpacing: -0.5,
+  },
+  seeAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.05)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   seeAll: {
-    fontSize: 11,
+    fontSize: 12,
+    fontWeight: "600",
     color: "#94A3B8",
-    letterSpacing: 1,
+    marginRight: 4,
   },
   item: {
     flexDirection: "row",
