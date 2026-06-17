@@ -52,14 +52,15 @@ export default function Metas() {
         </View>
 
         <View style={styles.containerPicker}>
+          <Ionicons name="filter-outline" size={18} color="rgba(255,255,255,0.7)" />
           <Picker
             selectedValue={membroFiltro}
             onValueChange={(value) => setMembroFiltro(value)}
             style={styles.picker}
-            dropdownIconColor="#999"
+            dropdownIconColor="rgba(255,255,255,0.7)"
             itemStyle={{ height: 40 }}
           >
-            <Picker.Item label="Filtrar por membros" value="" />
+            <Picker.Item label="Filtrar por membro" value="" />
             {membros.map((m, i) => (
               <Picker.Item key={m.email ?? i} label={m.nome} value={m.email} />
             ))}
@@ -193,18 +194,21 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   containerPicker: {
-    backgroundColor: "#9E9E9E",
+    backgroundColor: "transparent",
     borderRadius: 12,
-    width: "70%",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
+    width: "90%",
     alignSelf: "center",
     marginTop: 16,
-    overflow: "hidden",
-    height: 30,
-    justifyContent: "center",
-    color: "white"
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    height: 52,
   },
   picker: {
     color: "white",
+    flex: 1,
   },
   boxPatrimonio: {
     width: '90%',

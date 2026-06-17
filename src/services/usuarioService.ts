@@ -30,14 +30,17 @@ class UsuarioService {
     async buscarDadosUsuario(uid: string): Promise<Usuario | null> {
         const docRef = doc(db, 'usuarios', uid)
         const docSnap = await getDoc(docRef)
-
-        if (docSnap.exists()) {
-            const data = docSnap.data() as UsuarioFirestore
-            return Usuario.fromFirestore(data)
-        } else {
-            console.log("Usuário não encontrado")
-            return null
+        if (!docSnap.exists()) return null
+        
+        const data = docSnap.data() as any
+        const usuario = Usuario.fromFirestore(data)
+        
+        // Injeta o familiaId salvo como string no documento
+        if (data.familiaId && !usuario.familia) {
+            (usuario as any).familiaId = data.familiaId
         }
+        
+        return usuario
     }
 
     /**

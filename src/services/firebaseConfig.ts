@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
 
@@ -13,7 +13,8 @@ const firebaseConfig = {
   measurementId: "G-VKN0CFVTX5"
 };
 
-const app = initializeApp(firebaseConfig);
-
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = getAuth(app)  // para login/cadastro
 export const db = getFirestore(app);  // para o banco de dados 
+
+
