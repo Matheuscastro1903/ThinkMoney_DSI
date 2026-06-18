@@ -1,9 +1,9 @@
-import { Feather } from '@expo/vector-icons';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useFamiliaGastos } from '@/src/hooks/familia/useFamiliaGastos'
-import { useRouter } from 'expo-router';
 import HeaderBack from '@/src/components/headerBack';
+import { useFamiliaGastos } from '@/src/hooks/familia/useFamiliaGastos';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const AVATAR_1 = require('../../../../../assets/images/avatarcapivara.png');
 const AVATAR_2 = require('../../../../../assets/images/avatarjacare.png');
@@ -20,13 +20,13 @@ export default function Gastos() {
             <HeaderBack />
 
             <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
-                
+
                 {/* Top Card */}
                 <View style={styles.topCard}>
                     <View style={styles.topCardHeader}>
                         <Text style={styles.topCardLabel}>Gasto Total da Família</Text>
                     </View>
-                    
+
                     <View style={styles.topCardBody}>
                         <View>
                             <Text style={styles.currency}>R$</Text>
@@ -42,10 +42,10 @@ export default function Gastos() {
                     <View style={styles.topCardFooter}>
                         <View style={styles.avatarGroup}>
                             {membros.slice(0, 3).map((membro, i) => (
-                                <Image 
-                                  key={membro.email || i} 
-                                  source={membro.avatar != null ? AVATARES[membro.avatar % AVATARES.length] : AVATARES[0]} 
-                                  style={[styles.avatar, { zIndex: 3 - i, marginLeft: i > 0 ? -12 : 0 }]} 
+                                <Image
+                                    key={membro.email || i}
+                                    source={membro.avatar != null ? AVATARES[membro.avatar % AVATARES.length] : AVATARES[0]}
+                                    style={[styles.avatar, { zIndex: 3 - i, marginLeft: i > 0 ? -12 : 0 }]}
                                 />
                             ))}
                         </View>
@@ -62,29 +62,29 @@ export default function Gastos() {
                     sections.map((section, idx) => (
                         <View key={idx}>
                             <Text style={styles.sectionTitle}>{section.section}</Text>
-                            
+
                             {section.data.map((tx: any, txIdx: number) => (
                                 <View key={tx.id ?? txIdx} style={styles.txCard}>
                                     <View style={[styles.txIconContainer, { backgroundColor: '#F1F5F9' }]}>
                                         <Feather name="credit-card" size={20} color="#1D1252" />
                                     </View>
-                                    
+
                                     <View style={styles.txInfo}>
                                         <Text style={styles.txTitle}>{tx.titulo ?? tx.descricao ?? '—'}</Text>
                                         <View style={styles.txSubtitleRow}>
                                             <Text style={styles.txSubtitle}>{tx.categoria ?? ''}</Text>
-                                            
+
                                             {tx.criador && (
                                                 <View style={styles.memberPill}>
                                                     {tx.criador.avatar != null && (
                                                         <Image source={AVATARES[tx.criador.avatar % AVATARES.length]} style={styles.memberPillDot} />
                                                     )}
-                                                    <Text style={styles.memberPillText}>{tx.criador.nome}</Text>
+                                                    <Text style={styles.memberPillText}>{tx.criador.nome?.split(' ')[0]}</Text>
                                                 </View>
                                             )}
                                         </View>
                                     </View>
-                                    
+
                                     <View style={styles.txActionContainer}>
                                         <Text style={styles.txValue}>
                                             {tx.valor != null
@@ -93,7 +93,7 @@ export default function Gastos() {
                                             }
                                         </Text>
                                         <View style={styles.actionButtons}>
-                                            <TouchableOpacity 
+                                            <TouchableOpacity
                                                 style={styles.actionBtn}
                                                 onPress={() => router.push({
                                                     pathname: '/(details)/detailshome/gastos/editar_gasto',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     topCard: {
-        backgroundColor: '#5B21B6', 
+        backgroundColor: '#5B21B6',
         borderRadius: 20,
         padding: 24,
         marginBottom: 30,

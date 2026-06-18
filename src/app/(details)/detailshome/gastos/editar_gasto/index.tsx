@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Switch,
 } from "react-native";
-import { Component } from "react";
+import { Component, useEffect } from "react";
 import { useLocalSearchParams, useRouter, Router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBack from "@/src/components/headerBack";
@@ -16,8 +16,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import InputTitle from "@/src/components/details/gastos/inputtitle2/page";
 import InputValor from "@/src/components/details/gastos/inputvalor/page";
-import InputEnderecoGasto from "@/src/components/details/gastos/inputendereco/page";
-import { EnderecoProps } from "@/src/types/endereco";
+import InputEndereco from "@/src/components/InputEndereco";
+import { useEndereco } from "@/src/hooks/useEndereco";
 import { Endereco } from "../../../../../models/endereco";
 import InputDate from "@/src/components/auth/inputdata";
 import InputFixo from "@/src/components/details/gastos/inputfixo/page";
@@ -49,7 +49,24 @@ function valorParaTexto(valor: number): string {
 export default function EditarGastoWrapper() {
   const router = useRouter();
   const params = useLocalSearchParams<{ gasto: string; context?: string; familiaId?: string }>();
-  return <EditarGasto router={router} gastoJson={params.gasto as string} context={params.context} familiaId={params.familiaId} />;
+  const endereco = useEndereco();
+
+  useEffect(() => {
+    try {
+      const g = JSON.parse(params.gasto as string);
+      if (g?.endereco) {
+        endereco.inicializar({
+          cep: g.endereco.cep ?? '',
+          logradouro: g.endereco.logradouro ?? '',
+          bairro: g.endereco.bairro ?? '',
+          cidade: g.endereco.cidade ?? '',
+          numero: g.endereco.numero ?? '',
+        });
+      }
+    } catch {}
+  }, []);
+
+  return <EditarGasto router={router} gastoJson={params.gasto as string} context={params.context} familiaId={params.familiaId} endereco={endereco} />;
 }
 
 interface Props {
@@ -57,13 +74,13 @@ interface Props {
   gastoJson: string;
   context?: string;
   familiaId?: string;
+  endereco?: ReturnType<typeof useEndereco>
 }
 
 interface State {
   title: string;
   tituloEndereco: string;
   inputValor: string;
-  inputEndereco: EnderecoProps;
   inputData: Date;
   categoriaSelecionada: string | undefined;
   fixo: boolean;
@@ -90,13 +107,6 @@ class EditarGasto extends Component<Props, State> {
       title: g?.titulo ?? "",
       tituloEndereco: g?.endereco?.titulo ?? "",
       inputValor: g ? valorParaTexto(g.valor) : "",
-      inputEndereco: {
-        logradouro: g?.endereco?.logradouro ?? "",
-        numero: g?.endereco?.numero ?? "",
-        bairro: g?.endereco?.bairro ?? "",
-        cidade: g?.endereco?.cidade ?? "",
-        cep: g?.endereco?.cep ?? "",
-      },
       inputData: g ? new Date(g.data) : new Date(),
       categoriaSelecionada: g?.categoria,
       fixo: g?.fixo ?? false,
@@ -107,15 +117,16 @@ class EditarGasto extends Component<Props, State> {
     };
   }
 
-  validarCEP = () => this.state.inputEndereco.cep.replace(/\D/g, "").length === 8;
+  validarCEP = () => (this.props.endereco?.cep?.replace(/\D/g, '').length ?? 0) === 8;
 
   houveMudanca = (): boolean => {
     const g = this.gastoOriginal;
     if (!g) return false;
-    const { title, tituloEndereco, inputValor, categoriaSelecionada, fixo, inputData, inputEndereco } = this.state;
+    const { title, tituloEndereco, inputValor, categoriaSelecionada, fixo, inputData } = this.state;
     const valorNumerico = parseValor(inputValor);
     const tituloOriginal = g.titulo ?? "";
     const enderecoOriginalFoiPreenchido = !!g.endereco?.logradouro;
+    const e = this.props.endereco!
 
     if (
       title !== tituloOriginal ||
@@ -131,11 +142,11 @@ class EditarGasto extends Component<Props, State> {
     if (this.state.incluirEndereco) {
       if (
         tituloEndereco !== (g.endereco?.titulo ?? "") ||
-        inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
-        inputEndereco.numero !== (g.endereco?.numero ?? "") ||
-        inputEndereco.bairro !== (g.endereco?.bairro ?? "") ||
-        inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
-        inputEndereco.cep !== (g.endereco?.cep ?? "")
+        e?.logradouro !== (g.endereco?.logradouro ?? "") ||
+        e?.numero !== (g.endereco?.numero ?? "") ||
+        e?.bairro !== (g.endereco?.bairro ?? "") ||
+        e?.cidade !== (g.endereco?.cidade ?? "") ||
+        e?.cep !== (g.endereco?.cep ?? "")
       ) {
         return true;
       }
@@ -148,8 +159,8 @@ class EditarGasto extends Component<Props, State> {
     const g = this.gastoOriginal;
     if (!g) return;
 
-    const { inputValor, categoriaSelecionada, inputData, title, tituloEndereco, fixo, inputEndereco } = this.state;
-
+    const { inputValor, categoriaSelecionada, inputData, title, tituloEndereco, fixo } = this.state;
+    const e = this.props.endereco!
     if (!categoriaSelecionada) {
       Alert.alert("Atenção", "Selecione uma categoria.");
       return;
@@ -186,31 +197,36 @@ class EditarGasto extends Component<Props, State> {
 
       if (this.state.incluirEndereco) {
         const enderecoMudou =
-          inputEndereco.logradouro !== (g.endereco?.logradouro ?? "") ||
-          inputEndereco.numero !== (g.endereco?.numero ?? "") ||
-          inputEndereco.cidade !== (g.endereco?.cidade ?? "") ||
-          inputEndereco.cep !== (g.endereco?.cep ?? "");
+          e.logradouro !== (g.endereco?.logradouro ?? "") ||
+          e.numero !== (g.endereco?.numero ?? "") ||
+          e.cidade !== (g.endereco?.cidade ?? "") ||
+          e.cep !== (g.endereco?.cep ?? "");
 
         const coordenadas = enderecoMudou
-          ? await geocodificarEndereco(
-              inputEndereco.logradouro,
-              inputEndereco.numero,
-              inputEndereco.bairro,
-              inputEndereco.cidade,
-              inputEndereco.cep,
-            )
+          ? await geocodificarEndereco(e.logradouro, e.numero, e.bairro, e.cidade, e.cep)
           : null;
 
         enderecoObj = new Endereco(
-          inputEndereco.logradouro,
-          inputEndereco.numero,
-          inputEndereco.bairro,
-          inputEndereco.cidade,
-          inputEndereco.cep,
+          e.logradouro,
+          e.numero,
+          e.bairro,
+          e.cidade,
+          e.cep,
           tituloEndereco,
           coordenadas?.latitude ?? (g.endereco as any)?.latitude,
           coordenadas?.longitude ?? (g.endereco as any)?.longitude
         );
+
+        if (this.state.incluirEndereco) {
+          if (!this.validarCEP()) {
+            Alert.alert("Atenção", "CEP inválido. Informe um CEP com 8 dígitos.");
+            return;
+          }
+          if (this.props.endereco?.erroCep) {
+            Alert.alert("Atenção", "CEP não encontrado. Verifique o CEP informado.");
+            return;
+          }
+        }
       }
 
       const novoGasto = new Gasto(
@@ -286,7 +302,7 @@ class EditarGasto extends Component<Props, State> {
 
     const {
       title, inputValor, salvando, excluindo, erroValor,
-      fixo, inputEndereco, tituloEndereco, categoriaSelecionada, incluirEndereco
+      fixo, tituloEndereco, categoriaSelecionada, incluirEndereco
     } = this.state;
 
     return (
@@ -390,21 +406,24 @@ class EditarGasto extends Component<Props, State> {
                     onChangeText={(v) => this.setState({ tituloEndereco: v })}
                   />
 
-                  <InputEnderecoGasto
-                    inputEndereco={inputEndereco}
-                    atualizando={(patch) =>
-                      this.setState((prev) => ({
-                        inputEndereco: { ...prev.inputEndereco, ...patch },
-                      }))
-                    }
-                  />
+                 <InputEndereco
+                  cep={this.props.endereco!.cep}
+                  setCep={this.props.endereco!.setCep}
+                  logradouro={this.props.endereco!.logradouro}
+                  setLogradouro={this.props.endereco!.setLogradouro}
+                  numero={this.props.endereco!.numero}
+                  setNumero={this.props.endereco!.setNumero}
+                  bairro={this.props.endereco!.bairro}
+                  setBairro={this.props.endereco!.setBairro}
+                  cidade={this.props.endereco!.cidade}
+                  setCidade={this.props.endereco!.setCidade}
+                  buscando={this.props.endereco!.buscando}
+                  erroCep={this.props.endereco!.erroCep}
+                />
                 </>
               )}
             </View>
 
-            {incluirEndereco && this.validarCEP() && (
-              <Text style={styles.enderecoValidado}>Endereço validado</Text>
-            )}
 
             <TouchableOpacity
               style={[styles.register, salvando && { opacity: 0.6 }]}

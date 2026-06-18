@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -8,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import ThinkMoneyLogo from "../../../assets/images/thinkmoney_logo_4k.svg";
 import { SafeAreaView } from "react-native-safe-area-context"; // ADICIONADO: SafeAreaView
 
 import ButtonConfirmar from "@/src/components/auth/buttonaction";
@@ -15,7 +15,8 @@ import EscolhaAvatar from "@/src/components/auth/escolhaavantar";
 import InputDate from "@/src/components/auth/inputdata";
 import InputSenha from "@/src/components/auth/inputsenha";
 import InputLogin from "../../../components/auth/inputlogin";
-import InputEndereco, { Endereco } from "../../../components/InputEndereco";
+import InputEndereco from "@/src/components/InputEndereco"
+import { useEndereco } from "@/src/hooks/useEndereco"
 //import InputTelefone from "../../../components/InputTelefone";
 import HeaderBack from "@/src/components/headerBack";
 import InputTelefone from "@/src/components/auth/inputtelefone"
@@ -40,15 +41,9 @@ export default function EditarConta() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputSenha, setInputSenha] = useState("");
   const [inputTelefone, setInputTelefone] = useState("");
-  const [inputEndereco, setInputEndereco] = useState({
-    logradouro: "",
-    numero: "",
-    bairro: "",
-    cidade: "",
-    cep: "",
-  });
+  const { cep, setCep, logradouro, setLogradouro, numero, setNumero, bairro, setBairro, cidade, setCidade, buscando, erroCep, inicializar } = useEndereco()
   const [erroTelefone, setErroTelefone] = useState<string | null>(null);
-
+  const [errosEndereco, setErrosEndereco] = useState<ErrosEndereco>({});
 
   const [inputSenhaAtual, setInputSenhaAtual] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -79,13 +74,13 @@ export default function EditarConta() {
           setUserName(dados.username ?? "");
           setInputEmail(dados.email ?? "");
           setInputTelefone(dados.telefone ?? "");
-          setInputEndereco({
+          inicializar({
             logradouro: dados.endereco?.logradouro ?? dados.logradouro ?? "",
             numero: dados.endereco?.numero ?? dados.numero ?? "",
             bairro: dados.endereco?.bairro ?? dados.bairro ?? "",
             cidade: dados.endereco?.cidade ?? dados.cidade ?? "",
             cep: dados.endereco?.cep ?? dados.cep ?? "",
-          });
+          })
         }
       }
     }
@@ -120,6 +115,12 @@ export default function EditarConta() {
         return;
       }
 
+      if (erroCep) {
+        setMensagemErro("CEP inválido. Verifique o CEP informado.");
+        setIsLoading(false);
+        return;
+      }
+
       const emailMudou = inputEmail.trim() !== auth.currentUser.email;
       const senhaMudou = inputSenha.trim().length > 0;
 
@@ -148,13 +149,7 @@ export default function EditarConta() {
         email: inputEmail.trim(),
         telefone: inputTelefone,
         datanascimento: inputData,
-        endereco: {
-          logradouro: inputEndereco.logradouro,
-          numero: inputEndereco.numero,
-          bairro: inputEndereco.bairro,
-          cidade: inputEndereco.cidade,
-          cep: inputEndereco.cep,
-        },
+        endereco: { logradouro, numero, bairro, cidade, cep },
         avatar: avatarEscolhido
       });
 
@@ -189,9 +184,41 @@ export default function EditarConta() {
   }
 
   function validarTelefone(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
     const apenasNumeros = valor.replace(/\D/g, "");
     if (apenasNumeros.length < 10 || apenasNumeros.length > 11)
       return "Telefone inválido. Use (XX) 9XXXX-XXXX.";
+    return null;
+  }
+
+  function validarLogradouro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 3) return "Informe um logradouro válido.";
+    return null;
+  }
+
+  function validarNumero(valor: string): string | null {
+    if (valor.trim() === "") return null;
+    if (!/^\d+[A-Za-z]?$/.test(valor.trim())) return "Número inválido.";
+    return null;
+  }
+
+  function validarBairro(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe um bairro válido.";
+    return null;
+  }
+
+  function validarCidade(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    if (valor.trim().length < 2) return "Informe uma cidade válida.";
+    return null;
+  }
+
+  function validarCep(valor: string): string | null {
+    if (valor.trim().length === 0) return null;
+    const apenasNumeros = valor.replace(/\D/g, "");
+    if (apenasNumeros.length !== 8) return "CEP deve ter 8 dígitos.";
     return null;
   }
 
@@ -210,10 +237,7 @@ export default function EditarConta() {
           keyboardShouldPersistTaps="handled"
         >
           
-          <Image
-            source={require("../../../assets/images/logothinkmoney.png")}
-            style={styles.logo}
-          />
+          <ThinkMoneyLogo width={120} height={120} />
 
           <View style={styles.main}>
             <View>
@@ -231,6 +255,7 @@ export default function EditarConta() {
               atualizando={(valor) => setInputNome(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputNome}
+              maxLength={40}
             />
 
             <InputLogin
@@ -239,6 +264,7 @@ export default function EditarConta() {
               atualizando={(valor) => setUserName(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputUserName}
+              maxLength={20}
             />
 
             <InputLogin
@@ -247,6 +273,7 @@ export default function EditarConta() {
               atualizando={(valor) => setInputEmail(valor)}
               icon={require("../../../assets/icons/iconeusuario.svg")}
               value={inputEmail}
+              maxLength={50}
             />
 
             <InputSenha
@@ -277,16 +304,18 @@ export default function EditarConta() {
               value={inputTelefone}
               atualizando={(valor) => {
                 setInputTelefone(valor);
-                setErroTelefone(null); // ✅ limpa ao digitar
+                setErroTelefone(null); 
               }}
               erro={erroTelefone}
             />
 
             <InputEndereco
-              inputEndereco={inputEndereco}
-              atualizando={(patch: Partial<Endereco>) =>
-                setInputEndereco((prev) => ({ ...prev, ...patch }))
-              }
+              cep={cep} setCep={setCep}
+              logradouro={logradouro} setLogradouro={setLogradouro}
+              numero={numero} setNumero={setNumero}
+              bairro={bairro} setBairro={setBairro}
+              cidade={cidade} setCidade={setCidade}
+              buscando={buscando} erroCep={erroCep}
             />
 
             <View style={styles.aviso}>
@@ -371,6 +400,6 @@ const styles = StyleSheet.create({
   width: "100%",
   paddingTop: 8,
   paddingLeft: 16,
-  marginBottom: -10, // ✅ reduz o espaço entre header e logo
+  marginBottom: -10, 
 },
 });

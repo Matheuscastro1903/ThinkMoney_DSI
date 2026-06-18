@@ -2,16 +2,71 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useState } from 'react';
+import Svg, { Path } from 'react-native-svg';
 import NavBarFamilia from '@/src/components/tabs/familia/navbar/page';
 import InfoCards from '@/src/components/tabs/familia/info-cards';
 import { useFamiliaDados } from '@/src/hooks/familia/useFamiliaDados';
 
-// Cores fixas para os itens de categoria (visual)
-const CATEGORY_COLORS = ['#1D1252', '#4F46E5', '#818CF8', '#CBD5E1', '#E2E8F0']
+const CATEGORY_COLORS = ['#1D1252', '#4F46E5', '#818CF8', '#CBD5E1', '#94A3B8']
+
+const SIZE = 260
+const CX = SIZE / 2
+const CY = SIZE / 2
+const OUTER_R = 118
+const OUTER_R_SEL = 126
+const INNER_R = 80
+
+function buildArc(cx: number, cy: number, outerR: number, innerR: number, startAngle: number, endAngle: number) {
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0
+    const x1 = cx + outerR * Math.cos(startAngle)
+    const y1 = cy + outerR * Math.sin(startAngle)
+    const x2 = cx + outerR * Math.cos(endAngle)
+    const y2 = cy + outerR * Math.sin(endAngle)
+    const ix1 = cx + innerR * Math.cos(endAngle)
+    const iy1 = cy + innerR * Math.sin(endAngle)
+    const ix2 = cx + innerR * Math.cos(startAngle)
+    const iy2 = cy + innerR * Math.sin(startAngle)
+    return `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${ix1} ${iy1} A ${innerR} ${innerR} 0 ${largeArc} 0 ${ix2} ${iy2} Z`
+}
+
+function DonutChart({ data, total, selectedIndex, onPress }: {
+    data: { nome: string; valor: number }[];
+    total: number;
+    selectedIndex: number | null;
+    onPress: (i: number) => void;
+}) {
+    if (total <= 0) return null
+
+    let startAngle = -Math.PI / 2
+    const segments = data.map((item, i) => {
+        const angle = (item.valor / total) * 2 * Math.PI
+        const endAngle = startAngle + angle
+        const isSelected = selectedIndex === i
+        const d = buildArc(CX, CY, isSelected ? OUTER_R_SEL : OUTER_R, INNER_R, startAngle, endAngle)
+        startAngle = endAngle
+        return { d, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length], isSelected }
+    })
+
+    return (
+        <Svg width={SIZE} height={SIZE}>
+            {segments.map((seg, i) => (
+                <Path
+                    key={i}
+                    d={seg.d}
+                    fill={seg.color}
+                    opacity={selectedIndex !== null && !seg.isSelected ? 0.35 : 1}
+                    onPress={() => onPress(i)}
+                />
+            ))}
+        </Svg>
+    )
+}
 
 export default function Dados() {
     const router = useRouter();
-    
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+
     const {
         familyName,
         gastoTotal,
@@ -22,6 +77,14 @@ export default function Dados() {
         familiaId,
         isLoading,
     } = useFamiliaDados()
+
+    function handleSegmentPress(i: number) {
+        setSelectedIndex(prev => prev === i ? null : i)
+    }
+
+    const activeCategory = selectedIndex !== null ? gastosPorCategoria[selectedIndex] : gastosPorCategoria[0]
+    const centerLabel = selectedIndex !== null ? `${Math.round((activeCategory?.valor / gastoTotal) * 100)}%` : 'TOP 1'
+    const centerValue = activeCategory?.nome ?? '—'
     
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -79,13 +142,15 @@ export default function Dados() {
                                 <Text style={styles.sectionTitle}>DESPESAS</Text>
                                 <View style={styles.mainCard}>
                                     <View style={styles.donutContainer}>
-                                        <View style={styles.donutRing}>
-                                            <View style={styles.donutHole}>
-                                                <Text style={styles.donutLabel}>TOP 1</Text>
-                                                <Text style={styles.donutValue}>
-                                                    {gastosPorCategoria[0]?.nome ?? '—'}
-                                                </Text>
-                                            </View>
+                                        <DonutChart
+                                            data={gastosPorCategoria}
+                                            total={gastoTotal}
+                                            selectedIndex={selectedIndex}
+                                            onPress={handleSegmentPress}
+                                        />
+                                        <View style={styles.donutHole} pointerEvents="none">
+                                            <Text style={styles.donutLabel}>{centerLabel}</Text>
+                                            <Text style={styles.donutValue}>{centerValue}</Text>
                                         </View>
                                     </View>
 
@@ -261,22 +326,18 @@ const styles = StyleSheet.create({
         borderRadius: 4,
     },
     donutContainer: {
+        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 30,
-    },
-    donutRing: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        backgroundColor: '#E2E8F0',
-        alignItems: 'center',
-        justifyContent: 'center',
+        marginVertical: 20,
+        width: 260,
+        height: 260,
     },
     donutHole: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
+        position: 'absolute',
+        width: 160,
+        height: 160,
+        borderRadius: 80,
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
         justifyContent: 'center',

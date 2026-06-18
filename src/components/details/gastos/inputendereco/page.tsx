@@ -33,7 +33,7 @@ export default function InputEnderecoGasto({ inputEndereco, atualizando, erros,m
                     placeholderTextColor="#ccc"
                     placeholder={inputEndereco.numero ? inputEndereco.numero : "ex. 123"}
                     onChangeText={(value) => atualizando({numero: value})}
-                    maxLength={maxLenght}
+                    maxLength={10}
                 />
             
                 {erros?.numero ? <Text style={styles.erro}>{erros.numero}</Text> : null}

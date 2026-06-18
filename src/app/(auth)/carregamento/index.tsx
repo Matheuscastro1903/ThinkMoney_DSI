@@ -1,12 +1,9 @@
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Image} from 'react-native'; // ADICIONADO: ScrollView
+import ThinkMoneyLogo from '../../../assets/images/thinkmoney_logo_4k.svg';
 export default function TelaCarregamento() {
     return (
         <View style={styles.main}>
-            <Image
-                                source={require('../../../assets/images/logothinkmoney.png')}
-                                style={styles.logo}
-                            />
+            <ThinkMoneyLogo width={150} height={150} />
             
                 <ActivityIndicator 
                 size="large"       // tamanho grande da rodinha
