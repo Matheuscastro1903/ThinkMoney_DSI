@@ -45,7 +45,13 @@ export default function InputDateLembretes({ label, icon, onChange, value }: Inp
         <View style={styles.containerText}>
             <Text style={styles.label}>{label}</Text>
             <View style={styles.input}>
-                <Image source={icon} style={styles.icon} />
+                {typeof icon === 'function' ? (
+                    icon({ width: 15, height: 15, style: styles.icon })
+                ) : icon && typeof icon === 'object' && 'default' in icon && typeof icon.default === 'function' ? (
+                    icon.default({ width: 15, height: 15, style: styles.icon })
+                ) : (
+                    <Image source={icon} style={styles.icon} />
+                )}
                 <MaskInput
                     style={styles.textinput}
                     value={textoExibido}
