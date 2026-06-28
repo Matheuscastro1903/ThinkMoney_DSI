@@ -2,16 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Vibration } from 'react-native';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
+import { Audio } from 'expo-av';
 import { Gasto } from '../models/gasto';
 
-// Raio de agrupamento de gastos (metros)
 const CLUSTER_RADIUS_M = 50;
-// Distância máxima para alertar o usuário (metros)
 const DANGER_PROXIMITY_M = 200;
-// Número mínimo de gastos para considerar local perigoso
 const MIN_GASTOS_PERIGO = 3;
-
-// Padrão de vibração: liga 800ms, desliga 400ms, repete
 const VIBRATION_PATTERN = [0, 800, 400];
 
 function calcularDistanciaM(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -67,12 +63,49 @@ export function useDangerZone(
     const [zonaPerigo, setZonaPerigo] = useState<ZonaPerigo | null>(null);
     const alertadoRef = useRef<Set<string>>(new Set());
     const watchRef = useRef<Location.LocationSubscription | null>(null);
+    const soundRef = useRef<Audio.Sound | null>(null);
+
+    async function tocarAlarme() {
+        try {
+            await Audio.setAudioModeAsync({
+                playsInSilentModeIOS: true,
+                staysActiveInBackground: false,
+            });
+
+            if (soundRef.current) {
+                await soundRef.current.stopAsync();
+                await soundRef.current.unloadAsync();
+                soundRef.current = null;
+            }
+
+            const { sound } = await Audio.Sound.createAsync(
+                require('../assets/sounds/alerta.wav'),
+                { shouldPlay: true, isLooping: true, volume: 1.0 }
+            );
+            soundRef.current = sound;
+        } catch (e) {
+            console.warn('Erro ao tocar alarme:', e);
+        }
+    }
+
+    async function pararSom() {
+        try {
+            if (soundRef.current) {
+                await soundRef.current.stopAsync();
+                await soundRef.current.unloadAsync();
+                soundRef.current = null;
+            }
+        } catch (e) {
+            console.warn('Erro ao parar som:', e);
+        }
+    }
 
     useEffect(() => {
         if (!controleAvancado) {
             watchRef.current?.remove();
             watchRef.current = null;
             Vibration.cancel();
+            pararSom();
             return;
         }
 
@@ -97,9 +130,8 @@ export function useDangerZone(
                         if (dist <= DANGER_PROXIMITY_M && !alertadoRef.current.has(chave)) {
                             alertadoRef.current.add(chave);
                             setZonaPerigo({ cluster, distancia: Math.round(dist) });
-                            // Inicia vibração contínua
                             Vibration.vibrate(VIBRATION_PATTERN, true);
-                            // Dispara notificação sonora (som do sistema)
+                            tocarAlarme();
                             Notifications.scheduleNotificationAsync({
                                 content: {
                                     title: 'Zona de risco financeiro!',
@@ -111,7 +143,6 @@ export function useDangerZone(
                             break;
                         }
 
-                        // Reseta o alerta quando o usuário se afastar
                         if (dist > DANGER_PROXIMITY_M + 100) {
                             alertadoRef.current.delete(chave);
                         }
@@ -126,11 +157,13 @@ export function useDangerZone(
             ativo = false;
             watchRef.current?.remove();
             watchRef.current = null;
+            pararSom();
         };
     }, [gastos, controleAvancado]);
 
     const pararAlarme = () => {
         Vibration.cancel();
+        pararSom();
     };
 
     const fecharAlerta = () => {
