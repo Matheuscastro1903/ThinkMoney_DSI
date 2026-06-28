@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal, ActivityIndicator } from 'react-native';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import InputRenda from '@/src/components/auth/inputrenda';
-
+import DangerZoneModal from '@/src/components/DangerZoneModal';
+import { useDangerZone } from '@/src/hooks/useDangerZone';
 
 // Informacoes firebase
 import { auth, db } from '@/src/services/firebaseConfig';
@@ -56,6 +57,9 @@ export default function Home() {
     const [usuario, setUsuario] = useState<any>(null);
     const [gastos, setGastos] = useState<(Gasto & { id: string })[]>([]);
     const [metas, setMetas] = useState<any[]>([]);
+
+    const controleAvancado: boolean = usuario?.controleAvancado ?? false;
+    const { zonaPerigo, pararAlarme, fecharAlerta } = useDangerZone(gastos, controleAvancado);
 
     useEffect(() => {
         async function carregarDados() {
@@ -316,7 +320,12 @@ export default function Home() {
                     ))
                 )}
             </ScrollView>
-                
+
+            <DangerZoneModal
+                zonaPerigo={zonaPerigo}
+                onPararAlarme={pararAlarme}
+                onFechar={fecharAlerta}
+            />
         </View>
     );
 }

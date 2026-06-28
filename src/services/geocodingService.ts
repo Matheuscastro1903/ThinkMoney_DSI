@@ -53,20 +53,33 @@ export async function geocodificarEndereco(
 ): Promise<Coordenadas | null> {
   const cepLimpo = cep.replace(/\D/g, "");
 
-  const rua = encodeURIComponent(`${numero} ${logradouro}`);
-  const cidadeEnc = encodeURIComponent(cidade);
-  const resultado = await buscarNominatim(
-    `street=${rua}&city=${cidadeEnc}&postalcode=${cepLimpo}`,
-  );
-  if (resultado) return resultado;
-
- 
-  if (cepLimpo.length === 8) {
-    const porCep = await buscarNominatim(`postalcode=${cepLimpo}`);
-    if (porCep) return porCep;
+  // Tentativa 1: endereço completo com número (query livre — mais precisa para BR)
+  if (logradouro && numero && cidade) {
+    const partes = [logradouro, numero, bairro, cidade, 'Brasil'].filter(Boolean);
+    const q = encodeURIComponent(partes.join(', '));
+    const r1 = await buscarNominatim(`q=${q}`);
+    if (r1) return r1;
   }
 
+  // Tentativa 2: sem número (caso o número não esteja indexado)
+  if (logradouro && cidade) {
+    const partes = [logradouro, bairro, cidade, 'Brasil'].filter(Boolean);
+    const q = encodeURIComponent(partes.join(', '));
+    const r2 = await buscarNominatim(`q=${q}`);
+    if (r2) return r2;
+  }
 
-  const bairroEnc = encodeURIComponent(`${bairro}, ${cidade}, Brasil`);
-  return buscarNominatim(`q=${bairroEnc}`);
+  // Tentativa 3: só pelo CEP
+  if (cepLimpo.length === 8) {
+    const r3 = await buscarNominatim(`postalcode=${cepLimpo}&country=br`);
+    if (r3) return r3;
+  }
+
+  // Fallback: bairro e cidade
+  if (bairro && cidade) {
+    const q = encodeURIComponent(`${bairro}, ${cidade}, Brasil`);
+    return buscarNominatim(`q=${q}`);
+  }
+
+  return null;
 }

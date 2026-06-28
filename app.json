@@ -19,7 +19,12 @@
         "monochromeImage": "./src/assets/images/logothinkmoney.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "VIBRATE"
+      ]
     },
     "web": {
       "output": "static",
@@ -27,6 +32,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "O ThinkMoney precisa da sua localização para alertar zonas de risco financeiro próximas.",
+          "locationWhenInUsePermission": "O ThinkMoney precisa da sua localização para alertar zonas de risco financeiro próximas."
+        }
+      ],
       [
         "expo-notifications",
         {
