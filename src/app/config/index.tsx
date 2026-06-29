@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -16,28 +17,37 @@ import HeaderBack from "../../components/headerBack";
 // Informacoes firebase
 import { avatares } from '@/src/components/auth/escolhaavantar';
 import { auth, db } from '@/src/services/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function App() {
   const router = useRouter();
   const [usuario, setUsuario] = useState<any>(null);
+  const [controleAvancado, setControleAvancado] = useState(false);
 
   useEffect(() => {
     async function carregarDados() {
-      const uid = auth.currentUser?.uid; // ✅ pega o usuário logado
-
+      const uid = auth.currentUser?.uid;
       if (!uid) return;
 
       const docRef = doc(db, 'usuarios', uid);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setUsuario(docSnap.data());
+        const dados = docSnap.data();
+        setUsuario(dados);
+        setControleAvancado(dados?.controleAvancado ?? false);
       }
     }
 
     carregarDados();
   }, []);
+
+  async function toggleControleAvancado(valor: boolean) {
+    setControleAvancado(valor);
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    await updateDoc(doc(db, 'usuarios', uid), { controleAvancado: valor });
+  }
 
 
   const avatarKey = (usuario?.avatar || 1) as keyof typeof avatares;
@@ -126,6 +136,24 @@ export default function App() {
               </View>
               <Text style={styles.rowValue}>•⁠•⁠•⁠•⁠•⁠•⁠</Text>
             </View>
+          </View>
+
+          <View style={styles.controleAvancadoCard}>
+            <View style={styles.controleAvancadoLeft}>
+              <Ionicons name="navigate-circle-outline" size={24} color="#4ADE80" />
+              <View style={{ marginLeft: 12, flexShrink: 1 }}>
+                <Text style={styles.controleAvancadoTitulo}>Controle Avançado</Text>
+                <Text style={styles.controleAvancadoDesc}>
+                  Monitora localização em tempo real e alerta zonas de risco
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={controleAvancado}
+              onValueChange={toggleControleAvancado}
+              trackColor={{ false: '#3D3478', true: '#34D399' }}
+              thumbColor={controleAvancado ? '#ffffff' : '#94A3B8'}
+            />
           </View>
 
           <TouchableOpacity onPress={() => router.push("./config/editar")}>
@@ -262,5 +290,33 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     height: 40,
+  },
+  controleAvancadoCard: {
+    marginTop: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#281E5D",
+    borderRadius: 15,
+    marginLeft: 20,
+    marginRight: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  controleAvancadoLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 12,
+  },
+  controleAvancadoTitulo: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  controleAvancadoDesc: {
+    color: "#94A3B8",
+    fontSize: 11,
+    marginTop: 2,
   },
 });
